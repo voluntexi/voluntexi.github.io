@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hexo</title>
+  
+  
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2020-10-18T15:27:27.886Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>VolunteXi</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>怎么去发表文章</title>
+    <link href="http://example.com/2020/10/18/%E6%80%8E%E4%B9%88%E5%8E%BB%E5%8F%91%E8%A1%A8%E6%96%87%E7%AB%A0/"/>
+    <id>http://example.com/2020/10/18/%E6%80%8E%E4%B9%88%E5%8E%BB%E5%8F%91%E8%A1%A8%E6%96%87%E7%AB%A0/</id>
+    <published>2020-10-18T13:34:48.000Z</published>
+    <updated>2020-10-18T15:27:27.886Z</updated>
+    
+    <content type="html"><![CDATA[<p>1、新建一篇文章<br>(1）在hexo博客目录下，进入Git Bash命令窗口中，输入以下命令：<br>hexo new “怎么去发表文章”<br>(2）在博客目录下的/source/_posts/ 文件夹下，可以看到已经生成了标题为(在这里.md)的博客文件：<br>如图所示：<br>(3）在（怎么去发表文章.md）文件中编辑自己的博客文章即可。<br>注意：Hexo 发布的文章是 Markdown 格式的文件<br>2、给文章添加分类和标签<br>(1) 在（怎么去发表文章.md）文件中设置tags和categories属性：</p><a id="more"></a><p>3、启动服务器，本地测试<br>4、添加“阅读全文”按钮<br>方法一：输入”&lt;!–more&gt;”在文章任意你想添加的位置添加即可</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;1、新建一篇文章&lt;br&gt;(1）在hexo博客目录下，进入Git Bash命令窗口中，输入以下命令：&lt;br&gt;hexo new “怎么去发表文章”&lt;br&gt;(2）在博客目录下的/source/_posts/ 文件夹下，可以看到已经生成了标题为(在这里.md)的博客文件：&lt;br&gt;如图所示：&lt;br&gt;(3）在（怎么去发表文章.md）文件中编辑自己的博客文章即可。&lt;br&gt;注意：Hexo 发布的文章是 Markdown 格式的文件&lt;br&gt;2、给文章添加分类和标签&lt;br&gt;(1) 在（怎么去发表文章.md）文件中设置tags和categories属性：&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="教程" scheme="http://example.com/tags/%E6%95%99%E7%A8%8B/"/>
+    
+  </entry>
+  
+</feed>
