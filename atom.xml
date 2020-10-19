@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2020-10-19T06:09:04.087Z</updated>
+  <updated>2020-10-19T10:01:10.102Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JAVA为什么需要String args[]</title>
+    <link href="http://example.com/2020/10/19/java/"/>
+    <id>http://example.com/2020/10/19/java/</id>
+    <published>2020-10-19T09:54:56.000Z</published>
+    <updated>2020-10-19T10:01:10.102Z</updated>
+    
+    <content type="html"><![CDATA[<p>String args[]或者String[] args表示给主方法传一个字符串数组.</p><p>而args是一个字符串数组的变量名，不是关键字，</p><p>是arguments的缩写，只是一个默认名，一般都习惯性照写.</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Example</span></span>&#123;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</span><br><span class="line"></span><br><span class="line"> System.out.println(<span class="string">&quot;This is a simple Java program.&quot;</span>);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><strong>Q1:既然String args[]或者String[] args表示给主方法传一个字符串数组，那么</strong></p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(args[]);</span><br></pre></td></tr></table></figure><p>为什么是错误，args[]不就是那个字符串This is a simple Java program吗？</p><p>Args[]不和println有关</p><p>Args[]是保存运行main函数时候所输入的参数</p><p>例如main函数所在的类名为test  那么你在cmd运行  java  test  a  b  c  时，args[0]  =  a  ,args[1]=b,  args[2]=c   你就可以在你的程序中调用你输入的这些变量了。</p><p><strong>Q2:如果没关系，为什么程序中去掉String args[]会出现错误？</strong></p><p>java中不存在不带args[]的main函数，如果去掉这就不是主函数main了 所以出错</p><p>Java入口程序规定的方法必须是静态方法，方法名必须为main，括号内的参数必须是String数组。</p><p><strong>因为java是一个面向对象的语言所以第一个要创建类</strong></p><p><strong>Public class  XX</strong></p><p>公共   定义类 类名</p><p><strong>Public static void      main（string[]args）</strong></p><p>公共   静态  无返回值   入口函数</p><p>写了一个测试程序，在Eclipse上运行，以往都是点击一下运行就行了，今天试了几次都不行，然后把放到命令行去运行（cmd那个），编译：javac Test.java 运行：java Test hello world 显示：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">args[0] is hello</span><br><span class="line"></span><br><span class="line">args[1] is world</span><br><span class="line"></span><br><span class="line">args[2] is</span><br></pre></td></tr></table></figure><p>是可以运行的，心想：Eclipse这么强大这个肯定可以办到，后来网上一查，其实很简单，就是打开Run里面的Debug configuration，里面的arguments里输入你想要输入的参数，然后保存，出来点击运行按钮，OK</p><p><img src="/2020/10/19/java/1603101418115.png" alt="1603101418115"></p><p>结果出来了，显示的是刚刚输入的参数</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">args[0] is hello</span><br><span class="line"></span><br><span class="line">args[1] is world</span><br><span class="line"></span><br><span class="line">args[2] is</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;String args[]或者String[] args表示给主方法传一个字符串数组.&lt;/p&gt;
+&lt;p&gt;而args是一个字符串数组的变量名，不是关键字，&lt;/p&gt;
+&lt;p&gt;是arguments的缩写，只是一个默认名，一般都习惯性照写.&lt;/p&gt;
+&lt;figure class=&quot;hig</summary>
+      
+    
+    
+    
+    <category term="JAVA" scheme="http://example.com/categories/JAVA/"/>
+    
+    
+    <category term="JAVA" scheme="http://example.com/tags/JAVA/"/>
+    
+    <category term="语法详解" scheme="http://example.com/tags/%E8%AF%AD%E6%B3%95%E8%AF%A6%E8%A7%A3/"/>
+    
+  </entry>
   
   <entry>
     <title>题解：动态规划:分割等和子集</title>
