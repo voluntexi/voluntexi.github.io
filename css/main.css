@@ -2203,6 +2203,10 @@ pre code {
 .post-reward div span {
   display: block;
 }
+.post-reward div:hover span {
+  animation: next-roll 0.1s infinite linear;
+  pointer-events: none;
+}
 .post-reward img {
   display: inline-block;
   margin: 0.8em 2em 0 2em;
@@ -2657,7 +2661,7 @@ ul.breadcrumb li:last-child {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #b06bb0;
+  background: #ff25ff;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
