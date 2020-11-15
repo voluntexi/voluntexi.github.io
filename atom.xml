@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2020-11-07T13:45:39.004Z</updated>
+  <updated>2020-11-15T05:41:33.796Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,60 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>字符串转整数</title>
+    <link href="http://example.com/2020/11/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%95%B4%E6%95%B0/"/>
+    <id>http://example.com/2020/11/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%95%B4%E6%95%B0/</id>
+    <published>2020-11-15T05:23:44.000Z</published>
+    <updated>2020-11-15T05:41:33.796Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/2020/11/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%95%B4%E6%95%B0/image-20201115132632337.png" alt="image-20201115132632337"></p><p> <strong>最近刚学了正则表达式和STL就碰见了这道题</strong></p><p>在没学习正则和STL之前 我可能会直接<font color="red"><strong>暴力遍历</strong></font>提取把~</p><p>但是现在有了更为巧妙的两种方法</p><p>挺有意思的~</p><h1 id="方法一：正则表达式"><a href="#方法一：正则表达式" class="headerlink" title="方法一：正则表达式"></a><strong>方法一：正则表达式</strong></h1><p>这里引用一下正则表达式的说明：正则表达式(regular expression)描述了一种字符串匹配的模式（pattern），可以用来检查一个串是否含有某种子串、将匹配的子串替换或者从某个串中取出符合某个条件的子串等。</p><p>真的很强大，感兴趣可以学习一哈哈~~</p><p>思路</p><ul><li><p>先将字符串左侧的空格去除</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(str[<span class="number">0</span>]==<span class="string">&#x27; &#x27;</span>) str.erase(<span class="number">0</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure></li><li><p>利用正则表达式提取</p></li></ul>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">smatch tmpMatch;<span class="comment">//储存匹配的正则</span></span><br><span class="line"></span><br><span class="line"><span class="function">regex <span class="title">tmpRegex</span><span class="params">(<span class="string">&quot;^[\\+\\-\\d]\\d*&quot;</span>)</span></span>; <span class="comment">//c++中要用\\进行转义</span></span><br><span class="line"></span><br><span class="line">regex_search(str, tmpMatch, tmpRegex);<span class="comment">//提取</span></span><br></pre></td></tr></table></figure><ul><li><p>转化成long</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Stringstream ss;<span class="comment">//流 </span></span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> tmpStr = tmpMatch[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">ss &lt;&lt; tmpStr;</span><br><span class="line"></span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; tmpStr &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">long</span> longResult;</span><br><span class="line"></span><br><span class="line">ss &gt;&gt; longResult;</span><br></pre></td></tr></table></figure></li></ul><ul><li><p>判断是否越界</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result = max(min(longResult, <span class="keyword">long</span>(INT_MAX)), <span class="keyword">long</span>(INT_MIN));</span><br></pre></td></tr></table></figure></li><li><p>返回值 result</p><a id="more"></a><h1 id="方法二：直接使用输入输出流"><a href="#方法二：直接使用输入输出流" class="headerlink" title="方法二：直接使用输入输出流"></a><strong>方法二：直接使用输入输出流</strong></h1></li></ul><p><font color="red"><strong>这就是STL的魅力~</strong></font></p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(s.size()==<span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">   <span class="built_in">stringstream</span> a;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">   a&lt;&lt;s;</span><br><span class="line"></span><br><span class="line">   a&gt;&gt;n;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">return</span> n;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/2020/11/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%95%B4%E6%95%B0/image-20201115132632337.png&quot; alt=&quot;image-20201115132632337&quot;&gt;&lt;/p&gt;
+&lt;p&gt; &lt;strong&gt;最近刚学了正则表达式和STL就碰见了这道题&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;在没学习正则和STL之前 我可能会直接&lt;font color=&quot;red&quot;&gt;&lt;strong&gt;暴力遍历&lt;/strong&gt;&lt;/font&gt;提取把~&lt;/p&gt;
+&lt;p&gt;但是现在有了更为巧妙的两种方法&lt;/p&gt;
+&lt;p&gt;挺有意思的~&lt;/p&gt;
+&lt;h1 id=&quot;方法一：正则表达式&quot;&gt;&lt;a href=&quot;#方法一：正则表达式&quot; class=&quot;headerlink&quot; title=&quot;方法一：正则表达式&quot;&gt;&lt;/a&gt;&lt;strong&gt;方法一：正则表达式&lt;/strong&gt;&lt;/h1&gt;&lt;p&gt;这里引用一下正则表达式的说明：正则表达式(regular expression)描述了一种字符串匹配的模式（pattern），可以用来检查一个串是否含有某种子串、将匹配的子串替换或者从某个串中取出符合某个条件的子串等。&lt;/p&gt;
+&lt;p&gt;真的很强大，感兴趣可以学习一哈哈~~&lt;/p&gt;
+&lt;p&gt;思路&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;先将字符串左侧的空格去除&lt;/p&gt;
+&lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(str[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;]==&lt;span class=&quot;string&quot;&gt;&amp;#x27; &amp;#x27;&lt;/span&gt;) str.erase(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;,&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;);&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;利用正则表达式提取&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+  &lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;smatch tmpMatch;&lt;span class=&quot;comment&quot;&gt;//储存匹配的正则&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;regex &lt;span class=&quot;title&quot;&gt;tmpRegex&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;string&quot;&gt;&amp;quot;^[\\+\\-\\d]\\d*&amp;quot;&lt;/span&gt;)&lt;/span&gt;&lt;/span&gt;; &lt;span class=&quot;comment&quot;&gt;//c++中要用\\进行转义&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;regex_search(str, tmpMatch, tmpRegex);&lt;span class=&quot;comment&quot;&gt;//提取&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;转化成long&lt;/p&gt;
+&lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;Stringstream ss;&lt;span class=&quot;comment&quot;&gt;//流 &lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;string&lt;/span&gt; tmpStr = tmpMatch[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;];&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ss &amp;lt;&amp;lt; tmpStr;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;cout&lt;/span&gt; &amp;lt;&amp;lt; tmpStr &amp;lt;&amp;lt; &lt;span class=&quot;built_in&quot;&gt;endl&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;long&lt;/span&gt; longResult;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ss &amp;gt;&amp;gt; longResult;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;判断是否越界&lt;/p&gt;
+&lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;result = max(min(longResult, &lt;span class=&quot;keyword&quot;&gt;long&lt;/span&gt;(INT_MAX)), &lt;span class=&quot;keyword&quot;&gt;long&lt;/span&gt;(INT_MIN));&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;返回值 result&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="数据结构" scheme="http://example.com/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+    
+    <category term="算法" scheme="http://example.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+    <category term="题解" scheme="http://example.com/tags/%E9%A2%98%E8%A7%A3/"/>
+    
+    <category term="STL" scheme="http://example.com/tags/STL/"/>
+    
+  </entry>
   
   <entry>
     <title>题解：区间的个数</title>
