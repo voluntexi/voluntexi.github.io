@@ -1,0 +1,425 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三届“传智杯”全国大学生IT技能大赛（初赛B组）个人题解 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1743762265924">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="第三届“传智杯”全国大学生IT技能大赛（初赛B组）个人题解 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="题也不算难，因为第一次打比赛，所以也有失误 。
+
+总结
+这次算是第一次在洛谷OJ打比赛，之前一直在LeetCode刷题，这两个平台提交代码类型不一样，
+导致我没有适应过来洛谷的比赛环境，所以一直在疯狂出错，而比赛提交错误又有罚时，所以......" />
+    <meta name="keywords" content="算法" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1743762265924" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              第三届“传智杯”全国大学生IT技能大赛（初赛B组）个人题解
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-12-23
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Er6OWlLlY/" class="post-tag">
+                  # 算法
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="http://dasai.ityxb.com/images/sybox1_img1.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>题也不算难，因为第一次打比赛，所以也有失误 。</p>
+<!-- more -->
+<h2 id="总结">总结</h2>
+<p>这次算是第一次在洛谷OJ打比赛，之前一直在LeetCode刷题，这两个平台提交代码类型不一样，</p>
+<p>导致我没有适应过来洛谷的比赛环境，所以一直在疯狂出错，而比赛提交错误又有罚时，所以...</p>
+<p>总结了一下自己的不足：</p>
+<ul>
+<li>
+<p>比赛环境不熟悉导致程序一些库的调用、一些语法细节错误</p>
+</li>
+<li>
+<p>做题过程中太过着急，导致了程序没有验证就提交</p>
+</li>
+<li>
+<p>因为题目主办方数据的错误，导致一直在纠结题而错过了后面的题的计算<font  color=red >（这不是我的锅）</font></p>
+<!--more-->
+</li>
+</ul>
+<h2 id="题解">题解</h2>
+<ul>
+<li><strong>第一题</strong></li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1655960247810.png" alt="" loading="lazy">!</p>
+<p>这算是一道热身题吧~直接写就Vans</p>
+<p>题解如下：</p>
+<pre><code class="language-c++">#include&lt;iostream&gt;
+using namespace std;
+int main()
+{
+   int n,v,m,a;
+   cin&gt;&gt;n&gt;&gt;v&gt;&gt;m&gt;&gt;a;
+   int sum=0;
+   int lost=n%m;
+   for(int i=0;i&lt;(n/m);i++)
+   {
+      sum+=(v*m);
+      v=v+a;
+   }
+   sum+=(lost*v);
+   printf(&quot;%d&quot;,sum);
+   return 0;
+}
+</code></pre>
+<ul>
+<li><strong>第二题</strong></li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1655960034418.png" alt="" loading="lazy">!</p>
+<p>但是这道题有一个BUG</p>
+<p>就是按照题目的意思来做的话，会出现这样的一个现象：</p>
+<p><strong>如果分数为36~60这个区间，绩点居然比考60分的高？</strong></p>
+<p>（WTF ?那干脆不及格算了，还要什么60分万岁）</p>
+<p>刚开始我就没想到这个点，认为了36~60这个区间的绩点是1.0</p>
+<p>呵呵。。你不知道我这道题罚时了多少</p>
+<p>题解如下：</p>
+<pre><code class="language-C++">#include&lt;iostream&gt;
+#include&lt;math.h&gt;
+using namespace std;
+int main()
+{
+   int sco;
+   cin&gt;&gt;sco;
+   if (sco&gt;90)
+   {
+      float c=4.0f;
+      printf(&quot;%.1f&quot;,c);
+   }
+   else if(sco&gt;=60)
+   {
+      float l=4.0f-(90-sco)*0.1f;
+      printf(&quot;%.1f&quot;,l);
+   }
+   else
+   {
+      float c=(float)sqrt(sco)*10;
+      int a=(int)c;
+      float l=4.0f-(90-a)*0.1f;
+      a &gt;= 60?printf(&quot;%.1f&quot;, l):printf(&quot;%.1f&quot;, 0.0f);
+   }
+   return 0;
+}
+</code></pre>
+<ul>
+<li><strong>第三题</strong></li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1655960040162.png" alt="" loading="lazy">  !</p>
+<p>思路是挺简单的，创建一个二维数组然后无脑sort函数就行了。</p>
+<p><strong>注意判断贡献度、工作时间、志愿者编号就OK了。</strong></p>
+<p>题解如下：</p>
+<pre><code class="language-C++">#include&lt;iostream&gt;
+#include&lt;algorithm&gt;
+#include&lt;vector&gt;
+int main()
+{
+   int n;
+   scanf(&quot;%d&quot;,&amp;n);
+   std::vector&lt;std::vector&lt;int&gt;&gt;num(n,std::vector&lt;int&gt;(3));
+   for (int i=0;i&lt;n;i++)
+   {   
+      num[i][0]=i+1;
+      scanf(&quot;%d  %d&quot;,&amp;num[i][1],&amp;num[i][2]);
+   }
+   sort(num.begin(),num.end(),[&amp;](const std::vector&lt;int&gt;&amp;a,const std::vector&lt;int&gt;&amp;b)
+   {
+      if ((a[1]*a[2])==(b[1]*b[2]))
+         return a[2] == b[2]? a[0] &lt; b[0]:a[1] &gt; b[1];
+      else
+         return (a[1]*a[2])&gt;(b[1]*b[2]);
+   });
+   for(int i=0;i&lt;n;i++)
+      printf(&quot;%d &quot;,num[i][0]);
+   return 0;
+}
+</code></pre>
+<ul>
+<li><strong>第四题</strong></li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1655960045235.png" alt="" loading="lazy">  !</p>
+<p><strong>各单位注意！！本次比赛最“坑”的题目出现了，注意躲避</strong></p>
+<p>怎么坑呢？主办方数据给错了。<strong>导致你就算是正确的答案都没办法通过</strong></p>
+<p>而傻傻的我~独自在寒风中和这道题硬刚了一个小时</p>
+<p>结果就是纵使我的答案是正确的，但是这道题一直没做出来，而且导致最后一道题也没时间做了。。。。</p>
+<p><strong>（原来我才是那个小丑🤡）</strong></p>
+<p>题解如下：</p>
+<pre><code class="language-c++">#include&lt;iostream&gt;
+#include&lt;string&gt;
+#include&lt;math.h&gt;
+#include&lt;vector&gt;
+#include&lt;sstream&gt;
+using namespace std;
+int main()
+{
+   string si;
+   getline(cin, si);
+   vector&lt;string&gt;q;
+   int c=atoi(si.c_str());
+   for(int i=0;i&lt;c;i++)
+   {
+      string s;
+      getline(cin,s);
+      vector&lt;string&gt;l;
+      string result;
+      stringstream input(s);
+      while (input &gt;&gt; result)
+         l.push_back(result);
+      if(l[0]==&quot;touch&quot;)
+      {
+         string c = l[1];
+         q.push_back(c);
+      }
+      else if(l[0]==&quot;rename&quot;)
+      {
+         for(int i=0;i&lt;q.size();i++)
+            if (q[i] == l[1])
+		    q[i] = l[2];
+      }
+      else if (l[0] == &quot;ls&quot;)
+      {
+         if (q.size() == 0) 
+            cout &lt;&lt; &quot; &quot; &lt;&lt; endl;
+	else
+	   for (int i = 0; i &lt; q.size(); i++)
+	      cout &lt;&lt; q[i] &lt;&lt; endl;
+      }
+      else if (l[0] == &quot;rm&quot;)
+      {
+         for (auto it = q.begin(); it != q.end();)
+            *it == l[1]?it = q.erase(it):++it;
+      }
+   }
+   return 0;
+}
+</code></pre>
+<p>题解在输入数据的那段代码有瑕疵，我当时过多的纠结输入的问题了</p>
+<p>（因为我以为不通过程序是输入的原因）</p>
+<p>不过嘛，瑕不掩瑜~~凑合看看</p>
+<ul>
+<li><strong>第五题</strong></li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1655960051639.png" alt="" loading="lazy">!</p>
+<p>好了，到了这道因为时间而没做的题目了。</p>
+<p>在比赛结束后，我研究了一下这道题</p>
+<p>思路挺简单的，DFS模拟每次摇骰子就可以了</p>
+<p><font  color=red >注意骰子总数是<strong>long long int</strong> 类型</font></p>
+<p>题解如下：</p>
+<pre><code class="language-C++">#include&lt;iostream&gt;
+#include&lt;math.h&gt;
+using namespace std;
+int n, k; 
+void dfs(long long int num,int &amp;count,int res)
+{
+   if (res==n)
+   {
+      if(num%k==0)
+	  count =(count+1)% 1000000007;
+   }
+   else
+   {
+      res++;
+      for (int i=1;i&lt;=6;i++)
+	  dfs(num * 10+i,count,res);
+   }
+}
+int main()
+{
+   cin &gt;&gt;n&gt;&gt;k;
+   int count=0;
+   dfs(0,count,0);
+   cout &lt;&lt;count;
+   return 0;
+}
+</code></pre>
+<h4 id="这次算是给自己提升一下比赛经验吧希望下次不会再当小丑了">这次算是给自己提升一下比赛经验吧，希望下次不会再当小丑🤡了</h4>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+<li><a href="#%E9%A2%98%E8%A7%A3">题解</a><br>
+*
+<ul>
+<li><a href="#%E8%BF%99%E6%AC%A1%E7%AE%97%E6%98%AF%E7%BB%99%E8%87%AA%E5%B7%B1%E6%8F%90%E5%8D%87%E4%B8%80%E4%B8%8B%E6%AF%94%E8%B5%9B%E7%BB%8F%E9%AA%8C%E5%90%A7%E5%B8%8C%E6%9C%9B%E4%B8%8B%E6%AC%A1%E4%B8%8D%E4%BC%9A%E5%86%8D%E5%BD%93%E5%B0%8F%E4%B8%91%E4%BA%86">这次算是给自己提升一下比赛经验吧，希望下次不会再当小丑🤡了</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/zi-fu-chuan-zhuan-zheng-shu/">
+              <h3 class="post-title">
+                题解：字符串转整数
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
