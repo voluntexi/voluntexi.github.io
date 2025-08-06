@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://voluntexi.github.io/</id>
+    <title>威伦特</title>
+    <updated>2025-08-06T13:05:17.881Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://voluntexi.github.io/"/>
+    <link rel="self" href="https://voluntexi.github.io/atom.xml"/>
+    <subtitle>解码生命</subtitle>
+    <logo>https://voluntexi.github.io/images/avatar.png</logo>
+    <icon>https://voluntexi.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2025, 威伦特</rights>
+    <entry>
+        <title type="html"><![CDATA[Whisper：Robust Speech Recognition via Large-Scale Weak Supervision]]></title>
+        <id>https://voluntexi.github.io/whisper/</id>
+        <link href="https://voluntexi.github.io/whisper/">
+        </link>
+        <updated>2025-08-06T12:04:17.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近有语音识别方言方面的需求，由于之前没有接触到过这个领域，遂深入了解一下Open AI发布的语音识别模型Whisper</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近有语音识别方言方面的需求，由于之前没有接触到过这个领域，遂深入了解一下Open AI发布的语音识别模型Whisper</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[LMCache]]></title>
+        <id>https://voluntexi.github.io/lmcache/</id>
+        <link href="https://voluntexi.github.io/lmcache/">
+        </link>
+        <updated>2025-07-19T11:16:14.000Z</updated>
+        <summary type="html"><![CDATA[<p>想要大模型在通用性上获得更好的效果，就需要让大模型对更多的领域知识进行“补充”。</p>
+<p>《Do Large Language Models Need a Content Delivery Network》论文提出了 KDN（Knowledge Delivery Network），简单来说就是对输入进行“缓存”，从而提升模型首个 Token 响应时间，并将 KDN 开源为 <strong>LMCache</strong>（https://github.com/LMCache/LMCache）</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>想要大模型在通用性上获得更好的效果，就需要让大模型对更多的领域知识进行“补充”。</p>
+<p>《Do Large Language Models Need a Content Delivery Network》论文提出了 KDN（Knowledge Delivery Network），简单来说就是对输入进行“缓存”，从而提升模型首个 Token 响应时间，并将 KDN 开源为 <strong>LMCache</strong>（https://github.com/LMCache/LMCache）</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MCP && Function Calling]]></title>
+        <id>https://voluntexi.github.io/mcp-and-function-calling/</id>
+        <link href="https://voluntexi.github.io/mcp-and-function-calling/">
+        </link>
+        <updated>2025-05-26T05:16:18.000Z</updated>
+        <summary type="html"><![CDATA[<p>Function Calling 和 MCP 通过一组外部工具，帮助 LLM 获取其<strong>无法直接知晓的信息</strong>或者<strong>难以执行的操作</strong>。本文分别对他们进行说明，并对比异同</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>Function Calling 和 MCP 通过一组外部工具，帮助 LLM 获取其<strong>无法直接知晓的信息</strong>或者<strong>难以执行的操作</strong>。本文分别对他们进行说明，并对比异同</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[KV Cache]]></title>
+        <id>https://voluntexi.github.io/kv-cache/</id>
+        <link href="https://voluntexi.github.io/kv-cache/">
+        </link>
+        <updated>2025-03-11T06:01:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[正确使用 ORDER BY + LIMIT]]></title>
+        <id>https://voluntexi.github.io/zheng-que-shi-yong-order-by-limit/</id>
+        <link href="https://voluntexi.github.io/zheng-que-shi-yong-order-by-limit/">
+        </link>
+        <updated>2024-08-20T07:54:21.000Z</updated>
+        <summary type="html"><![CDATA[<p>当我们想在分页查询中对数据进行排序展示时，通常会使用 <code>ORDER BY</code> 进行排序。然而，当用于排序的字段并非唯一时，可能会在翻页时遇到数据重复的问题，下面是对这个问题的具体分析和解决方案。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>当我们想在分页查询中对数据进行排序展示时，通常会使用 <code>ORDER BY</code> 进行排序。然而，当用于排序的字段并非唯一时，可能会在翻页时遇到数据重复的问题，下面是对这个问题的具体分析和解决方案。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Prompt Learning]]></title>
+        <id>https://voluntexi.github.io/prompt-learning/</id>
+        <link href="https://voluntexi.github.io/prompt-learning/">
+        </link>
+        <updated>2023-12-12T14:01:05.000Z</updated>
+        <summary type="html"><![CDATA[<p><strong>Prompt Learning 的本质就是将所有下游任务统一成预训练任务；</strong> 以特定的模板，将下游任务的数据转成自然语言形式，从而充分挖掘预训练语言模型本身的能力。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p><strong>Prompt Learning 的本质就是将所有下游任务统一成预训练任务；</strong> 以特定的模板，将下游任务的数据转成自然语言形式，从而充分挖掘预训练语言模型本身的能力。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Less is More for Long Document Summary Evaluation by LLMs]]></title>
+        <id>https://voluntexi.github.io/less-is-more/</id>
+        <link href="https://voluntexi.github.io/less-is-more/">
+        </link>
+        <updated>2023-10-09T08:51:46.000Z</updated>
+        <summary type="html"><![CDATA[<p>这篇文章给了我们一种如何在自己研究的领域去&quot;蹭&quot;大模型热度的思路</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>这篇文章给了我们一种如何在自己研究的领域去&quot;蹭&quot;大模型热度的思路</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Generating EDU Extracts for Plan-Guided Summary Re-Ranking]]></title>
+        <id>https://voluntexi.github.io/PGA/</id>
+        <link href="https://voluntexi.github.io/PGA/">
+        </link>
+        <updated>2023-09-09T08:21:25.000Z</updated>
+        <summary type="html"><![CDATA[<p>这篇文章是在我之前介绍的<strong>BRIO模型（<a href="https://voluntexi.github.io/brio/">BRIO | 威伦特 (voluntexi.github.io)</a>）<strong>的基础上改进的，模型的整体框架也是采用两步式摘要，即结合</strong>生成候选摘要</strong>和<strong>评估候选摘要</strong>两个阶段来获得最佳摘要。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>这篇文章是在我之前介绍的<strong>BRIO模型（<a href="https://voluntexi.github.io/brio/">BRIO | 威伦特 (voluntexi.github.io)</a>）<strong>的基础上改进的，模型的整体框架也是采用两步式摘要，即结合</strong>生成候选摘要</strong>和<strong>评估候选摘要</strong>两个阶段来获得最佳摘要。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Copy is All You Need]]></title>
+        <id>https://voluntexi.github.io/copy-is-all-you-need/</id>
+        <link href="https://voluntexi.github.io/copy-is-all-you-need/">
+        </link>
+        <updated>2023-08-21T09:48:54.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近在<a href="https://paperswithcode.com/">paper with code</a>刷论文的时候，看到了一个很唬人的文章“《Copy is All You Need》”，遂找来研读研读，发现内容还是很有意思，准备写一篇阅读笔记的，偶然发现了这篇文章作者的采访稿，将文章背后的故事都介绍的挺详细的。于是乎转载一下（不是偷懒）</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近在<a href="https://paperswithcode.com/">paper with code</a>刷论文的时候，看到了一个很唬人的文章“《Copy is All You Need》”，遂找来研读研读，发现内容还是很有意思，准备写一篇阅读笔记的，偶然发现了这篇文章作者的采访稿，将文章背后的故事都介绍的挺详细的。于是乎转载一下（不是偷懒）</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ LONGNET: Scaling Transformers to 1,000,000,000 Tokens]]></title>
+        <id>https://voluntexi.github.io/longnet/</id>
+        <link href="https://voluntexi.github.io/longnet/">
+        </link>
+        <updated>2023-07-21T11:32:15.000Z</updated>
+        <summary type="html"><![CDATA[<p>前段时间刚介绍了能使模型处理上下文扩展到百万级别的方法，现在微软又提出了一种能扩展到十亿级别的方法（不过有标题党的嫌疑，因为在实验中作者只扩展到了百万级别）</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>前段时间刚介绍了能使模型处理上下文扩展到百万级别的方法，现在微软又提出了一种能扩展到十亿级别的方法（不过有标题党的嫌疑，因为在实验中作者只扩展到了百万级别）</p>
+]]></content>
+    </entry>
+</feed>
