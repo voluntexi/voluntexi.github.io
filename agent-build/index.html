@@ -1,0 +1,868 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agent 三大构建范式解析 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Agent 三大构建范式解析 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="今年年初Manus引爆了Agent概念，随着越来越多的厂商开发发布自己的Agent，Agent逐渐的走进了大众的视野，今年可谓是Agent元年。而对于我们想要尝试构建自己的Agent，除开从Coze、Dify、星辰智能体平台等平台构建，还可..." />
+    <meta name="keywords" content="Agent,大模型" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Agent 三大构建范式解析
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-12-07
+              </span>
+              <span>
+                25 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/agent/" class="post-tag">
+                  # Agent
+                </a>
+              
+                <a href="https://voluntexi.github.io/da-mo-xing/" class="post-tag">
+                  # 大模型
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/agent-build.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>今年年初Manus引爆了Agent概念，随着越来越多的厂商开发发布自己的Agent，Agent逐渐的走进了大众的视野，今年可谓是<u>Agent元年</u>。而对于我们想要尝试构建自己的Agent，除开从Coze、Dify、星辰智能体平台等平台构建，还可以通过调用API通过提示词来进行进行构建。（微调不起了...）为了让大家更好的做出自己的Agent，本文主要讲解构建Agent 的经典三大范式：ReAct、Plan-and-Solve和Relection。</p>
+<!-- more -->
+<h2 id="概述">概述</h2>
+<p>一个现代的Agent，其核心能力在于能将大语言模型的推理能力与外部世界联通。它能够自主地理解用户意图、拆解复杂任务，并通过调用代码解释器、搜索引擎、API等一系列“工具”，来获取信息、执行操作，最终达成目标。 然而，Agent并非万能，它同样面临着来自大模型本身的“幻觉”问题、在复杂任务中可能陷入推理循环、以及对工具的错误使用等挑战，这些也构成了智能体的能力边界。<br>
+为了更好地组织智能体的“思考”与“行动”过程，业界涌现出了多种经典的架构范式。本文将聚焦于其中最具代表性的三种经典构建范式：</p>
+<ul>
+<li>
+<p>ReAct (Reasoning and Acting)： 一种将“思考”和“行动”紧密结合的范式，让智能体边想边做，动态调整。</p>
+</li>
+<li>
+<p>Plan-and-Solve： 一种“三思而后行”的范式，让智能体首先生成一个完整的行动计划，然后严格执行。</p>
+</li>
+<li>
+<p>Reflection： 一种赋予智能体“反思”能力的范式，通过自我批判和修正来不断优化结果。</p>
+</li>
+</ul>
+<h2 id="react">ReAct</h2>
+<p>ReAct框架<sup>[1]</sup>于2022年首次提出，在ReAct诞生之前，主流的方法可以分为两类：</p>
+<ul>
+<li>
+<p>一类是“纯思考”型，如思维链 (Chain-of-Thought)，它能引导模型进行复杂的逻辑推理，但无法与外部世界交互，容易产生事实幻觉；</p>
+</li>
+<li>
+<p>另一类是“纯行动”型，模型直接输出要执行的动作，但缺乏规划和纠错能力。</p>
+</li>
+</ul>
+<p>ReAct 架构的则将语言模型的思考能力与行动能力结合起来，通过思考、行动、观察形成一个协同系统，让思考指导行动，而行动的结果又反过来修正思考，知道它在思考中认为已经找到了最终的答案。</p>
+<ul>
+<li>
+<p>Thought(思考)： Agent会分析当前情况、分解任务、制定下一步计划，或者反思上一步的结果。</p>
+</li>
+<li>
+<p>Action (行动)： 这是智能体决定采取的具体动作，通常是调用一个外部工具，</p>
+</li>
+<li>
+<p>Observation (观察)： 这是执行Action 后从外部工具返回的结果。</p>
+</li>
+</ul>
+<p>如下图所示：<br>
+<img src="https://voluntexi.github.io//post-images/1767012423098.jpg" alt="" loading="lazy"></p>
+<p>这种机制特别适用于以下场景：</p>
+<ul>
+<li>
+<p>需要外部知识的任务：如查询实时信息（天气、新闻、股价）、搜索专业领域的知识等。</p>
+</li>
+<li>
+<p>需要精确计算的任务：将数学问题交给计算器工具，避免LLM的计算错误。</p>
+</li>
+<li>
+<p>需要与API交互的任务：如操作数据库、调用某个服务的API来完成特定功能。</p>
+</li>
+</ul>
+<h3 id="实现">实现</h3>
+<p>以构建网页搜索Agent为例：</p>
+<p>首先需要提供一个网页搜索工具，这里选用<strong>SerpApi</strong>，它能直接返回Google搜索结果</p>
+<ol>
+<li>安装该库</li>
+</ol>
+<pre><code class="language-powershell"> pip install google-search-results
+</code></pre>
+<ol start="2">
+<li>前往<strong>SerpApi官网</strong>注册账户，获取API密钥，然后构建<code>search</code>工具函数</li>
+</ol>
+<pre><code class="language-python">from serpapi import SerpApiClient
+
+
+def search(query: str) -&gt; str:
+    &quot;&quot;&quot;
+    解析搜索结果，优先返回直接答案或知识图谱信息。
+    &quot;&quot;&quot;
+    params = {
+        &quot;engine&quot;: &quot;google&quot;,
+        &quot;q&quot;: query,
+        &quot;api_key&quot;: &quot;your_api_key&quot;,
+        &quot;gl&quot;: &quot;cn&quot;,  # 国家代码
+        &quot;hl&quot;: &quot;zh-cn&quot;,  # 语言
+    }
+    client = SerpApiClient(params)
+    results = client.get_dict()
+
+    if &quot;answer_box_list&quot; in results:
+        return &quot;\n&quot;.join(results[&quot;answer_box_list&quot;])
+    if &quot;answer_box&quot; in results and &quot;answer&quot; in results[&quot;answer_box&quot;]:
+        return results[&quot;answer_box&quot;][&quot;answer&quot;]
+    if &quot;knowledge_graph&quot; in results and &quot;description&quot; in results[&quot;knowledge_graph&quot;]:
+        return results[&quot;knowledge_graph&quot;][&quot;description&quot;]
+    if &quot;organic_results&quot; in results and results[&quot;organic_results&quot;]:
+        # 如果没有直接答案，则返回前三个有机结果的摘要
+        snippets = [
+            f&quot;[{i+1}] {res.get('title', '')}\n{res.get('snippet', '')}&quot;
+            for i, res in enumerate(results[&quot;organic_results&quot;][:3])
+        ]
+        return &quot;\n\n&quot;.join(snippets)
+    return f&quot;没有找到关于 '{query}' 的信息。&quot;
+</code></pre>
+<ol start="3">
+<li>构建工具执行器</li>
+</ol>
+<pre><code class="language-python">class ToolExecutor:
+    def __init__(self):
+        self.tools: dict[str, dict[str, any]] = {}
+
+    def registerTool(self, name: str, description: str, func: callable):
+        self.tools[name] = {&quot;description&quot;: description, &quot;func&quot;: func}
+        print(f&quot;工具 '{name}' 已注册。&quot;)
+
+    def getTool(self, name: str) -&gt; callable:
+        return self.tools.get(name, {}).get(&quot;func&quot;)
+
+    def getAvailableTools(self) -&gt; str:
+        return &quot;\n&quot;.join(
+            [f&quot;- {name}: {info['description']}&quot; for name, info in self.tools.items()]
+        )
+</code></pre>
+<ol start="4">
+<li>为Agent设计提示词：提示词是整个 ReAct 机制的<strong>核心</strong>，它为大语言模型提供了行动的操作指令。</li>
+</ol>
+<pre><code class="language-python">REACT_PROMPT_TEMPLATE = &quot;&quot;&quot;
+请注意，你是一个有能力调用外部工具的智能助手。
+可用工具如下:
+ {tools}
+请严格按照以下格式进行回应:
+Thought: 你的思考过程，用于分析问题、拆解任务和规划下一步行动。
+Action: 你决定采取的行动，必须是以下格式之一:
+- `tool_name[tool_input]`:调用一个可用工具。
+- `Finish[最终答案]`:当你认为已经获得最终答案时。
+- 当你收集到足够的信息，能够回答用户的最终问题时，你必须在Action:字段后使用 finish(answer=&quot;...&quot;) 来
+输出最终答案。
+现在，请开始解决以下问题:
+ Question: {question}
+ History: {history}
+ &quot;&quot;&quot;
+</code></pre>
+<ol start="5">
+<li>构建<code>ReActAgent</code>类，实现ReAct框架，大模型调用采用的<strong>siliconflow</strong>的API</li>
+</ol>
+<pre><code class="language-python">import re
+from langchain_openai import OpenAI
+
+class ReActAgent:
+    def __init__(
+        self,
+        tool_executor: ToolExecutor,
+        max_steps: int = 5,
+    ):
+        self.llm_client = OpenAI(
+            model=&quot;Qwen/Qwen2.5-7B-Instruct&quot;,
+            temperature=0.5,
+            base_url=&quot;https://api.siliconflow.cn/v1&quot;,
+            api_key=&quot;your_api_key&quot;,
+            streaming=False,
+        )
+        self.tool_executor = tool_executor
+        sel.max_steps = max_steps
+        self.history = []
+
+    def run(self, question: str) -&gt; str:
+        self.history = []  # 每次运行时重置历史记录
+        current_step = 0
+        while current_step &lt; self.max_steps:
+            current_step += 1
+            print(f&quot;--- 第 {current_step} 步 ---&quot;)
+            # 格式化提示词
+            tools_desc = self.tool_executor.getAvailableTools()
+            history_str = &quot;\n&quot;.join(self.history)
+            prompt = REACT_PROMPT_TEMPLATE.format(
+                tools=tools_desc, question=question, history=history_str
+            )
+
+            response_text = self.llm_client.invoke(prompt)
+            thought, action = self._parse_output(response_text)
+
+            if thought:
+                print(f&quot;思考: {thought}&quot;)
+            if not action:
+                print(&quot;警告:未能解析出有效的Action，流程终止。&quot;)
+                break
+            # 执行Action
+            if action.startswith(&quot;Finish&quot;):
+                # 如果是Finish指令，提取最终答案并结束
+                final_answer = re.match(r&quot;Finish\[(.*)\]&quot;, action).group(1)
+                print(f&quot;最终答案: {final_answer}&quot;)
+                return final_answer
+
+            tool_name, tool_input = self._parse_action(action)
+            if not tool_name or not tool_input:
+                # 无效Action格式
+                continue
+            print(f&quot;行动: {tool_name}[{tool_input}]&quot;)
+            tool_function = self.tool_executor.getTool(tool_name)
+            if not tool_function:
+                observation = f&quot;错误:未找到名为 '{tool_name}' 的工具。&quot;
+            else:
+                observation = tool_function(tool_input)  # 调用真实工具
+            print(f&quot; 观察: {observation}&quot;)
+            self.history.append(f&quot;Action: {action}&quot;)
+            self.history.append(f&quot;Observation: {observation}&quot;)
+        print(&quot;已达到最大步数，流程终止。&quot;)
+        return None
+
+    def _parse_output(self, text: str) -&gt; tuple[str | None, str | None]:
+        &quot;&quot;&quot;解析LLM的输出，提取Thought和Action。&quot;&quot;&quot;
+        thought_match = re.search(r&quot;Thought: (.*)&quot;, text)
+        action_match = re.search(r&quot;Action: (.*)&quot;, text)
+        thought = thought_match.group(1).strip() if thought_match else None
+        action = action_match.group(1).strip() if action_match else None
+        return thought, action
+
+    def _parse_action(self, action_text: str) -&gt; tuple[str | None, str | None]:
+        &quot;&quot;&quot;解析Action字符串，提取工具名称和输入。&quot;&quot;&quot;
+        match = re.match(r&quot;(\w+)\[(.*)\]&quot;, action_text)
+        if match:
+            return match.group(1), match.group(2)
+        return None, None
+</code></pre>
+<h3 id="总结">总结</h3>
+<p>ReAct 的优点</p>
+<ul>
+<li>
+<p><strong>高可解释性</strong>：ReAct 最大的优点之一就是透明。通过输出思考过程，我们可以清晰地看到智能体每一步的“心路历程”——它为什么会选择这个工具，下一步又打算做什么。这对于理解、信任和调试智能体的行为至关重要。</p>
+</li>
+<li>
+<p><strong>动态规划与纠错能力</strong>：与一次性生成完整计划的范式不同，ReAct 是“走一步，看一步”。它根据每一步从外部世界获得的观察结果来动态调整后续的过程。如果上一步的搜索结果不理想，它可以在下一步中修正搜索词，重新尝试。</p>
+</li>
+<li>
+<p><strong>工具协同能力</strong>：ReAct 范式天然地将大语言模型的推理能力与外部工具的执行能力结合起来。LLM 负责运筹帷幄（规划和推理），工具负责解决具体问题（搜索、计算），二者协同工作，突破了单一 LLM 在知识时效性、计算准确性等方面的固有局限。</p>
+</li>
+</ul>
+<p>不足：</p>
+<ul>
+<li>
+<p><strong>对LLM自身能力的强依赖</strong>：ReAct 流程的成功与否，高度依赖于底层 LLM 的综合能力。如果 LLM 的逻辑推理环节产生错误的规划，或者在能力、指令遵循能力或格式化输出能力不足，就很容易在节生成不符合格式的指令，导致整个流程出现偏差。</p>
+</li>
+<li>
+<p><strong>执行效率问题</strong>：完成一个任务通常需要多次调用 LLM。每一次调用都伴随着网络延迟<br>
+和计算成本。对于需要很多步骤的复杂任务，这种串行的“思考-行动”循环可能会导致较高的总耗时和费用。</p>
+</li>
+<li>
+<p><strong>对提示词的过分依赖</strong>：整个机制的稳定运行建立在一个精心设计的提示词模板之上。模板中的任何微小变动，甚至是用词的差异，都可能影响 LLM 的行为。此外，并非所有模型都能持续稳定地遵循预设的格式，这增加了在实际应用中的不确定性。</p>
+</li>
+<li>
+<p><strong>可能陷入局部最优</strong>：步进式的决策模式意味着智能体缺乏一个全局的、长远的规划。它可能会选择一个看似正确但长远来看并非最优的路径，甚至在某些情况下陷入“原地打转”的循环中。</p>
+</li>
+</ul>
+<h2 id="plan-and-solve">Plan-And-Solve</h2>
+<p>Plan-And-Solve由Lei Wang在2023年提出<sup>[2]</sup>，名字就很直观的展示出了该方法的思想，即对任务先进行规划，将任务拆分成多个清晰、分步骤的计划，随后再严格按照计划中的步骤，逐一执行。如下图所示：</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1767012435375.jpg" alt="" loading="lazy"></figure>
+<p>Plan-and-Solve 尤其适用于那些结构性强、可以被清晰分解的复杂任务，例如：</p>
+<ul>
+<li>
+<p>多步数学应用题：需要先列出计算步骤，再逐一求解。</p>
+</li>
+<li>
+<p>需要整合多个信息源的报告撰写：需要先规划好报告结构（引言、数据来源A、数据来源B、总结），再逐一填充内容。</p>
+</li>
+<li>
+<p>代码生成任务：需要先构思好函数、类和模块的结构，再逐一实现。</p>
+</li>
+</ul>
+<h3 id="实现-2">实现</h3>
+<p>实现Plan-and-Solve，我们需要调用两次大模型，第一次通过PLAN提示词让大模型生成对应的计划，然后再调用EXECUTOR提示词让大模型逐步执行对应的计划。</p>
+<ol>
+<li>构建PLAN和EXECUTOR的提示词</li>
+</ol>
+<pre><code class="language-python">PLANNER_PROMPT_TEMPLATE = &quot;&quot;&quot;
+你是一个顶级的AI规划专家。你的任务是将用户提出的复杂问题分解成一个由多个简单步骤组成的行动计划，针对数学题不需要进行计算。
+请确保计划中的每个步骤都是一个独立的、可执行的子任务，并且严格按照下面的逻辑顺序排列。
+注意：你的输出有且仅有必须是一个Python列表，其中每个元素都是一个描述子任务的字符串
+问题：{question}
+请严格按照以下格式输出你的计划,```python与```作为前后缀是必要的:
+​```python
+[
+    &quot;提供的步骤&quot;,
+    &quot;提供的步骤&quot;,
+    &quot;提供的步骤&quot;,
+    ...
+]
+
+&quot;&quot;&quot;
+EXECUTOR_PROMPT_TEMPLATE = &quot;&quot;&quot;
+你是一位顶级的AI执行专家。你的任务是严格按照给定的计划，一步步地解决问题。
+你将收到原始问题、完整的计划、以及到目前为止已经完成的步骤和结果。
+请你专注于解决“当前步骤”，并仅输出该步骤的最终答案，不要输出任何额外的解释或对话。
+
+# 原始问题:
+
+{question}
+
+# 完整计划:
+
+{plan}
+
+# 历史步骤与结果:
+
+{history}
+
+# 当前步骤:
+
+{current_step}
+&quot;&quot;&quot;
+</code></pre>
+<ol start="2">
+<li>分别构建 PLAN 大模型和 EXECUTOR大模型，我这里方便用了同一个模型。</li>
+</ol>
+<pre><code class="language-python">from langchain_openai import OpenAI
+class LLM:
+    def __init__(self):
+        self.llm = None
+
+    def chat(self, prompt: str) -&gt; str:
+        response = self.llm.invoke(prompt)
+        return response
+
+
+class ExecutorLLM(LLM):
+    def __init__(self):
+        super().__init__()
+        self.llm = OpenAI(
+            model=&quot;Qwen/Qwen2.5-7B-Instruct&quot;,
+            temperature=0.5,
+            base_url=&quot;https://api.siliconflow.cn/v1&quot;,
+            api_key=&quot;your-api-key&quot;,
+            streaming=False,
+        )
+
+
+class PlanLLM(LLM):
+    def __init__(self):
+        super().__init__()
+        self.llm = OpenAI(
+            model=&quot;Qwen/Qwen2.5-7B-Instruct&quot;,
+            temperature=0.7,
+            base_url=&quot;https://api.siliconflow.cn/v1&quot;,
+            api_key=&quot;your-api-key&quot;,
+            streaming=False,
+        )
+</code></pre>
+<ol start="3">
+<li>生成规划器和执行器</li>
+</ol>
+<pre><code class="language-python">import ast
+class Planer:
+    def __init__(self):
+        self.llm = PlanLLM()
+        self.PROMPT_TEMPLATE = PLANNER_PROMPT_TEMPLATE
+
+    def plan(self, question: str) -&gt; list[str]:
+        prompt = self.PROMPT_TEMPLATE.format(question=question)
+        print(&quot;--- 正在生成计划 ---&quot;)
+        response = self.llm.chat(prompt)
+        return self.parsePlan(response)
+
+    def planWithHistory(
+        self, question: str, plan: list[str], history: str, failed_step_index: int
+    ) -&gt; list[str]:
+        &quot;&quot;&quot;
+        这个函数根据历史执行记录和失败步骤，对后续步骤进行动态重规划。
+        只修改或替换从失败步骤开始到末尾的后续步骤，保持已经完成步骤不变。
+        &quot;&quot;&quot;
+        prompt = f&quot;&quot;&quot;
+        原问题：{question}
+        原始计划：{plan}
+        历史执行记录（包括已完成步骤和对应结果）：{history}
+        说明：在执行过程中第 {plan[failed_step_index]} 这一步遇到了问题，请根据历史和失败原因对后续步骤进行动态重规划。
+        要求：
+        - 保持已经完成步骤不变，只修改或替换从失败步骤开始到末尾的后续步骤。
+        - 输出格式严格为一个 Python 列表（```python ... ```），列表元素为新的后续步骤字符串（包含失败步骤的位置作为第一项）。
+        - 每个步骤要可执行、具体且按顺序排列。
+        请严格只输出计划列表，使用与原 plan() 相同的包裹格式（```python ... ```）。
+        &quot;&quot;&quot;
+        response = self.llm.chat(prompt)
+        return self.parsePlan(response)
+
+    def parsePlan(self, response: str) -&gt; list[str]:
+        try:
+            planList = response.split(&quot;```python&quot;)[1].split(&quot;```&quot;)[0].strip()
+            planList = ast.literal_eval(planList)
+            return planList if isinstance(planList, list) else []
+        except Exception as e:
+            print(&quot;计划解析失败:&quot;, e)
+            return []
+
+
+class Executor:
+    def __init__(self):
+        self.llm = ExecutorLLM()
+        self.PROMPT_TEMPLATE = EXECUTOR_PROMPT_TEMPLATE
+
+    def execute(self, question: str, plan: list[str]) -&gt; str:
+        history = &quot;&quot;
+        response_text = &quot;&quot;
+        print(f&quot;生成的计划如下:{plan}&quot;)
+        for current, step in enumerate(plan):
+            print(f&quot;\n-&gt; 正在执行步骤 {current+1}/{len(plan)}: {step}&quot;)
+            current_step = step
+            prompt = self.PROMPT_TEMPLATE.format(
+                question=question,
+                plan=plan,
+                history=history,
+                current_step=current_step,
+            )
+            response_text = self.llm.chat(prompt)
+            if self.failedStep(response_text):
+                print(f&quot;步骤 {current+1} 执行失败，正在进行动态重规划...&quot;)
+                replan = Planer()
+                while True:
+                    count = 0
+                    new_plan = replan.planWithHistory(question, plan, history, current)
+                    count += 1
+                    if new_plan:
+                        print(f&quot;新的计划生成成功: {new_plan}&quot;)
+                        plan = plan[:current] + new_plan
+                        print(f&quot;更新后的完整计划: {plan}&quot;)
+                        break
+                    elif count &gt; 3:
+                        print(&quot;动态重规划失败，无法继续执行。&quot;)
+                        break
+                    else:
+                        continue
+            history += f&quot;\n步骤{current+1}： {current_step}\n结果: {response_text}\n&quot;
+            print(f&quot;步骤 {current+1} 已完成，结果: {response_text}&quot;)
+        print(&quot;--- 计划执行完毕 ---&quot;)
+        return
+
+    def failedStep(self, response: str) -&gt; bool:
+        if not response or &quot;无法&quot; in response or &quot;不清楚&quot; in response:
+            return True
+</code></pre>
+<ol start="4">
+<li>现在已经分别构建了负责“规划”的 Planner 和负责“执行”的 Executor。最后一步是将这两个组件整合到一个统一的Agent PlanAndSolveAgent 中，并赋予它解决问题的完整能力。</li>
+</ol>
+<pre><code class="language-python">class PlanAndSolveAgent:
+    def __init__(self):
+        self.planner = Planer()
+        self.executor = Executor()
+
+    def run(self, question: str) -&gt; str:
+        print(f&quot;\n--- 开始处理问题 ---\n问题: {question}&quot;)
+        plan = self.planner.plan(question)
+        final_answer = self.executor.execute(question, plan)
+        return final_answer
+</code></pre>
+<h3 id="总结-2">总结</h3>
+<p>Plan-And-Solve特点：</p>
+<ol>
+<li><strong>提高了结果的准确性</strong>：很好的避免了计算错误、遗漏步骤错误和语义理解错误的问题。</li>
+<li><strong>良好的通用性</strong>：Plan-And-Solve方法不仅适用于数学推理问题，还可以扩展到常识推理和符号推理等问题。</li>
+<li><strong>自我一致性评估</strong>：通过自我一致性方法减少了大模型输出的随机性，进一步提高了推理质量。</li>
+</ol>
+<p>不足：</p>
+<ol>
+<li><strong>仍然是对提示词的过分依赖</strong>：引导LLMs生成正确推理步骤的提示需要精心设计，GPT-3模型对提示的表达非常敏感。</li>
+<li><strong>语义理解错误仍然存在</strong>：尽管Plan-And-Solve提示方法可以减少计算错误和遗漏步骤错误，但并没有完全解决语义理解错误的问题。</li>
+</ol>
+<h2 id="reflection">Reflection</h2>
+<p>之前的ReAct和Plan-and-Solve范式，Agent一旦完成了任务，那么整个工作流程便结束了。然而，它们生成的初始答案，无论是行动轨迹还是最终结果，都可能存在谬误或有待改进之处。</p>
+<p>Reflection由Shinn在2023年提出<sup>[3]</sup>，其核心思想，是为Agent引入了一种事后自我校正循环，使其能够像人类一样，审视自己的工作，发现不足，并进行迭代优化。核心工作流程可以概括为一个简洁的三步循环：执行 -&gt; 反思 -&gt; 优化。</p>
+<ul>
+<li>
+<p>执行：首先，使用我们熟悉的方法（如 ReAct 或 Plan-and-Solve）尝试完成任务，生成一个初步的解决方案或行动轨迹。这可以看作是“初稿”。</p>
+</li>
+<li>
+<p>反思：接着，进入反思阶段。调用一个独立的、或者带有特殊提示词的大语言模型实例，来扮演一个“评审员”的角色。这个“评审员”会审视第一步生成的“初稿”，并从多个维度进行评估，生成“反馈”。</p>
+</li>
+<li>
+<p>优化：最后，将“初稿”和“反馈”作为新的上下文，再次调用大语言模型，要求它根据反馈内容对初稿进行修正，如此循环，直至生成一个完善的“修订稿”。</p>
+</li>
+</ul>
+<p>与前两种范式相比，Reflection 的优势在于：</p>
+<ol>
+<li>
+<p>它为智能体提供了一个内部纠错回路，使其不再完全依赖于外部工具的反馈（ReAct 的 Observation），从而能够修正更高层次的逻辑和策略错误。</p>
+</li>
+<li>
+<p>它将一次性的任务执行，转变为一个持续优化的过程，显著提升了复杂任务的最终成功率和答案质量。</p>
+</li>
+<li>
+<p>它为智能体构建了一个临时的“短期记忆”。整个“执行-反思-优化”的轨迹形成了一个宝贵的经验记录，智能体不仅知道最终答案，还记得自己是如何从有缺陷的初稿迭代到最终版本的。</p>
+</li>
+</ol>
+<h3 id="实现-3">实现</h3>
+<p>Reflection 的核心在于迭代，而迭代的前提是能够<strong>记住之前的尝试和获得的反馈</strong>。因此，一个“短期记忆”模块是实现该范式的必需品。这个记忆模块将负责存储每一次“执行-反思”循环的完整轨迹。</p>
+<ol>
+<li>实现简单的记忆类</li>
+</ol>
+<pre><code class="language-python">from typing import Optional
+class Memory:
+    
+    def __init__(self):
+        self.storage: list[dict[str, any]] = []
+
+    def add_record(self, record_type: str, content: str) -&gt; None:
+        self.storage.append({&quot;type&quot;: record_type, &quot;content&quot;: content})
+        print(f&quot;记忆已更新，新增一条{record_type}记录。&quot;)
+
+    def get_trajectory(self) -&gt; str:
+        trajectory = []
+        for record in self.storage:
+            if record[&quot;type&quot;] == &quot;execution&quot;:
+                trajectory.append(f&quot;上一轮尝试：{record['content']}\n&quot;)
+            elif record[&quot;type&quot;] == &quot;reflection&quot;:
+                trajectory.append(f&quot;反思与改进建议：{record['content']}\n&quot;)
+        return &quot;\n&quot;.join(trajectory)
+
+    def get_last_execution(self) -&gt; Optional[str]:
+        for record in reversed(self.storage):
+            if record[&quot;type&quot;] == &quot;execution&quot;:
+                return record[&quot;content&quot;]
+        return None
+</code></pre>
+<ol start="2">
+<li>构建提示词模板，以python编程任务为例，需要构建三个提示词，分别是<strong>执行、反思、改正</strong>。</li>
+</ol>
+<pre><code class="language-python">INITIAL_PROMPT_TEMPLATE = &quot;&quot;&quot;
+    你是一位资深的Python程序员。请根据以下要求，编写一个Python函数。
+    你的代码必须包含完整的函数签名、文档字符串，并遵循PEP 8编码规范。
+    要求: {task}
+    请直接输出代码，不要包含任何额外的解释。
+&quot;&quot;&quot;
+
+
+REFLECT_PROMPT_TEMPLATE = &quot;&quot;&quot;
+    你是一位极其严格的代码评审专家和资深算法工程师，对代码的性能有极致的要求。
+    你的任务是审查以下Python代码，并专注于找出其在&lt;strong&gt;算法效率&lt;/strong&gt;上的主要瓶颈。
+    #原始任务:
+    {task}
+    #待审查的代码:
+    ```python
+    {code}
+
+    请分析该代码的时间复杂度，并思考是否存在一种&lt;strong&gt;算法上更优&lt;/strong&gt;的解决方案来显著提升性能。
+    如果存在，请清晰地指出当前算法的不足，并提出具体的、可行的改进算法建议（例如，使用筛法替代试除法）。
+    如果代码在算法层面已经达到最优，才能回答“无需改进”。
+    请直接输出你的反馈，不要包含任何额外的解释。
+
+&quot;&quot;&quot;
+
+
+REFINE_PROMPT_TEMPLATE = &quot;&quot;&quot;
+    你是一位资深的Python程序员。你正在根据一位代码评审专家的反馈来优化你的代码。
+    # 原始任务:
+    {task}
+    # 你上一轮尝试的代码:
+    ```
+    {last_code_attempt}
+    ```
+    评审员的反馈：
+    {feedback}
+    请根据评审员的反馈，生成一个优化后的新版本代码。
+    你的代码必须包含完整的函数签名、文档字符串，并遵循PEP 8编码规范。
+    请直接输出优化后的代码，不要包含任何额外的解释。
+&quot;&quot;&quot;
+
+</code></pre>
+<ol start="3">
+<li>构建<code>ReflectionAgent</code>类，实现执行、反思的循环过程，直到生成完美回复。</li>
+</ol>
+<pre><code class="language-python">from PlanAndSolve import ExecutorLLM
+#使用PlanAndSolve中实现的ExecutorLLM类
+class RelectionAgent:
+    def __init__(self):
+        self.memory = Memory()
+        self.llm = ExecutorLLM()
+
+    def run(self, task: str) -&gt; Optional[str]:
+        print(f&quot;开始处理任务：{task}&quot;)
+        initial_prompt = INITIAL_PROMPT_TEMPLATE.format(task=task)
+        code = self.llm.chat(initial_prompt)
+        self.memory.add_record(&quot;execution&quot;, code)
+
+        for iteration in range(3):  # 最多反思和改进三次
+            print(f&quot;\n--- 反思与改进轮次 {iteration + 1} ---&quot;)
+            last_code = self.memory.get_last_execution()
+            reflect_prompt = REFLECT_PROMPT_TEMPLATE.format(
+                task=task,
+                code=last_code,
+            )
+            feedback = self.llm.chat(reflect_prompt)
+            print(&quot;反思反馈:&quot;, feedback)
+            self.memory.add_record(&quot;reflection&quot;, feedback)
+            if &quot;无需改进&quot; in feedback:
+                print(&quot;代码已达到最优，无需进一步改进。&quot;)
+                break
+            else:
+                refine_prompt = REFINE_PROMPT_TEMPLATE.format(
+                    task=task,
+                    last_code_attempt=last_code,
+                    feedback=feedback,
+                )
+                refined_code = self.llm.chat(refine_prompt)
+                self.memory.add_record(&quot;execution&quot;, refined_code)
+                print(&quot;改进后的代码:&quot;, refined_code)
+        final_code = self.memory.get_last_execution()
+        print(&quot;\n--- 最终代码 ---&quot;)
+        print(final_code)
+        return final_code
+</code></pre>
+<h3 id="总结-3">总结</h3>
+<p>Reflection特点：</p>
+<ol>
+<li><strong>提高了解决方案质量</strong>：最大的收益在于，它能将一个“合格”的初始方案，迭代优化成一个“优秀”的最终方案。这种从功能正确到性能高效、从逻辑粗糙到逻辑严谨的提升，在很多关键任务中是至关重要的。</li>
+<li><strong>鲁棒性与可靠性</strong>：通过内部的自我纠错循环，智能体能够发现并修复初始方案中可能存在的逻辑漏洞、事实性错误或边界情况处理不当等问题，从而大大提高了最终结果的可靠性。</li>
+</ol>
+<p>不足：</p>
+<ol>
+<li><strong>模型调用开销增加：</strong> 每进行一轮迭代，至少需要额外调用两次大语言模型（一次用于反思，一次用于优化）。如果迭代多轮，API 调用成本和计算资源消耗将成倍增加。</li>
+<li><strong>任务延迟显著提高</strong>：Reflection 是一个串行过程，每一轮的优化都必须等待上一轮的反思完成。这使得任务的总耗时显著延长，不适合对实时性要求高的场景。</li>
+<li><strong>提示词复杂度上升</strong>：Reflection 的成功在很大程度上依赖于高质量、有针对性的提示词。</li>
+</ol>
+<h2 id="应用场景总结">应用场景总结</h2>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>选择</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不确定性，需要工具调用</td>
+<td>ReAct</td>
+<td>能根据调用结果动态调整路径</td>
+</tr>
+<tr>
+<td>逻辑路径清晰，侧重内部推理和步骤分解</td>
+<td>Plan-and-Solve</td>
+<td>提供稳定、结构化的执行流程</td>
+</tr>
+<tr>
+<td>对最终的结果的质量和可靠性有极高要求</td>
+<td>Reflection</td>
+<td>通过迭代，能回复极高可靠性的答案</td>
+</tr>
+</tbody>
+</table>
+<h2 id="参考文献">参考文献</h2>
+<p>[1] Yao S , Zhao J , Yu D ,et al.ReAct: Synergizing Reasoning and Acting in Language Models[J].ArXiv, 2022, abs/2210.03629.DOI:10.48550/arXiv.2210.03629.</p>
+<p>[2] Wang L , Xu W , Lan Y ,et al.Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models[J].Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), 2023.DOI:10.18653/v1/2023.acl-long.147.</p>
+<p>[3] Shinn N , Cassano F , Berman E ,et al.Reflexion: Language Agents with Verbal Reinforcement Learning[J].  2023.</p>
+<p>[4] <a href="https://github.com/datawhalechina/hello-agents">GitHub - datawhalechina/hello-agents: 📚 《从零开始构建智能体》——从零开始的智能体原理与实践教程</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#react">ReAct</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0">实现</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+<li><a href="#plan-and-solve">Plan-And-Solve</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-2">实现</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93-2">总结</a></li>
+</ul>
+</li>
+<li><a href="#reflection">Reflection</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-3">实现</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93-3">总结</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E6%80%BB%E7%BB%93">应用场景总结</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/rag/">
+              <h3 class="post-title">
+                RAG 解析
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

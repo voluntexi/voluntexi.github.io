@@ -1,0 +1,374 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Whisper：Robust Speech Recognition via Large-Scale Weak Supervision | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Whisper：Robust Speech Recognition via Large-Scale Weak Supervision | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="最近有语音识别方言方面的需求，由于之前没有接触到过这个领域，遂深入了解一下Open AI发布的语音识别模型Whisper
+
+概述
+Whisper 是用于自动语音识别 (Automatic speech recognition，ASR) 的预..." />
+    <meta name="keywords" content="语音识别" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Whisper：Robust Speech Recognition via Large-Scale Weak Supervision
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-08-06
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/yu-yin-shi-bie/" class="post-tag">
+                  # 语音识别
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/whisper.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>最近有语音识别方言方面的需求，由于之前没有接触到过这个领域，遂深入了解一下Open AI发布的语音识别模型Whisper</p>
+<!-- more -->
+<h2 id="概述">概述</h2>
+<p>Whisper 是用于自动语音识别 (Automatic speech recognition，ASR) 的预训练模型，它由来自于 OpenAI 的 Alec Radford 等人于2022年9月发布。在语音识别领域，以往的模型都是在未标注的音频数据上预训练的，而 Whisper 是在大量的<strong>已标注</strong>音频转录数据上预训练的。其用于训练的标注音频时长<strong>高达68万小时</strong>，比Wav2Vec 2.0使用的未标注训练数据 (6 万小时) 还多一个数量级（力大飞砖）。同时，该预训练数据中还含有11.7万小时的多语种数据。因此，Whisper 可以在超过96种语言进行自动语音识别，这其中包含不少数据匮乏的小语种。</p>
+<p>这么多的标注数据使得我们可以直接在有监督语音识别任务上预训练Whisper，从标注音频转录数据中直接习得语音到文本的映射。因此，Whisper几乎不需要额外的微调就已经是高性能的 ASR 模型了。同时，在68万小时标注数据训练的加持下， Whisper 模型表现出了强大的泛化到多种数据集和领域的能力。其预训练 checkpoint 表现出了与最先进的ASR系统旗鼓相当的性能。与人类相比，在语音识别和语音翻译领域上，模型的准确性和稳健性接近人类。</p>
+<h2 id="数据处理">数据处理</h2>
+<p>whisper的通过利用互联网上的网络数据来进行训练，但网络数据存在大量低质量的数据，所以他们开发了几种自动过滤方法来提高转录质量：</p>
+<ol>
+<li>
+<p>剔除全大写或全小写的转录数据；</p>
+</li>
+<li>
+<p>基于数据集VoxLingua107W微调音频语言检测器（audio language detector），若文本转写语言和音频语言不匹配，则剔除；</p>
+</li>
+<li>
+<p>模糊去重转写文本，减少训练数据集中的重复量和自动生成的内容；</p>
+</li>
+<li>
+<p>将音频文件分成<strong>30秒的片段</strong>，并与该时间片段内出现的转写子集配对。我们对所有音频进行训练，包括没有语音的片段，并将这些片段用作语音活动检测模型（voice activity detection）的训练数据。</p>
+</li>
+<li>
+<p>训练初始模型后，查看不同训练数据源的错误率，优先对高错误率和大数据尺寸的数据源进行手动检查，剔除低数据质量的数据源。这项检查发现了大量仅部分转录或对齐不良/未对齐的转写文本，以及前面方法无法检测到的剩余低质量机器生成的文本。</p>
+</li>
+</ol>
+<h2 id="whisper">Whisper</h2>
+<p>whisper的模型结构如下，可以看到处理结构是一个标准的Transformer Encoder-Decoder结构（熟悉的DNA动了）。<br>
+<img src="https://voluntexi.github.io//post-images/1754485334203.png" alt="" loading="lazy"></p>
+<p>当然仅采用Transformer结构作为模型结构，这样做的原因是作者以证明模型性能的提升只受到监督数据规模的影响。</p>
+<p>但模型的Encoder输入部分和原始的Transformer有所不同，具体如下：</p>
+<ol>
+<li>
+<p>音频需要转换为16kHz采样率的单声道音频，并对音频padding到30s，如果音频超过30s则截断，然后以每25ms的窗口进行提取特征；</p>
+<p><u>这里采用对输入进行压缩，而不是直接采用50ms的窗口，因为当采用50ms的窗口时，有时候会超过人说话的频率，可能会导致精度降低。</u></p>
+</li>
+<li>
+<p>将时域音频转换为<strong>频域特征</strong>，源码里将时域特征通过<strong>短时傅里叶变换（STFT）</strong> 转为二维的频域特征，其中维度为[batch,201,3000]，然后进一步通过<strong>梅尔滤波器组</strong>缩小特征的维度,为[batch,80,3000]，并进行归一化处理;</p>
+<p><u>使用梅尔滤波器组的好处是在压缩了数据的同时，把声音信号转换成更符合人耳听觉感知特性的频域表示，从而显著提升语音识别、说话人识别、音乐检索等任务的性能</u></p>
+<ol>
+<li>为了减小计算的开销，编码器输入采用了两个宽度为3的卷积层和GELU激活函数，对输入进一步压缩，然后将正弦位置编码嵌入到输入中，才完成了对语音数据的编码。</li>
+</ol>
+</li>
+</ol>
+<p>同时，模型为了展现多语言的语音识别能力，采用了GPT-2的BPE （Byte Pair Encoding）tokenizer分词器来组成vocab词汇表，具体如下：</p>
+<ol>
+<li>
+<p>将不同的语言转化为UTF-8编码的字节序列作为分词的基本单元；</p>
+</li>
+<li>
+<p>利用BPE算法对UTF-8字节序列进行分词，得到vocab中的token和对应的token_id (词汇中的词大概长得像这样：&quot;ä»Ĭå¤©çļĦ&quot;: 34947）;</p>
+</li>
+<li>
+<p>在模型的解码器中，文本的格式如下：</p>
+<p>[&lt;|startofprev|&gt;, Prompt,&lt;|startoftranscript|&gt;,&lt;|zh|&gt;,&lt;|transcribe|&gt;,&lt;|notimestamps|&gt;,token_id, &lt;|endoftext|&gt;]</p>
+<ul>
+<li>
+<p>&lt;|startofprev|&gt;：先前转录文本标识</p>
+</li>
+<li>
+<p>&lt;|startoftranscript|&gt;：开始标识</p>
+</li>
+<li>
+<p>&lt;|zh|&gt;：目标语言</p>
+</li>
+<li>
+<p>&lt;|transcribe|&gt;：识别任务，融入了多任务：多语种的语音识别，语音翻译，语音语言识别，声音活动检测</p>
+</li>
+<li>
+<p>&lt;|notimestamps|&gt;：数据是否有时间戳</p>
+</li>
+<li>
+<p>token_id：识别的文本，如果没有检测出语音则为&lt;|nospeech|&gt;</p>
+</li>
+<li>
+<p>&lt;|endoftext|&gt;：结束标识</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="针对长语音的优化策略">针对长语音的优化策略</h3>
+<p>通过上文可以知道，whisper在处理超过30s的语音的时候，会截取多余的内容。那这样是不是意味着whisper没有办法处理超过30s的文本呢？</p>
+<p><em>有的，有的，都有的。</em></p>
+<p>作者使用了一种策略，通过连续转录 30 秒的音频片段并根据模型预测的<strong>时间戳</strong>移动窗口来执行长音频的缓冲转写（滑动窗口）</p>
+<p>使用Whisper转写长音频依赖于<strong>时间戳</strong>的准确预测，以确定模型的30秒音频上下文窗口的移动量，一个窗口中的不准确转写可能会对后续窗口中的转写产生负面影响。</p>
+<p>为此，作者开发了一套启发式方法，有助于避免长音频转录的失败案例。</p>
+<ol>
+<li>
+<p>beam decoding: 作者利用Beam Search，在生成序列的过程中保留多个候选项，并根据更全面的得分函数进行选择。这样可以增加生成多样性，减少重复，并提供更多有趣的输出选项）：</p>
+<ol>
+<li>
+<p>当参数temperature=0时，采用beam decoding，选择概率n个tokens；</p>
+</li>
+<li>
+<p>当参数temperature&gt;0时，采用greedy decoding，选择概率n个tokens；</p>
+</li>
+</ol>
+<p>源代码默认n和beam_size都为5。</p>
+</li>
+<li>
+<p>temperature fallback: temperature从0开始，按0.2间隔逐步增加到1，但只有当生成token的平均对数概率低于-1或生成文本的gzip压缩率高于2.4时， 看作解码失败，会将逐步增加温度</p>
+<p>(可以直观理解为，beam search解码失败就走greedy search，前者搜索空间没有后者大)。</p>
+</li>
+<li>
+<p>voice activity detection: 若&lt;|nospeech|&gt;的概率&gt;阈值0.6，会跳出temperature调整，则认作silence状态。</p>
+</li>
+<li>
+<p>previous text conditioning: 当temperature低于0.5时，提供来自先前窗口的生成的转录文本作为上文context prompt，进一步提高了性能（语句会变连贯，但也可能会诱发陷入重复转写的风险），而温度高于0.5，就不提供上文context prompt。</p>
+<p>此外，针对第一个转写窗口，你也能提供initial_prompt，比如“这是一段演讲，里面会提到大数据和ChatGPT是如何结合的”，你可以通过prompt引导提高特定场景和术语下的语音识别表现。</p>
+</li>
+<li>
+<p>Initial timestamp constraint: 为了避免模型忽略输入中前几个单词，将初始时间戳token限制在0.0到1.0秒之间。</p>
+</li>
+</ol>
+<p>下图是加上这些策略的效果</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1754485346478.png" alt="" loading="lazy"></figure>
+<h2 id="实验">实验</h2>
+<p>whisper的模型有多个不同的版本，参数量、支持语言如下：</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1754485351699.png" alt="" loading="lazy"></figure>
+<h3 id="english-speech-recognized">English Speech Recognized</h3>
+<p>虽然语音领域在2015年就达到了人类的水平（Deep Speech 2），并且当前的LibriSpeech又将当时SOTA WER下降了73%，但是在不同的场景下，仍然与人类有巨大的差距。</p>
+<p>作者推测差距的原因在于测试集混淆了二者的训练方式。机器学习模型在分布内的数据集上进行训练后评估的，而人类是在分布外的泛化表现。而Whisper模型和人类的训练方式相同，都是在广泛多样的音频上训练，在零样本下评估。为了量化Whisper和人类之间的评估差异，作者测试了总体稳健性和有效稳健性，用于衡量分布内与分布外数据集之间预期性能的差异。结果如下图和下表所示：</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1754485444010.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1754485500179.png" alt="" loading="lazy"></figure>
+<h3 id="multi-lingual-speech-recognition">Multi-lingual Speech Recognition</h3>
+<p>英文很不错，中文处于中游。而且从下图的线性拟合估计来看，训练数据每增加16倍，WER预计就会减半。</p>
+<figure data-type="image" tabindex="5"><img src="https://voluntexi.github.io//post-images/1754485377949.png" alt="" loading="lazy"></figure>
+<h2 id="translation">Translation</h2>
+<p>whisper在语音翻译的表现</p>
+<figure data-type="image" tabindex="6"><img src="https://voluntexi.github.io//post-images/1754485468485.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="7"><img src="https://voluntexi.github.io//post-images/1754485393794.png" alt="" loading="lazy"></figure>
+<h1 id="未来工作">未来工作</h1>
+<ul>
+<li>
+<p>在高质量监督数据集上微调 Whisper 模型和/或使用强化学习更直接地优化解码性能可能有助于进一步减少与感知相关的错误（例如混淆发音相似的单词，长音频转写时陷入重复循环、无法转录音频片段的第一个或最后几个单词或模型将完全产生幻觉等问题）；</p>
+</li>
+<li>
+<p>有针对性地增加稀有语言的数据量可能会导致平均语音识别性能的大幅提高；</p>
+</li>
+<li>
+<p>添加辅助训练目标。</p>
+</li>
+</ul>
+<h2 id="参考文献">参考文献</h2>
+<ol>
+<li>
+<p><a href="https://arxiv.org/pdf/2212.04356">Radford, A., Kim, J. W., Xu, T., Brockman, G., McLeavey, C., &amp; Sutskever, I. (2023, July). Robust speech recognition via large-scale weak supervision. In <em>International Conference on Machine Learning</em> (pp. 28492-28518). PMLR.</a></p>
+</li>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/664595535">【语音识别】OpenAI语音力作Whisper - 知乎</a></p>
+</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86">数据处理</a></li>
+<li><a href="#whisper">Whisper</a>
+<ul>
+<li><a href="#%E9%92%88%E5%AF%B9%E9%95%BF%E8%AF%AD%E9%9F%B3%E7%9A%84%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5">针对长语音的优化策略</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E9%AA%8C">实验</a>
+<ul>
+<li><a href="#english-speech-recognized">English Speech Recognized</a></li>
+<li><a href="#multi-lingual-speech-recognition">Multi-lingual Speech Recognition</a></li>
+</ul>
+</li>
+<li><a href="#translation">Translation</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C">未来工作</a>
+<ul>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/lmcache/">
+              <h3 class="post-title">
+                LMCache
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

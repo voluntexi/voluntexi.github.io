@@ -1,0 +1,259 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Less is More for Long Document Summary Evaluation by LLMs | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Less is More for Long Document Summary Evaluation by LLMs | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="这篇文章给了我们一种如何在自己研究的领域去&quot;蹭&quot;大模型热度的思路
+
+摘要：
+大语言模型（LLM）在自动摘要评估任务有良好的性能，但它们因为有着高额的计算成本和关键句子丢失等问题，模型经常忽视长文本中的重要信息。为了解决这..." />
+    <meta name="keywords" content="文本摘要,NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Less is More for Long Document Summary Evaluation by LLMs
+            </h2>
+            <div class="post-info">
+              <span>
+                2023-10-09
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/wen-ben-zhai-yao/" class="post-tag">
+                  # 文本摘要
+                </a>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/less-is-more.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>这篇文章给了我们一种如何在自己研究的领域去&quot;蹭&quot;大模型热度的思路</p>
+<!-- more -->
+<h2 id="摘要">摘要：</h2>
+<p>大语言模型（LLM）在自动摘要评估任务有良好的性能，但它们因为有着<strong>高额的计算成本</strong>和<strong>关键句子丢失</strong>等问题，模型经常忽视长文本中的重要信息。为了解决这些问题，该文介绍了一种新的方法，首先提取然后评估，它涉及到从长的源文本中提取关键句子，然后通过prompt LLM对抽取的句子进行评估。结果表明，该方法不仅显着降低了计算成本，但也表现与人类的评价较高的相关性。此外，作者还提供了对长文本抽取最佳文档长度和句子抽取方法的建议，为基于LLM的文本生成评估的成本效益更高且更准确的方法的发展做出了贡献。</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1696827975056.png" alt="" loading="lazy"></figure>
+<h2 id="方法">方法</h2>
+<p>摘要评价指标为模型生成的摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">y1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">1</span></span></span></span> 分配一个评分 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">s1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord mathdefault">s</span><span class="mord">1</span></span></span></span>。评价指标与人工判断得分 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span></span></span></span> 之间的相关性越高，评估指标就被认为越好。为了分配评分 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">s1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord mathdefault">s</span><span class="mord">1</span></span></span></span>，现有研究使用参考摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span> 或输入文档 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span> ，以及生成的摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">y1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">1</span></span></span></span> 。</p>
+<p>为了使用LLM作为评估器，通常将模型生成的摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">y1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">1</span></span></span></span>和源文档<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span> 作为输入。</p>
+<p>但该文提出的提取-然后评估方法包括两个步骤来使用LLM，如下图所示：</p>
+<ol>
+<li>从长篇源文档 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span> 中提取重要的句子进行摘要评估，直到达到预定义的长度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span>，并构建一个短但信息密集的文档 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mi mathvariant="normal">′</mi></mrow><annotation encoding="application/x-tex">x′</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.55556em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mord">′</span></span></span></span>。</li>
+<li>通过prompt LLMs评估摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><mi>y</mi></mrow><annotation encoding="application/x-tex">1y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span> 的质量。设计一个prompt可以将提取的源文档<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mi mathvariant="normal">′</mi></mrow><annotation encoding="application/x-tex">x′</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.55556em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mord">′</span></span></span></span> 和摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">y1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">1</span></span></span></span>作为输入，并生成一个评分标度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span></span></span></span> 作为输出。要提取句子，作者考虑了以下方法：
+<ul>
+<li><strong>LEAD：</strong> 提取文本中前N个句子</li>
+<li><strong>ROUGE：</strong> 使用模型生成的摘要中有最大ROUGE得分的源文本句子</li>
+<li><strong>BERTScore：</strong> 和ROUGE一样，只不过是在BERTScore评价指标中</li>
+<li><strong>NLI：</strong> 使用NLI模型提取作为前提的句子，这些句子在生成的摘要<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">y1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">1</span></span></span></span>中被分类成抽取或不抽取，直到抽取句子达到N个字。这个过程旨在提取与正在评估的摘要在语义上相关的句子。</li>
+</ul>
+</li>
+</ol>
+<p>在所有方法中，原始顺序被保留，并且仅提取完整的句子。</p>
+<h3 id="实验">实验</h3>
+<p>作者使用了GPT-4作为评估器，在arXiv、PubMed、GovReport和SQuALITY上进行了实验，对于句子提取，分别用128、256、512、768、1024、1536、2048和4096作为提取的源文档的长度限制进行实验。</p>
+<h2 id="结果">结果</h2>
+<p>1.以1024作为抽取句子的长度效果最好</p>
+<p>2.以ROUGE作为抽取策略效果最好</p>
+<p>3.经过抽取后再评估，效果更好</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1696827960735.png" alt="" loading="lazy"></figure>
+<h2 id="总结">总结</h2>
+<ul>
+<li>
+<p>这篇文章在生成摘要评估的领域采用GPT4作为评估器，分为抽取+评估两阶段。</p>
+</li>
+<li>
+<p>prompt+LLM在NLP任务中具有发展潜力（好蹭热点），目前绝大数NLP的文章都涉及到LLM，主要分为三个方向：</p>
+<ul>
+<li>1.提出了大模型 （大牛实验室）</li>
+<li>2.提出了一种对大模型的分析（优缺点、新的微调方法等）</li>
+<li>3.使用prompt 结合大模型应用到自己任务（最常见）</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%91%98%E8%A6%81">摘要：</a></li>
+<li><a href="#%E6%96%B9%E6%B3%95">方法</a>
+<ul>
+<li><a href="#%E5%AE%9E%E9%AA%8C">实验</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%93%E6%9E%9C">结果</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/PGA/">
+              <h3 class="post-title">
+                Generating EDU Extracts for Plan-Guided Summary Re-Ranking
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

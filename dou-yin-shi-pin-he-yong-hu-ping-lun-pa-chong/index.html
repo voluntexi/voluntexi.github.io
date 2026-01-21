@@ -1,0 +1,304 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>抖音视频和用户评论爬虫 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="抖音视频和用户评论爬虫 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="本文将详细的讲述关于抖音网络爬虫的实现过程。
+
+由于抖音爬虫的反爬虫策略较为严格，本节将抖音网络爬虫用作详细介绍，主要详细介绍抖音网站的特点，对抖音网站进行分析，爬取抖音的用户评论所用到的具体实现思路过程
+ 
+抖音网站分析
+要抓取抖音中的用..." />
+    <meta name="keywords" content="网络爬虫" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              抖音视频和用户评论爬虫
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-05-29
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/_of5dqwwh/" class="post-tag">
+                  # 网络爬虫
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic3.zhimg.com%2Fv2-8617dbabc38aaa87b878b6ee5d615f8f_1440w.jpg%3Fsource%3D172ae18b&amp;refer=http%3A%2F%2Fpic3.zhimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1658553842&amp;t=dcf4e4220f062ca915fedcc7b797c4c2" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>本文将详细的讲述关于抖音网络爬虫的实现过程。</p>
+<!-- more -->
+<p>由于抖音爬虫的反爬虫策略较为严格，本节将抖音网络爬虫用作详细介绍，主要详细介绍抖音网站的特点，对抖音网站进行分析，爬取抖音的用户评论所用到的具体实现思路过程</p>
+ <!--more-->
+<h2 id="抖音网站分析">抖音网站分析</h2>
+<p>要抓取抖音中的用户评论等相关信息，首先要对抖音的网站页面整体布局以及网站所储存的信息的方式进行一个相对全面的理解和分析，才能逐个攻破，最终获取到我们所需要的有用信息。</p>
+<p>首先，打开网页版的抖音，在搜索栏中输入想要进行分析的视频博主的视频，如图1。进入视频的详细页后，如图下拉评论页面，找到评论所存在的位置，如图2。<br>
+<img src="https://voluntexi.github.io//post-images/1655960471002.jpg" alt="" loading="lazy"><br>
+<img src="https://voluntexi.github.io//post-images/1655960477323.jpg" alt="" loading="lazy"><br>
+接下来在Google Chrome浏览器中按下F12，打开开发者模式，然后点击网络，在开发者模式窗口左方的文件中，点击预览来搜索评论存在的网页，来观察其存储的方式<br>
+<img src="https://voluntexi.github.io//post-images/1655960486077.jpg" alt="" loading="lazy"><br>
+同时发现，每翻一页评论页面，该网络请求下的cursor参数就会增加20。</p>
+<p>经过上诉分析，发现抖音用户评论以及用户的相关的数据是存储在?device_platform=webapp&amp;aid=6383&amp;channel=channel_p…iJquvs9LcUAKk2YMk3aKHHEubQFxlKDQOwtkPFZryFj6FS.99之中的，而且通过XHR的方式来进行加载的，存储的方式是通过JSON。于是我们就可以通过模拟请求头来模拟，向?device_platform=webapp&amp;aid=6383&amp;channel=channel_p…iJquvs9LcUAKk2YMk3aKHHEubQFxlKDQOwtkPFZryFj6FS.99进行请求，通过将cursor增加20的操作来进行翻页，然后将请求得到的信息通过json进行转化，最后再提取所需要的信息。</p>
+<p>同理，我们也可以在开发者模式中，通过上述的操作同样找到视频的地址<br>
+<img src="https://voluntexi.github.io//post-images/1655960495011.jpg" alt="" loading="lazy"></p>
+<h2 id="抖音爬虫的实现">抖音爬虫的实现</h2>
+<h3 id="构造请求头向抖音模拟requests请求提取网站存储的用户信息">构造请求头向抖音模拟requests请求，提取网站存储的用户信息：：</h3>
+<p>构造DouyinCrawler函数，并通过构造形参来接受请求的URL。并通过cursor增加20的操作来进行翻页。Hearders的请求参数如下：</p>
+<pre><code class="language-python">params = (
+       ('device_platform', 'webapp'),
+       ('aid', '6383'),
+       ('channel', 'channel_pc_web'),
+       ('aweme_id', '70694199578814723'),
+       ('cursor', str(0+cursor*20)),
+       ('count', '20'),
+       ('version_code', '170400'),
+       ('version_name', '17.4.0'),
+       ('cookie_enabled', 'true'),
+       ('screen_width', '1920'),
+       ('screen_height', '1080'),
+       ('browser_language', 'zh-CN'),
+       ('browser_name', 'Chrome'),
+       ('browser_version', '96.0.4664.45'),
+       ('browser_online', 'true'),
+       ('engine_name', 'Blink'),
+       ('engine_version', '96.0.4664.45'),
+       ('os_name', 'Windows'),
+       ('os_version', '10'),
+       ('cpu_core_num', '8'),
+       ('device_memory', '8'),
+       ('platform', 'PC'),
+       ('downlink', '3.4'),
+       ('effective_type', '4g'),
+       ('round_trip_time', '50'),
+       ('msToken',  'xO8ykiImW4_y1P17rjjV82tkToK8sdVUSXsck7dqlo5egXnsLielL_-gNoh0eTlNzohikTmdqccSsY3Es0-we3HmgJYX-jaWe7rO1uKCGLQSCz4tUKiWsZwpNQ=='),
+       ('X-Bogus', 'DFSzswVuuEtANasbSiKxme9WX7j6'),
+       ('_signature',
+        '_02B4Z6wo00001cGgFBAAAIDBQaLuUEhgJOnBoBCAABHQa2zGW56-brVbd8zPJMMr5zV9wMRK.Fw-baUMHl14.I7n6EC4lETZbOyGYyoi08uVzPer1kHjbwJPWfXZBARPia3I0l-u0HyASZI012'),
+   )
+
+</code></pre>
+<p>接下来就可以对网站的数据进行获取，将数据通过一个数组保存下来</p>
+<pre><code class="language-python">def Html(html):
+#     获取所需内容
+    s=json.loads(html)
+    for i in range(20):
+        comment=s['data']['replies'][i]
+        floor = comment['member']['mid']
+        sex=comment['member']['sex']
+        ctime = time.strftime(&quot;%Y-%m-%d&quot;,time.localtime(comment['ctime']))
+        content = comment['content']['message']
+        likes = comment['like']
+        rcounts = comment['rcount']
+        username=comment['member']['uname']
+        content=comment['content']['message']
+        list=[]
+        print(floor)
+        list.append(floor)
+        list.append(username)
+        list.append(content)
+        list.append(ctime)
+    com.append(list)
+
+</code></pre>
+<p>在使用Google Chrome浏览器访问抖音网页版的时候，浏览器会向抖音网页版的服务器自动的发送headers请求头。如果没有请求头，抖音网页版的服务器便会返回空值，这是识别爬虫的最基本策略。因此在使用爬虫向抖音网页版发起headers请求的时候，要模拟浏览器向抖音网页版服务器发送请求头headers。每个浏览器的请求头不同，以Google Chrome浏览器为例：按下F12，可在开发者模式下，点击标头，下拉在请求标头中查看headers请求头并复制。<br>
+<img src="https://voluntexi.github.io//post-images/1655960510953.jpg" alt="" loading="lazy"><br>
+构造自己的请求头：其中cookie，由于不同的用户的cookie不同，可以在开发者模式，控制台中输入document.cookie来获取自己的cookie，然后添加到请求头中。</p>
+<pre><code class="language-python">  headers={
+        'path': '/aweme/v1/web/comment/list/?device_platform=webapp&amp;aid=6383&amp;channel=channel_pc_web&amp;aweme_id=7083293845496073510&amp;cursor=80&amp;count=20&amp;item_type=0&amp;rcFT=&amp;version_code=170400&amp;version_name=17.4.0&amp;cookie_enabled=true&amp;screen_width=1920&amp;screen_height=1080&amp;browser_language=zh-CN&amp;browser_platform=Win32&amp;browser_name=Chrome&amp;browser_version=99.0.4844.51&amp;browser_online=true&amp;engine_name=Blink&amp;engine_version=99.0.4844.51&amp;os_name=Windows&amp;os_version=10&amp;cpu_core_num=8&amp;device_memory=8&amp;platform=PC&amp;downlink=10&amp;effective_type=4g&amp;round_trip_time=0&amp;webid=7082249047388145183&amp;msToken=QWSrXp1LBsAJx5ebu3Xk7Ngwx3nHhQVsOCDXXYdq3e_pA-zZ9fJQjIUvVtcXRt1QsuhdrP-F47kapoadK_ZlMkYZbtgFHK6gO7Yvg5_FOLbVyvxugb_Azp-WjXGZ4w9q&amp;X-Bogus=DFSzswVL9c0ANr98SlqafGUClL9E&amp;_signature=_02B4Z6wo00001OaWiIgAAIDBzRzTTsCKJKzmlowAAFvuTAqjP5WE9ZlERwOQJsQRqw5IfPL3OR3ay.tAxct-hAEFfBTSSxfJPx4JOtmjEkqpbIbXVBKVk9.Q5JXAJ9XdKE.-VfGi5xy9Lrxg23',
+        'referer': 'https://www.douyin.com/search/%E6%88%90%E9%83%BD%E7%96%AB%E6%83%85%E6%9C%80%E6%96%B0%E6%B6%88%E6%81%AF?source=recom_search&amp;aid=3e537954-a78f-4f98-8bd9-0c8b01cd977b&amp;enter_from=search_result',
+        'sec-ch-ua': '&quot; Not A;Brand&quot;;v=&quot;99&quot;, &quot;Chromium&quot;;v=&quot;99&quot;, &quot;Google Chrome&quot;;v=&quot;99&quot;',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+        'cookie': &quot;你的cookie&quot; 
+
+</code></pre>
+<p>调用解析函数require，通过模拟构造的请求头向目标URL发送requests请求，同时获取请求的状态，即：200为请求成功。在请求成功后，在python中json库中的loads函数可以方便的将字符串的信息转化为字典类型，可以方便的进行数据的处理和提取。接下来通过构建的Html函数和download函数来获取该请求链接中的所有内容，Html将内容通过json.loads转化为字典类型的格式并进行数据的提取。提取出用户ID、用户名、用户评论、用户评论时间以及当前页面的抖音视频的信息。 其中，视频通过you_get库进行下载到本地指定文件夹之中。</p>
+<ul>
+<li>you_get库是一个可以下载全网视频、音频、图像的开源库。它拥有非常强大的功能，能够支持下载的网站非常多，而且使用方法极其简单。仅仅需要一个命令便可实现下载</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%8A%96%E9%9F%B3%E7%BD%91%E7%AB%99%E5%88%86%E6%9E%90">抖音网站分析</a></li>
+<li><a href="#%E6%8A%96%E9%9F%B3%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E7%8E%B0">抖音爬虫的实现</a>
+<ul>
+<li><a href="#%E6%9E%84%E9%80%A0%E8%AF%B7%E6%B1%82%E5%A4%B4%E5%90%91%E6%8A%96%E9%9F%B3%E6%A8%A1%E6%8B%9Frequests%E8%AF%B7%E6%B1%82%E6%8F%90%E5%8F%96%E7%BD%91%E7%AB%99%E5%AD%98%E5%82%A8%E7%9A%84%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF">构造请求头向抖音模拟requests请求，提取网站存储的用户信息：：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/di-san-jie-chuan-zhi-bei-quan-guo-da-xue-sheng-it-ji-neng-da-sai-chu-sai-b-zu-ge-ren-ti-jie/">
+              <h3 class="post-title">
+                第三届“传智杯”全国大学生IT技能大赛（初赛B组）个人题解
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

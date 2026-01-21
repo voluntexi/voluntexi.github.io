@@ -1,0 +1,359 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prompt Learning | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Prompt Learning | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Prompt Learning 的本质就是将所有下游任务统一成预训练任务； 以特定的模板，将下游任务的数据转成自然语言形式，从而充分挖掘预训练语言模型本身的能力。
+
+概述
+将所有下游任务统一成预训练任务；以特定的模板，将下游任务的数据转成自..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Prompt Learning
+            </h2>
+            <div class="post-info">
+              <span>
+                2023-12-12
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://miro.medium.com/v2/resize:fit:1100/format:webp/0*gJlUvCo-c1r0vbtz.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><strong>Prompt Learning 的本质就是将所有下游任务统一成预训练任务；</strong> 以特定的模板，将下游任务的数据转成自然语言形式，从而充分挖掘预训练语言模型本身的能力。</p>
+<!-- more -->
+<h2 id="概述">概述</h2>
+<p>将所有下游任务统一成预训练任务；以特定的模板，将下游任务的数据转成自然语言形式，充分挖掘预训练模型本身的能力。</p>
+<p>Prompt Learning本质上就是设计一个比较契合上游预训练任务的模板，通过模板的设计就是挖掘出上游预训练模型的潜力，让上游的预训练模型在尽量不需要标注数据的情况下比较好的完成下游的任务，关键包括 3 个步骤：</p>
+<ul>
+<li>
+<p>1.设计预训练语言模型的任务</p>
+</li>
+<li>
+<p>2.设计输入模板样式（Prompt Engineering）</p>
+</li>
+<li>
+<p>3.设计 label 样式及模型的输出映射到 label 的方式（Answer Engineering）</p>
+</li>
+</ul>
+<p>举个例子：</p>
+<p>对于输入的文本 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span>，有函数<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>f</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>t</mi></mrow></msub><mo>(</mo><mi mathvariant="normal">.</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">f_{prompt}(.)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.28055599999999997em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">.</span><span class="mclose">)</span></span></span></span>，能将 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span> 转化成prompt的形式<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><msup><mrow></mrow><mo mathvariant="normal">′</mo></msup></mrow><annotation encoding="application/x-tex">x{}&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.751892em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mord"><span class="mord"></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span>，即：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><msup><mrow></mrow><mo mathvariant="normal">′</mo></msup><mo>=</mo><msub><mi>f</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>t</mi></mrow></msub><mo>(</mo><mi>x</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">x{}&#x27; = f_{prompt}(x)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.801892em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mord"><span class="mord"></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.801892em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.28055599999999997em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span></span></span></span></span></p>
+<p>该函数通常会进行两步操作：</p>
+<ul>
+<li>
+<p>1.使用一个模板，模板通常为一段自然语言，并且包含有两个空位置：用于填输入x的位置[X]和用于生成答案文本z的位置[Z].</p>
+</li>
+<li>
+<p>2.把输入x填到[X]的位置。</p>
+</li>
+</ul>
+<blockquote>
+<p>以情感分析任务为例，模型需根据输入句子做二分类：</p>
+<p>原始<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span>输入：特效非常酷炫，我很喜欢。</p>
+<p>经过<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>f</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>t</mi></mrow></msub><mo>(</mo><mi mathvariant="normal">.</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">f_{prompt}(.)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.28055599999999997em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">.</span><span class="mclose">)</span></span></span></span>输入后变为：</p>
+<p>特效非常酷炫，我很喜欢。这是一部[MASK]电影 ；</p>
+<p>最后根据模型预测的[MASK]的词语进行正面情感/负面情感的映射</p>
+</blockquote>
+<p>通常，Prompt 来填充答案的位置一般在句中或句首。如果在句中，一般称这种 Prompt 为 <strong>Cloze Prompt</strong>；如果在句首，一般称这种 Prompt 为 <strong>Prefix Prompt</strong>。原始x 和 Prompt的位置、数量以及使用模板句的不同，都有可能对结果造成影响，因此需要灵活调整。</p>
+<p>针对其他 NLP 任务， Prompt 一般如下表所示进行设计。</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1702390383756.png" alt="" loading="lazy"></figure>
+<h2 id="常见方法">常见方法</h2>
+<h3 id="硬模板方法"><strong>硬模板方法</strong></h3>
+<h4 id="petpattern-exploiting-training"><strong>PET（Pattern Exploiting Training）</strong></h4>
+<p>PET 是一种较为经典的提示学习方法，和将任务描述与标准的监督学习相结合它使用自然语言<code>pattern</code>将<code>input examples</code>转化为<code>cloze-style phrases</code>。如下图所示，PET 分三步工作：</p>
+<p>PET-BERT的计算方式如下图所示，它包含三步：</p>
+<ul>
+<li>针对每种pattern，在一个小的训练集 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="script">T</mi></mrow><annotation encoding="application/x-tex">\mathcal{T}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.25417em;">T</span></span></span></span></span>上对一个单独的PLM进行微调。</li>
+<li>使用所有PLM模型的集合为一个大的未标注数据集 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="script">D</mi></mrow><annotation encoding="application/x-tex">\mathcal{D}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.02778em;">D</span></span></span></span></span> 添加soft labels。</li>
+<li>在这个soft-label的数据集上训练标准分类器。</li>
+</ul>
+<img src="https://www.mikecaptain.com/img/src/2023/2023-01-23-captain-aigc-2-llm-65.png" alt="img" style="zoom:50%;" />
+<h4 id="lm-bff"><strong>LM-BFF</strong></h4>
+<p>LM-BFF是一套针对小样本进行微调的技术，主要包括两部分：基于提示（prompt）进行微调，关键是如何自动化生成提示模板；</p>
+<p>将样本示例以上下文的形式添加到每个输入中，关键是如何对示例进行采样。<br>
+<img src="https://voluntexi.github.io//post-images/1702389723488.png" alt="" loading="lazy"></p>
+<p><strong>硬模板方法的缺陷：</strong></p>
+<p>硬模板产生依赖两种方式：根据经验的人工设计和自动化搜索。但是，人工设计的不一定比自动搜索的好，自动搜索的可读性和可解释性也不强。</p>
+<p>对于prompt，改变prompt中的单个单词 会给实验结果带来巨大的差异， 所以也为后续优化提供了方向，如索性直接放弃硬模板，去优化 prompt token embedding。</p>
+<img src="https://s1.ax1x.com/2022/10/06/x3CnHS.png#shadow" alt="img" style="zoom:50%;" />
+<h3 id="软模板方法"><strong>软模板方法</strong></h3>
+<p>软模版是直接优化 Prompt Token Embedding，是<strong>向量/可学习的参数</strong>，不再追求模板的直观可解释性</p>
+<h4 id="p-tuning"><strong>P-tuning</strong></h4>
+<p>不再设计/搜索硬模板，而是在输入端直接插入若干可被优化的 <strong>Pseudo Prompt Tokens</strong>，自动化地寻找连续空间中的知识模板：</p>
+<p>1.不依赖人工设计</p>
+<p>2.要优化的参数极少，避免了过拟合（也可全量微调，退化成传统 finetuning）</p>
+<p>P-Tuning主要结构是利用了一个prompt encoder（Bi-LSTM），将一些pseudo prompt（离散token）进行编码再与input embedding进行拼接，并引入少量自然语言提示的锚字符（例如Britain）进一步提升效果。再优化生成的encoder部分。<br>
+<img src="https://voluntexi.github.io//post-images/1702390367888.png" alt="" loading="lazy"></p>
+<blockquote>
+<ol>
+<li>初始化一个模板：The capital of [X] is [mask]</li>
+<li>替换输入：[X] 处替换为输入 “Britian”，即预测 Britain 的首都</li>
+<li>挑选模板中的一个或多个 token 作为 pseudo prompt</li>
+<li>将所有 pseudo prompt 送入 Bi-LSTM，获得每个 pseudo prompt 的「隐状态向量 h」</li>
+<li>将初始模板送入模型的 Embedding Layer，「图中 pseudo prompt 的 token embedding用 h 代替」，然后预测mask。</li>
+</ol>
+</blockquote>
+<h4 id="prefix-tuning"><strong>Prefix tuning</strong></h4>
+<p>P-tuning 更新 prompt token embedding 的方法，能够优化的参数较少。Prefix tuning 希望能够优化更多的参数，提升效果，但是又不带来过大的负担。虽然 prefix tuning 是在生成任务上被提出来的，但是它对 soft prompt 后续发展有着启发性的影响.</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1702390551204.png" alt="" loading="lazy"></figure>
+<p>模型上在每层 transformer 之前加入 <strong>prefix</strong>。特点是 prefix 不是真实的 token，而是连续向量（soft prompt），Prefix-tuning 训练期间冻结 transformer 的参数，只更新 Prefix 的参数。</p>
+<p>只需要不同任务设置不同的Prefix即可，因此实现上只需要存储一个大型transformer模型和多个学习的任务特定的prefix参数。每个任务训练产生非常小的开销。<br>
+<img src="https://voluntexi.github.io//post-images/1702390461971.png" alt="" loading="lazy"></p>
+<p>以图上自回归模型为例的做法：</p>
+<ol>
+<li>
+<p>输入表示为 Z = [ prefix ; x ; y ]</p>
+</li>
+<li>
+<p>Prefix-tuning 初始化一个训练的 矩阵 P，用于存储 prefix parameters</p>
+</li>
+<li>
+<p>前缀部分 token，参数选择设计的训练矩阵，而其他部分的 token，参数则固定 且为预训练语言模型的参数</p>
+</li>
+</ol>
+<p>核心结论：Prefix-tuning 在生成任务上，全量数据、大模型：仅微调 prompt 相关的参数，媲美 fine-tuning 的表现。</p>
+<h4 id="soft-prompt-tuning"><strong>Soft Prompt Tuning</strong></h4>
+<p>Soft Prompt Tuning 验证了软模板方法的有效性，并提出了固定基础模型，有效利用任务特定的 Soft Prompt Token，可以大幅减少资源占用，达到大模型的通用性。</p>
+<p>对 Prefix-tuning 的简化，固定预训练模型，只对下游任务的输入添加额外的 k 个可学习的 token。这种方式在大规模预训练模型的前提下，能够媲美传统的 fine-tuning 表现。</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1702390329279.png" alt="" loading="lazy"></figure>
+<p><strong>P-tuning与 Prefix-Tuning 的区别</strong></p>
+<ul>
+<li>Prefix Tuning 是将额外的 embedding 加在开头，看起来更像是模仿 Instruction 指令；而 <strong>P-Tuning 的位置则不固定</strong>。</li>
+<li>Prefix Tuning 通过在每个 Attention 层都加入 Prefix Embedding 来增加了模型额外的参数；<strong>而 P-Tuning 只是在输入的时候加入 Embedding，并通过 LSTM来初始化</strong>。</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>尽管 Prompt 研究搞得如火如荼，但目前仍存在许多问题值得研究者们去探究</p>
+<ol>
+<li><strong>Prompt 的设计问题</strong>。目前使用 Prompt 的工作大多集中于分类任务和生成任务，其它任务则较少。另外，「模板」和「答案」的联系也亟待解决。模型的表现同时依赖于使用的「模板」和「答案」的映射，如何同时搜索或者学习出两者联合的最好效果仍然很具挑战性</li>
+<li><strong>Prompt 的理论分析和可解释性</strong>。尽管 Prompt 方法在很多情况下都取得了成功，但是目前 Prompt-based Learning 理论分析还很少，人们很难了解 Prompt 为什么能达到好的效果，又为什么在自然语言中意义相近的 Prompt 有时效果却相差很大</li>
+<li><strong>Prompt 在 PLM debias 方面的应用</strong>。由于 PLM 在预训练过程中见过了大量的人类世界的自然语言，所以很自然地会受到一些影响。举一个简单的例子，比如说训练语料中有非常多 &quot;The capital of China is Beijing&quot;，导致模型每次看到 &quot;capital&quot; 的时候都会预测出 &quot;Beijing&quot;，而不是去分析到底是哪个国家的首都。在应用的过程中，Prompt 还暴露了 PLM 学习到的很多其它 bias，比如种族歧视、性别对立等。这也许会是一个值得研究的方向</li>
+</ol>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li>
+<p><a href="https://dl.acm.org/doi/full/10.1145/3560815">Pre-train, Prompt, and Predict: A Systematic Survey of Prompting Methods in Natural Language Processing | ACM Computing Surveys</a></p>
+</li>
+<li>
+<p>[<a href="https://arxiv.org/abs/2009.07118">2009.07118] It's Not Just Size That Matters: Small Language Models Are Also Few-Shot Learners (arxiv.org)</a></p>
+</li>
+<li>
+<p>[<a href="https://arxiv.org/abs/2012.15723">2012.15723] Making Pre-trained Language Models Better Few-shot Learners (arxiv.org)</a></p>
+</li>
+<li>
+<p>[<a href="https://arxiv.org/abs/2103.10385">2103.10385] GPT Understands, Too (arxiv.org)</a></p>
+</li>
+<li>
+<p>[<a href="https://arxiv.org/abs/2101.00190">2101.00190] Prefix-Tuning: Optimizing Continuous Prompts for Generation (arxiv.org)</a></p>
+</li>
+<li>
+<p>[<a href="https://arxiv.org/abs/2104.08691">2104.08691] The Power of Scale for Parameter-Efficient Prompt Tuning (arxiv.org)</a></p>
+</li>
+<li>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzI4MDYzNzg4Mw==&amp;mid=2247555729&amp;idx=2&amp;sn=058c7cd5268cba88a7b1a1affd5920d2&amp;chksm=ebb72245dcc0ab5333c90fa682bbb462ca5944f73af94dac935bcbdf7ca54dc62f2096123309&amp;scene=27">深入浅出Prompt Learning要旨及常用方法 </a></p>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E6%96%B9%E6%B3%95">常见方法</a>
+<ul>
+<li><a href="#%E7%A1%AC%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95"><strong>硬模板方法</strong></a>
+<ul>
+<li><a href="#petpattern-exploiting-training"><strong>PET（Pattern Exploiting Training）</strong></a></li>
+<li><a href="#lm-bff"><strong>LM-BFF</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E8%BD%AF%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95"><strong>软模板方法</strong></a>
+<ul>
+<li><a href="#p-tuning"><strong>P-tuning</strong></a></li>
+<li><a href="#prefix-tuning"><strong>Prefix tuning</strong></a></li>
+<li><a href="#soft-prompt-tuning"><strong>Soft Prompt Tuning</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/less-is-more/">
+              <h3 class="post-title">
+                Less is More for Long Document Summary Evaluation by LLMs
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

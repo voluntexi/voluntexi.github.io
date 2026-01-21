@@ -1,0 +1,316 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LMCache | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="LMCache | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="想要大模型在通用性上获得更好的效果，就需要让大模型对更多的领域知识进行“补充”。
+《Do Large Language Models Need a Content Delivery Network》论文提出了 KDN（Knowledge D..." />
+    <meta name="keywords" content="大模型,NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              LMCache
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-07-19
+              </span>
+              <span>
+                11 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/da-mo-xing/" class="post-tag">
+                  # 大模型
+                </a>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/lmcache.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>想要大模型在通用性上获得更好的效果，就需要让大模型对更多的领域知识进行“补充”。</p>
+<p>《Do Large Language Models Need a Content Delivery Network》论文提出了 KDN（Knowledge Delivery Network），简单来说就是对输入进行“缓存”，从而提升模型首个 Token 响应时间，并将 KDN 开源为 <a href="https://github.com/LMCache/LMCache"><strong>LMCache</strong></a></p>
+<!-- more -->
+<h2 id="概述">概述</h2>
+<p>随着大模型（LLM, Large Language Model）的发展，使用规模和参数的持续扩大，尤其是在处理长上下文（long-context）请求时，LLM 推理面临两大核心性能瓶颈：</p>
+<ul>
+<li>成本激增 —— 用户请求变得更加复杂与庞大，导致 GPU 资源消耗迅速攀升，从而引发推理成本成倍增长的问题；</li>
+<li>延迟指标难以达标 —— 在保障用户体验的前提下，如何满足对“首个 Token 响应时间（TTFT, Time to First Token）与 Token 间响应时间（ITL, Inter-Token Latency）”的严格服务等级目标（SLOs），已成为技术落地的关键挑战之一。</li>
+</ul>
+<p>为缓解上述情况，KV Cache应运而生。所谓 KV Cache就是预先计算新知识内容的 KV Cache，以便在后续相同知识输入时，KV Cache可以直接被 LLM 使用。</p>
+<p>通过这种方式，KV Cache一旦生成，就可以供 LLM 重用，以便在后续输入请求使用已缓存的相同上下文时，跳过预填充阶段。当许多查询重用相同上下文时，KV Cache可以极大减少每个查询的延迟和计算开销，同时仍保留上下文学习的模块性，无需额外的计算开销来预填充知识文本。</p>
+<p><strong>本质上是一种用空间换时间的技术</strong></p>
+<p>作者在《Do Large Language Models Need a Content Delivery Network》论文中对这种“空间换时间”的技术指出了两个优点：</p>
+<ul>
+<li>KV Cache被大量重用。许多上下文，特别是长上下文，经常被不同查询和不同用户重用。这可以看作是 LLM 版本的帕累托法则：即 LLM 像人类一样，在 80% 的时间内使用 20% 的知识，这意味着知识被频繁重用。</li>
+<li>KV Cache大小的增加速度慢于预填充延迟。随着上下文增加，KV Cache大小线性增长，而预填充延迟<strong>超线性增长</strong>（由于注意力机制的存在）。随着 LLM 规模变大，更多计算将发生在前馈层，这不会影响 KV Cache大小。</li>
+</ul>
+<p>然而目前的 KV Cache系统也存在一些局限性：</p>
+<ul>
+<li><strong>KV Cache的存储空间有限</strong>：目前，许多服务仅使用可由单个 LLM 实例本地访问的 GPU/CPU 内存来存储 KV Cache。这种仅本地存储的方式极大地限制了可被存储和重用的 KV Cache量。例如，对于小型 LLM（Llama 34B），64 GB 的 CPU 内存只能存储 160 K Token 的 KV Cache。而将 KV Cache扩展到硬盘或远程服务器将显著限制其加载到 GPU 中的速度。</li>
+<li><strong>仅前缀的 KV Cache可重用</strong>：为了重用 KV Cache，大多数系统要求 KV Cache的文本必须是 LLM 输入的前缀。尽管 LLM 自然支持重用前缀的 KV Cache，但这种“仅共享前缀”的假设严重限制了其用例。例如，在 RAG+LLM 方法中，会在 LLM 中写入多个检索到的文本块，但这些重用的文本大多并非前缀。</li>
+<li><strong>在长上下文中缓存质量下降</strong>：随着更多文本作为上下文添加到输入中，LLM 捕获重要信息的能力可能降低，从而降低推理质量。因此，当 KV Cache被更多查询重复使用时，LLM 的输出质量会下降。</li>
+</ul>
+<p>作者针对现有 KV Cache的局限性进行改进，并提出了一种新的 KV Cache系统——KDN。</p>
+<h2 id="kdn">KDN</h2>
+<p>作者认为，要解决当前 KV Cache存在的问题，需要一个独立的 KV Cache管理系统，该系统可以动态压缩、组合并修改 KV Cache，以优化其存储与交付，并在此基础上提升 LLM 推理效率。作者将这样的系统称为 KDN。如下图所示，KDN 的架构由三个主要模块组成：</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1752923810895.png" alt="" loading="lazy"></figure>
+<ul>
+<li><strong>KV Cache Store</strong>：存储模块负责存储文本及其可修改的 KV Cache，使其能够提升 LLM 推理质量。</li>
+<li><strong>KV Cache Delivery</strong>：发送模块负责将<strong>压缩</strong>后的 KV Cache传输到运行 LLM 的服务器，并在 GPU 中解压以供 LLM 服务使用。</li>
+<li><strong>KV Cache Blend</strong>：混合模块能够动态将多个不同文本的 KV Cache进行组合，然后将这些 KV Cache一起放入 LLM 上下文中。</li>
+</ul>
+<p>现有的 LLM 服务系统将 KV Cache与 LLM 深度耦合。相比之下，KDN 的概念是将 KV Cache和 LLM 服务分离，实现了 KV Cache的存储、共享和使用，而无需与快速发展的 LLM 服务深度耦合。通过单独优化 KDN，它可以作为 LLM 服务生态系统的关键新系统模块（类似中间件）。</p>
+<p>KDN 使 KV Cache管理与 LLM 服务解耦，这允许 LLM 服务专注于快速高效地进行推理，而 KDN 可以独立专注于 KV Cache相关的优化。</p>
+<h3 id="技术路线">技术路线</h3>
+<p>KDN 本身的架构并不直接解决 KV Cache相关问题。KDN 只是解耦了 KV Cache与 LLM 服务之间的关联，目前针对 KV Cache的新兴研究工作可能逐步让每个模块实用化，从而提升 KDN 整体有效性。</p>
+<ul>
+<li>
+<p><strong>KV Cache Delivery</strong>：最近的 KV Cache压缩技术使得在 GPU 和 CPU 内存之外，能够以更低成本存储并快速加载 KV Cache。例如，CacheGen<sup>[1]</sup> 通过量化并将其编码为二进制字符串来压缩 KV Cache；LLMLingua<sup>[2]</sup> 引入一个更小的语言模型识别并删除知识文本中的非必要标记，从而减少相应 KV Cache大小；H2O<sup>[3]</sup>根据推断过程中的重要性直接删除 KV Cache中的元素。通过结合上述技术，KV Cache的内存占用可减少 10 倍以上，大幅提升加载速度并降低存储成本。</p>
+</li>
+<li>
+<p><strong>KV Cache Blend</strong>：最近的一些工作也提高了 KV Cache的可组合性。例如，CacheBlend<sup>[4]</sup>通过重新计算 KV Cache之间的交叉注意力，可任意组合不同 KV Cache，其中重新计算仅需全文 10% 的计算；PromptCache<sup>[5]</sup>允许用户定义不同段的提示模板，使得每个段的 KV Cache可在不同位置重复使用，而不仅限于前缀。</p>
+</li>
+<li>
+<p><strong>Offline KV-cache editing</strong>：通过将 KV Cache管理与 LLM 服务引擎分离，KDN 为提高推理质量开辟了新可能性。最近的研究表明，如果适当修改 LLM 输入的注意力矩阵，推理质量可显著提升<sup>[6,7]</sup>。换句话说，当 KV Cache“存放”到 KDN 时，KDN 不仅存储它，还可通过修改 KV Cache并在下次检索时返回修改后的版本，从而主动影响 LLM 推理质量，而无需对输入提示的模型本身做任何更改。</p>
+</li>
+<li>
+<p><strong>Interface with LLM serving engines</strong>：目前，大多数 LLM 服务引擎（如 vLLM、HuggingFace TGI 和 SGLang）不支持将外部提供的 KV Cache注入为 LLM 输入的一部分。然而，它们内部的 KV Cache管理与模型推理高度耦合。部署 KDN 的一种方法是将其作为 LLM 引擎的子模块来增强每个引擎。然而，开发高性能 KDN 是一项艰巨任务，若每个引擎都独立维护和发展其 KDN，将导致大量冗余工程工作。为避免重复造轮子，LLM 服务引擎可通过两个 API 与独立的共享 KDN 提供者对接：</p>
+<p>（1）LLM 将 KV Cache与相关文本一起存储到 KDN<br>
+（2）LLM 使用某些文本从 KDN 检索 KV Cache</p>
+<p>公开这些 API 是可行的，因为大多数主流 LLM 引擎均为开源。但仍存在一些设计问题：如何利用异构链路（如 NVLink、RDMA 或 PCIe）传输 KV Cache？API 能否与其他 LLM 函数（如分解预填充）共享？</p>
+</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>
+<p>使用 KDN，在注入新知识时比微调快 40 倍，与上下文学习相比，推理时间降低 3.7 倍，速度提升 2.5 倍。<br>
+<img src="https://voluntexi.github.io//post-images/1752923823134.png" alt="" loading="lazy"></p>
+</li>
+<li>
+<p>在 32 K 上下文的多轮对话场景中，LMCache 的 TTFT（首 Token 延迟）从 1.8 秒降至 0.4 秒，GPU 利用率下降 40%。<br>
+<img src="https://voluntexi.github.io//post-images/1752923846126.png" alt="" loading="lazy"></p>
+</li>
+</ul>
+<h2 id="使用">使用</h2>
+<ol>
+<li>下载库</li>
+</ol>
+<pre><code class="language-cmd">git clone https://github.com/LMCache/LMCache.git  
+
+cd LMCache   pip install -e . --no-cache-dir  
+</code></pre>
+<ol start="2">
+<li>启动 vLLM 并挂载 LMCache</li>
+</ol>
+<pre><code class="language-cmd">python -m vllm.entrypoints.api_server \      
+
+--model meta-llama/Meta-Llama-3-8B-Instruct \      
+
+--kv-transfer-config '{&quot;kv_connector&quot;: &quot;lmcacheconnector&quot;}' \      
+
+--max-model-len 128000  # 支持长上下文
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>简而言之，该论文的创新性为：</p>
+<ul>
+<li>将知识管理（以 KV Cache的形式）与 LLM 服务引擎之间的解耦</li>
+<li>提出了知识交付网络（KDN）作为新的 LLM 系统组件，并利用最新研究优化基于 KV Cache的知识注入效率（速度与成本）</li>
+</ul>
+<h2 id="参考文献">参考文献</h2>
+<p>[1] Yuhan Liu, Hanchen Li, Kuntai Du, Jiayi Yao, Yihua Cheng, Yuyang Huang, Shan Lu, Michael Maire, Henry Hoffmann, Ari Holtzman, et al. Cachegen: Fast context loading for language model applications. arXiv preprint arXiv:2310.07240, 2023.</p>
+<p>[2] Huiqiang Jiang, Qianhui Wu, Chin-Yew Lin, Yuqing Yang, and Lili Qiu. Llmlingua: Compressing prompts for accelerated inference of large language models. arXiv preprint arXiv:2310.05736, 2023.</p>
+<p>[3] Zhenyu Zhang, Ying Sheng, Tianyi Zhou, Tianlong Chen, Lianmin Zheng, Ruisi Cai, Zhao Song, Yuandong Tian, Christopher Re, Clark Barrett, Zhangyang Wang, and Beidi Chen. H2O: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models. In Workshop on Efficient Systems for Foundation Models @ICML2023, 2023.</p>
+<p>[4] Jiayi Yao, Hanchen Li, Yuhan Liu, Siddhant Ray, Yihua Cheng, Qizheng Zhang, Kuntai Du, Shan Lu, and Junchen Jiang. Cacheblend: Fast large language model serving with cached knowledge fusion. arXiv preprint arXiv:2405.16444, 2024.</p>
+<p>[5] In Gim, Guojun Chen, Seung seob Lee, Nikhil Sarda, Anurag Khandelwal, and Lin Zhong. Prompt cache: Modular attention reuse for low-latency inference, 2023.</p>
+<p>[6] Anonymous. Model tells itself where to attend: Faithfulness meetsautomatic attention steering. In Submitted to ACL Rolling Review June 2024, 2024. under review.</p>
+<p>[7] Qingru Zhang, Chandan Singh, Liyuan Liu, Xiaodong Liu, Bin Yu, Jianfeng Gao, and Tuo Zhao. Tell your model where to attend: Posthoc attention steering for llms. arXiv preprint arXiv:2311.02262, 2023.</p>
+<p>[8] [<a href="https://arxiv.org/abs/2409.13761">2409.13761] Do Large Language Models Need a Content Delivery Network?</a></p>
+<p>[9] <a href="https://github.com/LMCache/LMCache">LMCache/LMCache: Supercharge Your LLM with the Fastest KV Cache Layer</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#kdn">KDN</a>
+<ul>
+<li><a href="#%E6%8A%80%E6%9C%AF%E8%B7%AF%E7%BA%BF">技术路线</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E9%AA%8C">实验</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8">使用</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/mcp-and-function-calling/">
+              <h3 class="post-title">
+                MCP &amp;&amp; Function Calling
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

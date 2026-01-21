@@ -1,0 +1,253 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title> LONGNET: Scaling Transformers to 1,000,000,000 Tokens | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title=" LONGNET: Scaling Transformers to 1,000,000,000 Tokens | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="前段时间刚介绍了能使模型处理上下文扩展到百万级别的方法，现在微软又提出了一种能扩展到十亿级别的方法（不过有标题党的嫌疑，因为在实验中作者只扩展到了百万级别）
+
+概述
+微软研究提出了一种新的Transformer变体：LONGNET，该架构将..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+               LONGNET: Scaling Transformers to 1,000,000,000 Tokens
+            </h2>
+            <div class="post-info">
+              <span>
+                2023-07-21
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/longnet.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>前段时间刚介绍了能使模型处理上下文扩展到百万级别的方法，现在微软又提出了一种能扩展到十亿级别的方法（不过有标题党的嫌疑，因为在实验中作者只扩展到了百万级别）</p>
+<!-- more -->
+<h2 id="概述">概述</h2>
+<p>微软研究提出了一种新的Transformer变体：<strong>LONGNET</strong>，该架构将序列标记长度扩展到了10亿级别，且不会影响较短序列的性能。它采用用一个名为 <strong>膨胀注意力（dilated attention）</strong> 的新颖组件取代了普通Transformers的注意力，其设计原则为：注意力分配随着Token之间距离的增加呈指数减少。这使得LONGNET可以获得线性计算复杂度和对数依赖性，从而解决了有限的注意力资源和每个标记的可访问性之间的矛盾。</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1688989328365.png" alt="" loading="lazy"></figure>
+<h2 id="longnet">LONGNET</h2>
+<h3 id="膨胀注意力">膨胀注意力</h3>
+<p>膨胀注意力由一系列用于建模短程和长程依赖关系的注意力模式组成，注意力模式的数量可以根据序列长度进行扩展。在每个注意力模式中，查询向量和键向量之间的点积被分解为多个子点积，每个子点积仅涉及到一小部分的键向量。这种分解方式可以减少计算复杂度，同时也可以使模型更好地处理长序列。具体如下图所示：<br>
+<img src="https://voluntexi.github.io//post-images/1688989340194.png" alt="" loading="lazy"></p>
+<p>膨胀注意力还引入了“多头”机制，可以在不同的头之间分别计算注意力。每个头都有自己的偏移量，这样就可以在不同的位置上计算注意力，从而更好地捕捉序列中的信息。通过这种方式，扩张注意力可以更好地处理长序列，同时保持较短序列的性能。具体如下图所示：<br>
+<img src="https://voluntexi.github.io//post-images/1688989350707.png" alt="" loading="lazy"></p>
+<blockquote>
+<p>看到这里，会不会觉得这里的膨胀注意力其实和之前介绍的<a href="https://voluntexi.github.io/longformer/">Longformer </a>很相似？</p>
+</blockquote>
+<h3 id="分布式训练"><strong>分布式训练</strong></h3>
+<p>虽然 膨胀注意力的计算复杂度已经大幅降低到 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span>，但由于计算和内存的限制，在单个 GPU 设备上将序列长度扩展到百万级别是不可行的。有一些用于大规模模型训练的分布式训练算法，如模型并行、序列并行 和 流水线并行，然而这些方法对于 LONGNET 来说是不够的，特别是当序列维度非常大时。</p>
+<p>作者利用 LONGNET 的线性计算复杂度来进行序列维度的分布式训练。下图展示了在两个 GPU 上的分布式算法，还可以进一步扩展到任意数量的设备。<br>
+<img src="https://voluntexi.github.io//post-images/1688989357813.png" alt="" loading="lazy"></p>
+<blockquote>
+<p>也就将上下文划分成多个segment，每个GPU处理一个segment进行膨胀注意力，然后再将每个膨胀注意力组合起来，也就是说只要GPU数量足够，那么就可以扩展到任意长度的context</p>
+</blockquote>
+<h2 id="实验结果">实验结果</h2>
+<p>LONGNET能够在几乎恒定的运行时间下有效地将序列长度扩展到1B个Token如下图所示，而普通Transformer则面临着二次复杂度的问题。</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1688989366069.png" alt="" loading="lazy"></figure>
+<p>将LONGNET与原始Transformer和稀疏Transformer进行比较。架构之间的差异在于注意力层，而其他部分保持不变。将这些模型的序列长度从2K扩展到32K，同时减小批次大小以保持每批次的Token数量恒定。实验结果表明：<br>
+<strong>1)在训练期间增加序列长度通常会产生更好的语言模型;</strong><br>
+<strong>2)推理中序列长度的外推不适用于长度远大于模型支持的情况;</strong><br>
+<strong>3)LONGNET始终优于基线模型，证明了其在语言建模方面的有效性。</strong></p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1688989374645.png" alt="" loading="lazy"></figure>
+<p><strong>Scaling Curves of Sequence Length</strong></p>
+<p>下图绘制了原始transformer 和 LONGNET 的序列长度扩展曲线。作者通过计算矩阵乘法的总 flops 来估计计算量。<strong>结果表明LONGNET 可以更有效地扩展上下文长度，以较小的计算量实现较低的测试损失。</strong></p>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1688989381378.png" alt="" loading="lazy"></figure>
+<p><strong>Scaling up Model Size</strong></p>
+<p>为了验证 LONGNET 是否仍然遵循类似的扩展规律，作者用不同的模型规模（从 1.25 亿到 27 亿个参数） 训练了一系列模型。27 亿的模型是用 300B 的 token 训练的，而其余的模型则用到了大约 400B 的 token。下图a部分为 LONGNET 关于计算的扩展曲线。作者在相同的测试集上计算了复杂度。这证明了 LONGNET 仍然可以遵循幂律。这也就意味着 dense Transformer 不是扩展语言模型的先决条件。<strong>LONGNET 可以提高模型的可扩展性和效率</strong>。<br>
+<img src="https://voluntexi.github.io//post-images/1688989385391.png" alt="" loading="lazy"></p>
+<p><strong>Long Context Prompting</strong></p>
+<p>作者保留了一段前缀（prefixes）作为 prompt，并测试其后缀（suffixes）的困惑度。并且逐渐将 prompt 从 2K 扩展到 32K。为了进行公平的比较，保持后缀的长度不变，而将前缀的长度增加到模型的最大长度。上图 (b) 报告了测试集上的结果。它表明，随着上下文窗口的增加，LONGNET 的测试损失逐渐减少。<strong>这证明了 LONGNET 在充分利用长语境来改进语言模型方面的优越性</strong>。</p>
+<h2 id="参考文献">参考文献</h2>
+<p><a href="https://arxiv.org/pdf/2307.02486.pdf">LONGNET: Scaling Transformers to 1,000,000,000 Tokens</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#longnet">LONGNET</a>
+<ul>
+<li><a href="#%E8%86%A8%E8%83%80%E6%B3%A8%E6%84%8F%E5%8A%9B">膨胀注意力</a></li>
+<li><a href="#%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%AD%E7%BB%83"><strong>分布式训练</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C">实验结果</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/scalingTo1m/">
+              <h3 class="post-title">
+                Scaling Transformer to 1M tokens and beyond with RMT
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

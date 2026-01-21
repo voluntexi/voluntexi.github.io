@@ -1,0 +1,479 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>命名实体识别在HanLP中的实现 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="命名实体识别在HanLP中的实现 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="命名实体：文本中有一些描述实体的词汇。比如人名、地名、组织机构名、股票基金、医学术语等
+
+具有以下特点:
+
+数量无穷。比如宇宙中的恒星命名、新生儿的命名不断出现新组合。
+构词灵活。比如中国工商银行，既可以称为工商银行，也可以简称工行。
+类别..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              命名实体识别在HanLP中的实现
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-08-13
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><strong>命名实体</strong>：文本中有一些描述实体的词汇。比如人名、地名、组织机构名、股票基金、医学术语等</p>
+<!-- more -->
+<p>具有以下特点:</p>
+<ul>
+<li>数量无穷。比如宇宙中的恒星命名、新生儿的命名不断出现新组合。</li>
+<li>构词灵活。比如中国工商银行，既可以称为工商银行，也可以简称工行。</li>
+<li>类别模糊。有一些地名本身就是机构名，比如“国家博物馆”。</li>
+</ul>
+<p>识别出句子中<strong>命名实体</strong>的边界与类别的任务称为<strong>命名实体识别</strong></p>
+<ul>
+<li>对于规则性较强的命名实体，比如网址、E-mail、IBSN、商品编号等。可以通过正则表达式处理，未匹配上的片段交给统计模型处理。</li>
+<li>对于较短的命名实体，比如人名，可以通过分词来确定边界，通过词性标注确定类别</li>
+</ul>
+<p>命名实体识别也可以转化为一个序列标注问题，可以将命名实体识别附着到{B,M,E,S}标签</p>
+<h2 id="基于规则的命名实体识别">基于规则的命名实体识别</h2>
+<h3 id="人名识别">人名识别</h3>
+<p>音译人名用字较为固定，若音译字符连续的出现，则很有可能来自于一个音译人名。因此可以通过如下规则来进行人名识别：</p>
+<ul>
+<li>
+<p>若粗分结果中某词语的备选词性有出现音译人名中的词语，则从该词的出发，向后扫描进行合并，知道词语为非音译人名库中的词语。</p>
+<p>例如：</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1660357758114.png" alt="" loading="lazy"></figure>
+<p>&quot;卡利斯&quot;触发了合并规则，直到遇到“出生于”才会中止合并</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1660357766177.png" alt="" loading="lazy"></figure>
+<h3 id="数词英文识别">数词英文识别</h3>
+<p>数词（123、一、二、三）的识别的常见做法为：</p>
+<ul>
+<li>
+<p>获取每个字符的类型</p>
+</li>
+<li>
+<p>然后扫描字符串的类型数组，将类型相同的字符合并，利用类型（数词m或者英文nx）来确定词性</p>
+<p>HanLP中实现如下</p>
+<pre><code class="language-python">from pyhanlp import *
+ViterbiSegment = JClass('com.hankcs.hanlp.seg.Viterbi.ViterbiSegment')
+CharType = JClass('com.hankcs.hanlp.dictionary.other.CharType')
+segment = ViterbiSegment()
+print(segment.seg(&quot;牛奶三〇〇克壹佰块&quot;))
+print(segment.seg(&quot;牛奶300克100块&quot;))
+print(segment.seg(&quot;牛奶300g100rmb&quot;))
+# 自定义字符串
+text = &quot;牛奶300~400g100rmb&quot;
+print(segment.seg(text))
+CharType.set('~', CharType.CT_NUM)
+print(segment.seg(text))
+</code></pre>
+<p>结果</p>
+<pre><code class="language-python">[牛奶/nf, 三〇〇/m, 克/q, 壹佰/m, 块/q]
+[牛奶/nf, 300/m, 克/q, 100/m, 块/q]
+[牛奶/nf, 300/m, g/nx, 100/m, rmb/nx]
+[牛奶/nf, 300~400/m, g/nx, 100/m, rmb/nx]
+[牛奶/nf, 300~400/m, g/nx, 100/m, rmb/nx]
+</code></pre>
+<h3 id="总结">总结</h3>
+<p>基于规则和词典的方法是命名实体识别中最早使用的方法，规则简单易于实现，但是一般而言，当提取的规则能比较精确地反映语言现象时，基于规则的方法性能要优于基于统计的方法。但是这些规则往往依赖于具体语言、领域和文本风格，编制过程耗时且难以涵盖所有的语言现象，特别容易产生错误，系统可移植性不好，对于不同的系统需要语言学专家重新书写规则。基于规则的方法的另外一个缺点是代价太大，存在系统建设周期长、移植性差而且需要建立不同领域知识库作为辅助以提高系统识别能力等问题。</p>
+</li>
+</ul>
+<h2 id="命名实体识别语料库">命名实体识别语料库</h2>
+<h3 id="1998人民日报语料库">1998《人民日报》语料库</h3>
+<p>假设我们只关心人名、地名和机构名的话，PKU语料就可以视作命名实体识别语料库。其中一句典型样例为:<br>
+<img src="https://voluntexi.github.io//post-images/1660357776148.png" alt="" loading="lazy"></p>
+<h3 id="微软命名实体识别语料库">微软命名实体识别语料库</h3>
+<p>为xml格式，并且命名实体之外的词语没有标注词性，例句为：</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1660357783057.png" alt="" loading="lazy"></figure>
+<h3 id="下载语料库">下载语料库</h3>
+<p>本文使用PKU98语料库进行训练</p>
+<pre><code class="language-python">import zipfile
+import os
+from pyhanlp.static import download, remove_file, HANLP_DATA_PATH
+def test_data_path():
+    data_path = os.path.join(HANLP_DATA_PATH, 'test')
+    if not os.path.isdir(data_path):
+        os.mkdir(data_path)
+    return data_path
+## 验证是否存在 MSR语料库，如果没有自动下载
+def ensure_data(data_name, data_url):
+    root_path = test_data_path()
+    dest_path = os.path.join(root_path, data_name)
+    if os.path.exists(dest_path):
+        return dest_path
+    if data_url.endswith('.zip'):
+        dest_path += '.zip'
+    download(data_url, dest_path)
+    if data_url.endswith('.zip'):
+        with zipfile.ZipFile(dest_path, &quot;r&quot;) as archive:
+            archive.extractall(root_path)
+        remove_file(dest_path)
+        dest_path = dest_path[:-len('.zip')]
+    return dest_path
+## 指定 PKU 语料库
+PKU98 = ensure_data(&quot;pku98&quot;, &quot;http://file.hankcs.com/corpus/pku98.zip&quot;)
+NER_MODEL = os.path.join(PKU98, 'ner.bin')
+
+</code></pre>
+<h2 id="基于统计的命名实体识别">基于统计的命名实体识别</h2>
+<h3 id="基于hmm序列标注的命名实体识别">基于HMM序列标注的命名实体识别</h3>
+<pre><code class="language-python">## 开始 HMM 命名实体识别
+HMMNERecognizer = JClass('com.hankcs.hanlp.model.hmm.HMMNERecognizer')
+AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+PerceptronPOSTagger = JClass('com.hankcs.hanlp.model.perceptron.PerceptronPOSTagger')
+Utility = JClass('com.hankcs.hanlp.model.perceptron.utility.Utility')
+def train(corpus):
+    recognizer = HMMNERecognizer()
+    recognizer.train(corpus)  #训练
+    return recognizer
+def test(recognizer):
+    # 包装了感知机分词器和词性标注器的词法分析器
+    analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), PerceptronPOSTagger(), recognizer)
+    print(analyzer.analyze(&quot;华北电力公司董事长谭旭光和秘书胡花蕊来到美国纽约现代艺术博物馆参观&quot;))
+if __name__ == '__main__':
+    recognizer = train(PKU98)
+    test(recognizer)
+</code></pre>
+<p>识别结果如下：</p>
+<pre><code class="language-python">华北电力公司/nt 董事长/n 谭旭光/nr 和/c 秘书/n 胡花蕊/nr 来到/v 美国纽约/ns 现代/ntc 艺术/n 博物馆/n 参观/v
+</code></pre>
+<p>其中机构名“华北电力公司”、人名“谭旭光”“胡花蕊”全部识别正确。但是地名“美国纽约现代艺术博物馆”则无法识别。有以下两个原因:</p>
+<ul>
+<li>PKU 语料库中没有出现过这个样本。</li>
+<li>隐马尔可夫模型无法利用词性特征。</li>
+</ul>
+<p>对于第一个原因，只能额外标注一些语料。对于第二个原因可以通过切换到更强大的模型来解决。</p>
+<h3 id="基于感知机序列标注的命名实体识别">基于感知机序列标注的命名实体识别</h3>
+<p>与分词和词性标注一样，结构化感知机仍然可以胜任命名实体识别任务。</p>
+<pre><code class="language-python">## 开始 感知机 命名实体识别
+NERTrainer = JClass('com.hankcs.hanlp.model.perceptron.NERTrainer')
+PerceptronNERecognizer = JClass('com.hankcs.hanlp.model.perceptron.PerceptronNERecognizer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+PerceptronPOSTagger = JClass('com.hankcs.hanlp.model.perceptron.PerceptronPOSTagger')
+AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+Utility = JClass('com.hankcs.hanlp.model.perceptron.utility.Utility')
+def train(corpus, model):
+    trainer = NERTrainer()
+    return PerceptronNERecognizer(trainer.train(corpus, model).getModel())
+def test(recognizer):
+    analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), PerceptronPOSTagger(), recognizer)# 包装了感知机分词器和词性标注器的词法分析器
+    print(analyzer.analyze(&quot;华北电力公司董事长谭旭光和秘书胡花蕊来到美国纽约现代艺术博物馆参观&quot;))
+if __name__ == '__main__':
+    recognizer = train(PKU98, NER_MODEL)
+    test(recognizer)
+</code></pre>
+<p>结果如下：</p>
+<pre><code>华北电力公司/nt 董事长/n 谭旭光/nr 和/c 秘书/n 胡花蕊/nr 来到/v [美国纽约/ns 现代/ntc 艺术/n 博物馆/n]/ns 参观/v
+</code></pre>
+<p>与隐马尔可夫模型相比，已经能够正确识别地名了。</p>
+<p>同时，感知机命名实体识别还支持在线学习。</p>
+<p>通过调用<strong>PerceptronLexicalAnalyzer</strong>接口来在线学习新知识</p>
+<pre><code class="language-python">from  pyhanlp import *
+PerceptronNERecognizer = JClass('com.hankcs.hanlp.model.perceptron.PerceptronNERecognizer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+PerceptronPOSTagger = JClass('com.hankcs.hanlp.model.perceptron.PerceptronPOSTagger')
+Sentence = JClass('com.hankcs.hanlp.corpus.document.sentence.Sentence')
+def train(corpus, model):
+    trainer = NERTrainer()
+    return PerceptronNERecognizer(trainer.train(corpus, model).getModel())
+if __name__ == '__main__':
+    recognizer = train(PKU98, NER_MODEL)#创建感知机词法分析器
+    analyzer = PerceptronLexicalAnalyzer(PerceptronSegmenter(), PerceptronPOSTagger(), recognizer)# 根据标注样本的字符串形式创建等价的Sentence对象
+        sentence = Sentence.create(&quot;与/c 特朗普/nr 通/v 电话/n 讨论/v [太空/s 探索/vn 技术/n 公司/n]/nt&quot;)  # ②
+        # 测试词法分析器对样本的分析结果是否与标注一致，若不一致重复在线学习，直到两者一致。
+        while not analyzer.analyze(sentence.text()).equals(sentence):  # ③
+            analyzer.learn(sentence)
+</code></pre>
+<h3 id="基于条件随机场序列标注的命名实体识别">基于条件随机场序列标注的命名实体识别</h3>
+<pre><code class="language-python">CRFNERecognizer = JClass('com.hankcs.hanlp.model.crf.CRFNERecognizer')
+AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+Utility = JClass('com.hankcs.hanlp.model.perceptron.utility.Utility')
+def train(corpus, model):
+    # 零参数的构造函数代表加载配置文件默认的模型，必须用null None 与之区分。
+    recognizer = CRFNERecognizer(None)  # 空白
+    recognizer.train(corpus, model)
+    return recognizer
+def test(recognizer):
+    analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), PerceptronPOSTagger(), recognizer)
+    print(analyzer.analyze(&quot;华北电力公司董事长谭旭光和秘书胡花蕊来到美国纽约现代艺术博物馆参观&quot;))
+if __name__ == '__main__':
+    recognizer = train(PKU98, NER_MODEL)
+    test(recognizer)
+</code></pre>
+<p>运行时间较长，结果如下:</p>
+<pre><code>华北电力公司/nt 董事长/n 谭旭光/nr 和/c 秘书/n 胡花蕊/nr 来到/v [美国纽约/ns 现代/ntc 艺术/n 博物馆/n]/ns 参观/v
+</code></pre>
+<p>得到了正确结果。</p>
+<h3 id="命名实体识别标准化评测">命名实体识别标准化评测</h3>
+<p>各个命名实体识别模块的准确率如何，并非只能通过几个句子主观感受。任何监督学习任务都有一套标准化评测方案，对于命名实体识别，按照惯例引入P、R 和 F1 评测指标。</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mfrac><mrow><mi mathvariant="normal">正</mi><mi mathvariant="normal">确</mi><mi mathvariant="normal">识</mi><mi mathvariant="normal">别</mi><mi mathvariant="normal">的</mi><mi mathvariant="normal">命</mi><mi mathvariant="normal">名</mi><mi mathvariant="normal">实</mi><mi mathvariant="normal">体</mi><mi mathvariant="normal">数</mi></mrow><mrow><mi mathvariant="normal">识</mi><mi mathvariant="normal">别</mi><mi mathvariant="normal">出</mi><mi mathvariant="normal">的</mi><mi mathvariant="normal">命</mi><mi mathvariant="normal">名</mi><mi mathvariant="normal">实</mi><mi mathvariant="normal">体</mi><mi mathvariant="normal">总</mi><mi mathvariant="normal">数</mi></mrow></mfrac><mtext> </mtext><mi mathvariant="normal">，</mi><mi>R</mi><mo>=</mo><mfrac><mrow><mi mathvariant="normal">正</mi><mi mathvariant="normal">确</mi><mi mathvariant="normal">识</mi><mi mathvariant="normal">别</mi><mi mathvariant="normal">的</mi><mi mathvariant="normal">命</mi><mi mathvariant="normal">名</mi><mi mathvariant="normal">实</mi><mi mathvariant="normal">体</mi><mi mathvariant="normal">数</mi></mrow><mrow><mi mathvariant="normal">命</mi><mi mathvariant="normal">名</mi><mi mathvariant="normal">实</mi><mi mathvariant="normal">体</mi><mi mathvariant="normal">总</mi><mi mathvariant="normal">数</mi></mrow></mfrac><mtext> </mtext><mi mathvariant="normal">，</mi><msub><mi>F</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mo>∗</mo><mi>P</mi><mo>∗</mo><mi>R</mi></mrow><mrow><mi>P</mi><mo>+</mo><mi>R</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">P=\frac{正确识别的命名实体数}{识别出的命名实体总数} \ ，
+R=\frac{正确识别的命名实体数}{命名实体总数} \ ，
+F_1=\frac{2*P*R}{P+R}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.3693300000000002em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.677em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">识</span><span class="mord cjk_fallback">别</span><span class="mord cjk_fallback">出</span><span class="mord cjk_fallback">的</span><span class="mord cjk_fallback">命</span><span class="mord cjk_fallback">名</span><span class="mord cjk_fallback">实</span><span class="mord cjk_fallback">体</span><span class="mord cjk_fallback">总</span><span class="mord cjk_fallback">数</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">正</span><span class="mord cjk_fallback">确</span><span class="mord cjk_fallback">识</span><span class="mord cjk_fallback">别</span><span class="mord cjk_fallback">的</span><span class="mord cjk_fallback">命</span><span class="mord cjk_fallback">名</span><span class="mord cjk_fallback">实</span><span class="mord cjk_fallback">体</span><span class="mord cjk_fallback">数</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace"> </span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.3693300000000002em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.677em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">命</span><span class="mord cjk_fallback">名</span><span class="mord cjk_fallback">实</span><span class="mord cjk_fallback">体</span><span class="mord cjk_fallback">总</span><span class="mord cjk_fallback">数</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">正</span><span class="mord cjk_fallback">确</span><span class="mord cjk_fallback">识</span><span class="mord cjk_fallback">别</span><span class="mord cjk_fallback">的</span><span class="mord cjk_fallback">命</span><span class="mord cjk_fallback">名</span><span class="mord cjk_fallback">实</span><span class="mord cjk_fallback">体</span><span class="mord cjk_fallback">数</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace"> </span><span class="mord cjk_fallback">，</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.1296600000000003em;vertical-align:-0.7693300000000001em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.36033em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693300000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>引用《自然语言处理入门》书中的数据：</p>
+<p>在1998年1月《人民日报》语料库上的标准化评测结果如下:</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>P</th>
+<th>R</th>
+<th>F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>隐马尔可夫模型</td>
+<td>79.01</td>
+<td>30.14</td>
+<td>43.64</td>
+</tr>
+<tr>
+<td>感知机</td>
+<td>87.33</td>
+<td>78.98</td>
+<td>82.94</td>
+</tr>
+<tr>
+<td>条件随机场</td>
+<td>87.93</td>
+<td>73.75</td>
+<td>80.22</td>
+</tr>
+</tbody>
+</table>
+<h3 id="总结-2">总结</h3>
+<p>条件随机场为命名实体识别提供了一个特征灵活、全局最优的标注框架，但同时存在收敛速度慢、训练时间长的问题。一般说来，支持向量机在正确率上要比隐马尔可夫模型高一些，但是隐马尔可夫模型在训练和识别时的速度要快一些，主要是由于在利用维特比算法求解命名实体类别序列的效率较高。隐马尔可夫模型更适用于一些对实时性有要求以及像信息检索这样需要处理大量文本的应用,如短文本命名实体识别。</p>
+<p>基于统计的方法对语料库的依赖也比较大，而可以用来建设和评估命名实体识别系统的大规模通用语料库又比较少。</p>
+<h2 id="自定义领域命名实体识别">自定义领域命名实体识别</h2>
+<p>假设我们想要识别专门领域中的命名实体，这时，我们就要自定义领域的语料库了。</p>
+<ul>
+<li>
+<p>收集一些文本， 作为标注语料库的原料，称为<strong>生语料</strong></p>
+</li>
+<li>
+<p>生语料准备就绪后，就可以开始标注了。对于命名实体识别语料库，若以词语和词性为特征的话，还需要标注分词边界和词性。可以在HanLP的标注基础上进行校正，这样工作量更小。</p>
+<p>例如：</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1660357640887.png" alt="" loading="lazy"></figure>
+<p>通过HanLP词法分析器，输出：</p>
+<figure data-type="image" tabindex="5"><img src="https://voluntexi.github.io//post-images/1660357646432.png" alt="" loading="lazy"></figure>
+<p>人工定义标签，将米格-17PF作为一个标签</p>
+<p><img src="https://voluntexi.github.io//post-images/1660357651169.png" alt="" loading="lazy"><br>
+样本标注了数千个之后，生语料就被标注成了<strong>熟语料</strong>。</p>
+<ul>
+<li>通过使用感知机作为训练算法，让语料库能够正确识别</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E8%A7%84%E5%88%99%E7%9A%84%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB">基于规则的命名实体识别</a>
+<ul>
+<li><a href="#%E4%BA%BA%E5%90%8D%E8%AF%86%E5%88%AB">人名识别</a></li>
+<li><a href="#%E6%95%B0%E8%AF%8D%E8%8B%B1%E6%96%87%E8%AF%86%E5%88%AB">数词英文识别</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+<li><a href="#%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB%E8%AF%AD%E6%96%99%E5%BA%93">命名实体识别语料库</a>
+<ul>
+<li><a href="#1998%E4%BA%BA%E6%B0%91%E6%97%A5%E6%8A%A5%E8%AF%AD%E6%96%99%E5%BA%93">1998《人民日报》语料库</a></li>
+<li><a href="#%E5%BE%AE%E8%BD%AF%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB%E8%AF%AD%E6%96%99%E5%BA%93">微软命名实体识别语料库</a></li>
+<li><a href="#%E4%B8%8B%E8%BD%BD%E8%AF%AD%E6%96%99%E5%BA%93">下载语料库</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E7%9A%84%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB">基于统计的命名实体识别</a>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8Ehmm%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8%E7%9A%84%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB">基于HMM序列标注的命名实体识别</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8%E7%9A%84%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB">基于感知机序列标注的命名实体识别</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E6%9D%A1%E4%BB%B6%E9%9A%8F%E6%9C%BA%E5%9C%BA%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8%E7%9A%84%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB">基于条件随机场序列标注的命名实体识别</a></li>
+<li><a href="#%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB%E6%A0%87%E5%87%86%E5%8C%96%E8%AF%84%E6%B5%8B">命名实体识别标准化评测</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93-2">总结</a></li>
+</ul>
+</li>
+<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%A2%86%E5%9F%9F%E5%91%BD%E5%90%8D%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB">自定义领域命名实体识别</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/ci-xing-biao-zhu-zai-hanlp-zhong-de-shi-xian/">
+              <h3 class="post-title">
+                词性标注在HanLP中的实现
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

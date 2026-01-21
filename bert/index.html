@@ -1,0 +1,297 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BERT | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="BERT | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="BERT(Bidirectional Encoder Representation from Transformers)，BERT模型在结构上简单来讲就是一个多层的transformer的Encoder
+
+概述
+Transformer模型自..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              BERT
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-12-28
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://img1.baidu.com/it/u=2880138106,1379969921&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=640&amp;h=324" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><strong>BERT</strong>(Bidirectional Encoder Representation from Transformers)，BERT模型在结构上简单来讲就是一个多层的transformer的<strong>Encoder</strong></p>
+<!-- more -->
+<h2 id="概述">概述</h2>
+<p>Transformer模型自提出以来，已经在很多地方都取得了不错的成果，尤其是在nlp领域，它取得的成果是令人瞩目的，相比于之前的模型，transformer模型的attention机制更够更好地学习到句子当中单词与单词之间的联系，从而能够结合上下文语境来提高准确度。</p>
+<p>更重要的是，transformer的这种attention机制是一种底层的方法，基于它可以构造出一些新的模型，而这些模型在nlp中往往有着出色的表现，BERT模型就是其中之一。</p>
+<p>对于Transformer模型的结构，可以参考上一篇文章：<a href="https://voluntexi.github.io/post/transformer/">Transformer | 威伦特 (voluntexi.github.io)</a></p>
+<h2 id="bert的架构">BERT的架构</h2>
+<blockquote>
+<p>论文原文：<a href="https://arxiv.org/pdf/1810.04805.pdf">1810.04805.pdf (arxiv.org)</a></p>
+</blockquote>
+<p>BERT的模型架构是基于Vaswani et al. (2017) 中描述的原始实现multi-layer bidirectional Transformer编码器，并在tensor2tensor库中发布。</p>
+<p>论文将Transformer blocks表示为L，将隐藏大小表示为H，将self-attention heads的数量表示为A。在所有情况下，将 feed-forward 的大小设置为 4H，即H = 768时为3072，H = 1024时为4096。论文主要报告了Bert两种模型大小的结果：</p>
+<figure data-type="image" tabindex="1"><img src="https://pic2.zhimg.com/v2-0864e6b980e2457ef66b0cf55a03b1d5_b.jpg" alt="img" loading="lazy"></figure>
+<p>论文选择了BERT LARGE ，它与OpenAI GPT具有相同的模型大小。然而，重要的是，BERT 使用了双向self-attention，而GPT Transformer 使用受限制的self-attention，其中每个token只能处理其左侧的上下文。研究团队注意到，在文献中，双向 Transformer 通常被称为“<strong>Transformer encoder</strong>”，而左侧上下文被称为“<strong>Transformer decoder</strong>”，因为它可以用于文本生成。BERT，OpenAI GPT和ELMo之间的比较如图</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1672072386365.png" alt="" loading="lazy"></figure>
+<h3 id="embedding"><strong>Embedding</strong></h3>
+<p>BERT的<strong>embedding</strong>由<strong>token embedding</strong>、<strong>segment embedding</strong>、<strong>position embedding</strong>进行求和组成</p>
+<figure data-type="image" tabindex="3"><img src="https://pic2.zhimg.com/80/v2-11505b394299037e999d12997e9d1789_720w.webp" alt="img" loading="lazy"></figure>
+<p>在句子开头和结尾加入  <strong>[CLS]</strong> 和  <strong>[SEP]</strong> 特殊符号，组成了输入的句子。</p>
+<blockquote>
+<p>BERT对句子的长度进行了大小为512的限制，目前对这个问题的处理的方法有：</p>
+<ul>
+<li>head：保存前 510 个 token （留两个位置给 [CLS] 和 [SEP] ）</li>
+<li>tail ：保存最后 510 个token</li>
+<li>head+tail ：选择前128个 token 和最后382个 token（文本在800以内）或者前256个token+后254个token（文本大于800tokens）</li>
+</ul>
+</blockquote>
+<hr>
+<p>其中：</p>
+<ul>
+<li><strong>Token Embeddings</strong>是词向量，对每个字符进行768维向量化</li>
+<li><strong>Segment Embeddings</strong>用来区别两个句子，第一个句子全为0，第二个句子全为1，因为预训练不光做LM还要做以两个句子为输入的分类任务</li>
+<li><strong>Position Embeddings</strong>和之前文章中的Transformer不一样，是通过不断学习得出的</li>
+</ul>
+<h2 id="预训练阶段">预训练阶段</h2>
+<p>BERT是一个多任务模型，它的任务是由两个自监督任务组成，即<strong>MLM(masked language model )<strong>和</strong>NSP（next sentence prediction）</strong>。</p>
+<h3 id="masked-language-model">Masked Language Model</h3>
+<p>Masked Language Model（MLM）和核心思想取自Wilson Taylor在1953年发表的一篇论文。所谓MLM是指在训练的时候随即从输入预料上<strong>mask</strong>掉一些单词，然后通过的上下文预测该单词，该任务非常像我们在中学时期经常做的<strong>完形填空</strong>。正如传统的语言模型算法和RNN匹配那样，MLM的这个性质和Transformer的结构是非常匹配的。</p>
+<p>在BERT的实验中，<strong>15%</strong> 的WordPiece Token会被随机Mask掉。</p>
+<p>在训练模型时，一个句子会被多次喂到模型中用于参数学习，但是Google并没有在每次都mask掉这些单词，而是在确定要Mask掉的单词之后，<strong>80%的时候会直接替换为[Mask]</strong>，<strong>10%的时候将其替换为其它任意单词，10%的时候会保留原始Token。</strong></p>
+<ul>
+<li>
+<p>80%：<code>my dog is hairy -&gt; my dog is [mask]</code></p>
+</li>
+<li>
+<p>10%：<code>my dog is hairy -&gt; my dog is apple</code></p>
+</li>
+<li>
+<p>10%：<code>my dog is hairy -&gt; my dog is hairy</code></p>
+</li>
+</ul>
+<p><strong>损失函数：</strong>  将模型被MLM掉的词向量，与正确的词向量进行交叉熵</p>
+<h3 id="next-sentence-prediction">Next Sentence Prediction</h3>
+<p>Next Sentence Prediction（NSP）的任务是判断句子B是否是句子A的下文。如果是的话输出’IsNext‘，否则输出’NotNext‘。训练数据的生成方式是从平行语料中随机抽取的连续两句话，其中<strong>50%</strong> 保留抽取的两句话，它们符合IsNext关系，另外50%的第二句话是随机从预料中提取的，它们的关系是NotNext的。</p>
+<p><strong>损失函数：</strong> 将模型最后输出的[CLS]向量，接一个线性层（768*2）进行一个二分类任务，与正确结果进行交叉熵</p>
+<p><strong>模型的损失函数</strong></p>
+<p>MLM和NSP是一起训练的，总体的损失函数=MLM损失函数+NSP损失函数。</p>
+<h2 id="fine-tuning">Fine-tuning</h2>
+<p>Bert模型在预训练完成后，对模型进行微调，带入对应NLP任务的数据集<strong>再进行训练</strong>，就完成了Fine-tuning过程。</p>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1672072398023.png" alt="" loading="lazy"></figure>
+<ul>
+<li>
+<p><strong>两个句分类任务：</strong> 例如自然语言推断 (MNLI)，句子语义等价判断 (QQP) 等，只需要将两个句子传入 BERT，然后使用 [CLS] 的输出值 <strong>C</strong> 进行句子对分类。</p>
+</li>
+<li>
+<p><strong>单个句子分类任务：</strong> 例如句子情感分析 (SST-2)，判断句子语法是否可以接受 (CoLA) 等，只需要输入一个句子，无需使用 [SEP] 标志，然后也是用 [CLS] 的输出值 <strong>C</strong> 进行分类。</p>
+</li>
+<li>
+<p><strong>问答任务：</strong> 样本是语句对 (Question, Paragraph)，Question 表示问题，Paragraph 是问题的答案。而训练的目标是在 Paragraph 找出答案的起始位置 (Start，End)。将 Question 和 Paragraph 传入 BERT，然后 BERT 根据 Paragraph 所有单词的输出预测 Start 和 End 的位置。</p>
+</li>
+<li>
+<p><strong>单个句子标注任务：</strong> 例如命名实体识别 (NER)，输入单个句子，然后根据 BERT 对于每个单词的输出 <strong>T</strong> 预测这个单词的类别，是属于 Person，Organization，Location，Miscellaneous 还是 Other (非命名实体)。</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="5"><img src="https://voluntexi.github.io//post-images/1672072597166.png" alt="" loading="lazy"></figure>
+<h2 id="bert家族">BERT家族</h2>
+<p>现在几个出名的预训练模型基本都是<strong>Transformer</strong>架构，了解了Transformer其他模型就能够比较快的掌握。<br>
+<img src="https://voluntexi.github.io//post-images/1672072602398.png" alt="" loading="lazy"></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#bert%E7%9A%84%E6%9E%B6%E6%9E%84">BERT的架构</a>
+<ul>
+<li><a href="#embedding"><strong>Embedding</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E9%A2%84%E8%AE%AD%E7%BB%83%E9%98%B6%E6%AE%B5">预训练阶段</a>
+<ul>
+<li><a href="#masked-language-model">Masked Language Model</a></li>
+<li><a href="#next-sentence-prediction">Next Sentence Prediction</a></li>
+</ul>
+</li>
+<li><a href="#fine-tuning">Fine-tuning</a></li>
+<li><a href="#bert%E5%AE%B6%E6%97%8F">BERT家族</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/transformer/">
+              <h3 class="post-title">
+                Transformer
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

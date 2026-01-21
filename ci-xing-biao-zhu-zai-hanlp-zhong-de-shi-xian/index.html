@@ -1,0 +1,422 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>词性标注在HanLP中的实现 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="词性标注在HanLP中的实现 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="词性标注
+词性标注指的是为句子中每个单词预测一个词性标签的任务。
+
+
+r：代词	u：助词	n：名词	v：动词	nr：人名	p：介词	a：形容词
+词性标注语料库与标注集
+同中文分词一样，语言学界在标注规范上存在分歧，导致目前还没有一个被广泛接..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              词性标注在HanLP中的实现
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-08-10
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h2 id="词性标注">词性标注</h2>
+<p><strong>词性标注</strong>指的是为句子中每个单词预测一个词性标签的任务。</p>
+<!-- more -->
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1660124347178.png" alt="" loading="lazy"></figure>
+<p>r：代词	u：助词	n：名词	v：动词	nr：人名	p：介词	a：形容词</p>
+<h3 id="词性标注语料库与标注集">词性标注语料库与标注集</h3>
+<p>同中文分词一样，语言学界在标注规范上存在分歧，导致目前还没有一个被广泛接受的汉语词性划分标准。无论是词性划分的颗粒度，还是词性标签都不统一。一方面，各研究机构各持己见、派系林立，标注了大量互不兼容的语料库。另一方面，部分语料库受到严格版权控制，成为内部材料，得不到充分共享利用。</p>
+<h4 id="人民日报语料库和pku标注集">《人民日报》语料库和PKU标注集</h4>
+<p>语料库中的一句样例为：</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1660124353469.png" alt="" loading="lazy"></figure>
+<h4 id="国家语委语料库与863标注集">国家语委语料库与863标注集</h4>
+<p>语料库中的一句样例为：</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1660124359667.png" alt="" loading="lazy"></figure>
+<h4 id="诛仙语料库与ctb标注集">《诛仙》语料库与CTB标注集</h4>
+<p>语料库中的一句样例为：</p>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1660124365841.png" alt="" loading="lazy"></figure>
+<h2 id="词性标注模型">词性标注模型</h2>
+<p>最朴素的词性标注模型：通过将中文分词中的汉字替换为词语，{B,M,E,S} 替换为“名词、动词、形容词等”，序列标注模型马上就可以用来做词性标注。</p>
+<p>词性标注模型同时解决了在句子中挑选最符合语境的词语和预测新词的词性的问题。</p>
+<h3 id="下载语料库">下载语料库</h3>
+<p>首先需要对PKU语料库进行下载</p>
+<pre><code class="language-python">from  pyhanlp import *
+import zipfile
+import os
+from pyhanlp.static import download, remove_file, HANLP_DATA_PATH
+#获取测试数据路径
+def test_data_path():
+    data_path = os.path.join(HANLP_DATA_PATH, 'test')
+    if not os.path.isdir(data_path):
+        os.mkdir(data_path)
+    return data_path
+## 验证是否存在 MSR语料库，如果没有自动下载
+def ensure_data(data_name, data_url):
+    root_path = test_data_path()
+    dest_path = os.path.join(root_path, data_name)
+    if os.path.exists(dest_path):
+        return dest_path
+    if data_url.endswith('.zip'):
+        dest_path += '.zip'
+    download(data_url, dest_path)
+    if data_url.endswith('.zip'):
+        with zipfile.ZipFile(dest_path, &quot;r&quot;) as archive:
+            archive.extractall(root_path)
+        remove_file(dest_path)
+        dest_path = dest_path[:-len('.zip')]
+    return dest_path
+## 下载 PKU 语料库
+PKU98 = ensure_data(&quot;pku98&quot;, &quot;http://file.hankcs.com/corpus/pku98.zip&quot;)
+</code></pre>
+<p>下载完成后，就可以将该语料库对各种模型进行训练而进行词性标注了</p>
+<h3 id="基于hmm的词性标注">基于HMM的词性标注</h3>
+<p>在HanLP中<strong>HMMPOSTagger</strong>为HMM词性标注器</p>
+<p><strong>FirstOrderHiddenMarkovModel</strong>为一阶HMM</p>
+<pre><code class="language-python">HMMPOSTagger = JClass('com.hankcs.hanlp.model.hmm.HMMPOSTagger')
+AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+FirstOrderHiddenMarkovModel = JClass('com.hankcs.hanlp.model.hmm.FirstOrderHiddenMarkovModel')
+def train_hmm_pos(corpus, model):
+    tagger = HMMPOSTagger(model)  # 创建词性标注器
+    tagger.train(corpus)  # 训练
+    print(', '.join(tagger.tag(&quot;他&quot;, &quot;认为&quot;, &quot;人生&quot;, &quot;充满&quot;, &quot;了&quot;, &quot;希望&quot;)))  # 预测
+    analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), tagger)  # 同时进行分词和词性标注
+    print(analyzer.analyze(&quot;他认为人生充满了希望&quot;).translateLabels())
+    return tagger
+train_hmm_pos(PKU98, FirstOrderHiddenMarkovModel())
+</code></pre>
+<p>由于词性标注其并不负责分词，<strong>tagger.tag</strong>仅接受分词后的词语序列</p>
+<p><strong>AbstractLexicalAnalyzer</strong>是对HMM和感知机分词器结合，可以同时执行分词和词性标注</p>
+<p>结果</p>
+<pre><code class="language-python">r, v, n, v, u, n
+他/代词 认为/动词 人生/名词 充满/动词 了/助词 希望/名词
+</code></pre>
+<p>然而，由于HMM是根据上一个状态而推断出当前状态，容易出现“一步走错，满盘皆输”的情况</p>
+<pre><code class="language-python"> print(analyzer.analyze(&quot;李狗蛋的希望是希望上学&quot;).translateLabels())
+</code></pre>
+<pre><code class="language-python">李狗蛋/动词 的/动词 希望/动词 是/动词 希望/动词 上学/动词
+</code></pre>
+<h3 id="基于感知机的词性标注">基于感知机的词性标注</h3>
+<p>感知机能够利用丰富的上下文特征，是优于隐马尔可夫模型的选择，对于词性标注也是如此。</p>
+<p>在HanLP中，感知机词性标注器实现为<strong>PerceptronPoSTagger</strong></p>
+<pre><code class="language-python">POS_MODEL = os.path.join(PKU98, 'pos.bin')
+AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+POSTrainer = JClass('com.hankcs.hanlp.model.perceptron.POSTrainer')
+PerceptronPOSTagger = JClass('com.hankcs.hanlp.model.perceptron.PerceptronPOSTagger')
+def train_perceptron_pos(corpus):
+    trainer = POSTrainer()
+    trainer.train(corpus, POS_MODEL)  # 训练
+    tagger = PerceptronPOSTagger(POS_MODEL)  # 加载
+    print(', '.join(tagger.tag(&quot;李狗蛋&quot;, &quot;的&quot;, &quot;希望&quot;, &quot;是&quot;, &quot;希望&quot;, &quot;上学&quot;)))  # 预测
+    analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), tagger)  
+    print(analyzer.analyze(&quot;李狗蛋的希望是希望上学&quot;).translateLabels())  
+    return tagger
+train_perceptron_pos(PKU98)
+</code></pre>
+<p>结果</p>
+<pre><code class="language-python">nr, un, v, v, v
+李狗蛋/人名 的/助词 希望/名词 是/动词 希望/动词 上学/动词
+</code></pre>
+<p>这次的运行结果完全正确，感知机能成功的识别出新词的词性</p>
+<h3 id="基于条件随机场的词性标注">基于条件随机场的词性标注</h3>
+<p>条件随机场进行词性标注的精度比感知机高，在HanLP中实现为<strong>CRFPPOSTagger</strong></p>
+<p><strong>CRFTagger</strong>是通用的序列标注器</p>
+<pre><code class="language-python">AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+CRFPOSTagger = JClass('com.hankcs.hanlp.model.crf.CRFPOSTagger')
+def train_crf_pos(corpus):
+    tagger = CRFPOSTagger(None)  # 创建空白标注器
+    tagger.train(corpus, POS_MODEL)  # 训练
+    tagger = CRFPOSTagger(POS_MODEL) # 加载
+    print(', '.join(tagger.tag(&quot;李狗蛋&quot;, &quot;的&quot;, &quot;希望&quot;, &quot;是&quot;, &quot;希望&quot;, &quot;上学&quot;)))  # 预测
+    analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), tagger)  
+    print(analyzer.analyze(&quot;李狗蛋的希望是希望上学&quot;).translateLabels())  
+    return tagger
+tagger = train_crf_pos(PKU98)
+</code></pre>
+<p>结果</p>
+<pre><code>nr, un, v, v, v
+李狗蛋/人名 的/助词 希望/名词 是/动词 希望/动词 上学/动词
+</code></pre>
+<h3 id="词性标注评测">词性标注评测</h3>
+<p>将 PKU 语料库按 9:1 分隔为训练集和测试集，分别用以上三种模型来训练，准确率如下:</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>准确率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一阶隐马尔可夫模型</td>
+<td>44.99%</td>
+</tr>
+<tr>
+<td>二阶隐马尔可夫模型</td>
+<td>40.53%</td>
+</tr>
+<tr>
+<td>结构化感知机</td>
+<td>83.07%</td>
+</tr>
+<tr>
+<td>条件随机场</td>
+<td>82.12%</td>
+</tr>
+</tbody>
+</table>
+<p>结构化感知机和条件随机场都要优于隐马尔可夫模型，判别式模型能够利用更多的特征来进行训练，从而提高更多的精度。</p>
+<h2 id="自定义词性">自定义词性</h2>
+<p>将一些特定词语打上自定义的标签。HanLP提供了自定义词性的功能，实现方式有两种</p>
+<h3 id="朴素实现">朴素实现</h3>
+<p>根据词典的规则，将自定义的词性作为词典交给HanLP</p>
+<pre><code class="language-python">from pyhanlp import *
+CustomDictionary.insert(&quot;苹果&quot;, &quot;手机品牌&quot;)
+CustomDictionary.insert(&quot;iPhone X&quot;, &quot;手机型号&quot;)
+analyzer = PerceptronLexicalAnalyzer()#加载配置文件指定的模型构造词法分析器
+analyzer.enableCustomDictionaryForcing(True)
+print(analyzer.analyze(&quot;你们苹果iPhone X保修吗？&quot;))
+print(analyzer.analyze(&quot;多吃苹果有益健康&quot;))
+</code></pre>
+<pre><code class="language-python">你们/r 苹果/手机品牌 iPhone X/手机型号 保修/v 吗/y ？/w
+多/d 吃/v 苹果/手机品牌 有益健康/i
+</code></pre>
+<p>可以看到，通过字典的形式只是机械的进行匹配</p>
+<h3 id="标注语料">标注语料</h3>
+<p>词性的确定需要根据上下文语境，因此可以通过标注一份语料库，然后训练一个统计模型。</p>
+<p>语料库规模，与所有机器学习问题一样，数据越多，模型越准。</p>
+<p>通过以《诛仙》语料库为例进行训练</p>
+<pre><code class="language-python">AbstractLexicalAnalyzer = JClass('com.hankcs.hanlp.tokenizer.lexical.AbstractLexicalAnalyzer')
+PerceptronSegmenter = JClass('com.hankcs.hanlp.model.perceptron.PerceptronSegmenter')
+CRFPOSTagger = JClass('com.hankcs.hanlp.model.crf.CRFPOSTagger')
+ZHUXIAN = ensure_data(&quot;zhuxian&quot;, &quot;http://file.hankcs.com/corpus/zhuxian.zip&quot;) + &quot;/train.txt&quot;#诛仙语料库
+def train_perceptron_pos(corpus):
+    trainer = POSTrainer()
+    trainer.train(corpus, POS_MODEL)  # 训练感知机模型
+    tagger = PerceptronPOSTagger(POS_MODEL)  # 加载
+    return tagger
+posTagger = train_perceptron_pos(ZHUXIAN)  # 训练
+analyzer = AbstractLexicalAnalyzer(PerceptronSegmenter(), posTagger)  # 包装
+print(analyzer.analyze(&quot;陆雪琪的天琊神剑不做丝毫退避，直冲而上，瞬间，这两道奇光异宝撞到了一起。&quot;))  # 分词+标注
+</code></pre>
+<pre><code class="language-python">陆雪琪/NR 的/DEG 天琊/NR 神剑/NN 不/AD 做/VV 丝毫/NN 退避/VV ，/PU 直冲/VV 而/MSP 上/VV ，/PU 瞬间/NN ，/PU 这/DT 两/CD 道/M 奇光/NN 异宝/NN 撞到/VV 了/AS 一起/AD 。/PU
+</code></pre>
+<p>在学习了新的语料库之后，模型自动切换为新的词性标注集。</p>
+<h2 id="总结">总结</h2>
+<p>提高词性标注的准确率，无非是标注更多的语料，设计更多的特征，采用更高精度的模型</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8">词性标注</a>
+<ul>
+<li><a href="#%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8%E8%AF%AD%E6%96%99%E5%BA%93%E4%B8%8E%E6%A0%87%E6%B3%A8%E9%9B%86">词性标注语料库与标注集</a>
+<ul>
+<li><a href="#%E4%BA%BA%E6%B0%91%E6%97%A5%E6%8A%A5%E8%AF%AD%E6%96%99%E5%BA%93%E5%92%8Cpku%E6%A0%87%E6%B3%A8%E9%9B%86">《人民日报》语料库和PKU标注集</a></li>
+<li><a href="#%E5%9B%BD%E5%AE%B6%E8%AF%AD%E5%A7%94%E8%AF%AD%E6%96%99%E5%BA%93%E4%B8%8E863%E6%A0%87%E6%B3%A8%E9%9B%86">国家语委语料库与863标注集</a></li>
+<li><a href="#%E8%AF%9B%E4%BB%99%E8%AF%AD%E6%96%99%E5%BA%93%E4%B8%8Ectb%E6%A0%87%E6%B3%A8%E9%9B%86">《诛仙》语料库与CTB标注集</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8%E6%A8%A1%E5%9E%8B">词性标注模型</a>
+<ul>
+<li><a href="#%E4%B8%8B%E8%BD%BD%E8%AF%AD%E6%96%99%E5%BA%93">下载语料库</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8Ehmm%E7%9A%84%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8">基于HMM的词性标注</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E6%84%9F%E7%9F%A5%E6%9C%BA%E7%9A%84%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8">基于感知机的词性标注</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E6%9D%A1%E4%BB%B6%E9%9A%8F%E6%9C%BA%E5%9C%BA%E7%9A%84%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8">基于条件随机场的词性标注</a></li>
+<li><a href="#%E8%AF%8D%E6%80%A7%E6%A0%87%E6%B3%A8%E8%AF%84%E6%B5%8B">词性标注评测</a></li>
+</ul>
+</li>
+<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%8D%E6%80%A7">自定义词性</a>
+<ul>
+<li><a href="#%E6%9C%B4%E7%B4%A0%E5%AE%9E%E7%8E%B0">朴素实现</a></li>
+<li><a href="#%E6%A0%87%E6%B3%A8%E8%AF%AD%E6%96%99">标注语料</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/tiao-jian-sui-ji-chang/">
+              <h3 class="post-title">
+                条件随机场
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

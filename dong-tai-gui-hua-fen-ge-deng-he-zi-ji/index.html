@@ -1,0 +1,251 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>题解:分割等和子集 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="题解:分割等和子集 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="动态规划 dp
+
+根据数组的长度 num.size() 判断数组是否可以被划分。如果 n%2!=0，则不可能将数组分割成元素和相等的两个子集，因此直接返回 false。
+计算整个数组的元素和 sum 以及最大元素maxNum。如果 sum ..." />
+    <meta name="keywords" content="算法" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              题解:分割等和子集
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-10-19
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Er6OWlLlY/" class="post-tag">
+                  # 算法
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/dong-tai-gui-hua-fen-ge-deng-he-zi-ji.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>动态规划 dp</p>
+<!-- more -->
+<p>根据数组的长度 num.size() 判断数组是否可以被划分。如果 n%2!=0，则不可能将数组分割成元素和相等的两个子集，因此直接返回 false。</p>
+<p>计算整个数组的元素和 sum 以及最大元素maxNum。如果 sum 是奇数，则不可能将数组分割成元素和相等的两个子集，因此直接返回false。如果 sum 是偶数，则令 target= sum/2,如果 数组num中maxNum&gt;target，直接返回false。</p>
+<p>之后我们创建一个二维数组</p>
+<pre><code class="language-c++">vector&lt;vector&lt;int&gt;dp(num.size(),vector&lt;int&gt;(target,0));
+</code></pre>
+<pre><code>Dp[i][j] 
+</code></pre>
+<p>i表示 从数组num[0~i] 中选取任意个元素 j表示和，</p>
+<p>如果相加存在等于j</p>
+<p>则 dp[i][j]=1;</p>
+<p>其中有两个边界</p>
+<p>1.如果不选任何的正整数，则和可以为0：则dp[i][0]=1(0&lt;i&lt;num.size());</p>
+<p>2.当i==0的时候只有num[0]可以选取 则dp[0][num[0]=1;</p>
+<p>对于 i&gt;0<em>i</em>&gt;0 且 j&gt;0<em>j</em>&gt;0 的情况，如何确定 \textit{dp}[i][j]<em>dp</em>[<em>i</em>][<em>j</em>] 的值？需要分别考虑以下两种情况。</p>
+<p>如果j&gt;=num[i] 则当前数字num[i]可以选取，也可以不选取 只要一种情况为true 则都可以</p>
+<p>如果j&lt;num[i]，则无法选取</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1655953249709.png" alt="formula" loading="lazy"></figure>
+<p>最终返回</p>
+<pre><code>dp[sum.size()-1][target]
+</code></pre>
+<p>为答案</p>
+<pre><code class="language-c++">   `class Solution
+   {  
+       bool canPartiton(vector&lt;int&gt;&amp;nums)
+       {
+           sort(nums.begin(),nums.end());
+           int total=0,len=nums.size();
+           if(len&lt;2||(len==2&amp;&amp;num[0]!=nums[1]))
+               return false;  
+           for(int i=0;i&lt;len;i++)total+=nums[i];
+           if(total%2!=0) return false;
+           int half—total/2;
+           if(nums[len-1]&gt;half) return false;
+           vector&lt;vector&lt;int&gt;&gt;dp(len,vector&lt;int&gt;(half+1,0));
+           for(int i=1;i&lt;len;i++) dp[i][0]=1;
+           dp[0][nums[0]]=1;
+           for(int i=1;i&lt;len;i++)
+           {
+               for(int j=1;j&lt;half+1;j++)
+               {
+                   if(j&gt;=nums[i])
+                       dp[i][j]=dp[i-1][j]||dp[i-1][j-nums[i]];
+                   else
+                       dp[i][j]=dp[i-1][j];
+               }
+           }
+               return dp[len-1][half];
+       }
+   };
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/ti-jie-dong-tai-gui-hua-di-xia-cheng-you-xi/">
+              <h3 class="post-title">
+                题解：动态规划:地下城游戏
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,460 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>文本聚类算法及其实现 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="文本聚类算法及其实现 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="聚类分析在文本分析、商务应用、网页搜索、推荐系统、生物医学等多个领域都有着十分广泛的应用。
+
+聚类是一种无监督学习方式，目的是把一个数据根据某种规则划分为多个子数据，一个子数据就称为一个聚类。
+目前聚类主要分为以下几类：
+
+基于划分的聚类算..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              文本聚类算法及其实现
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-08-23
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/wen-ben-ju-lei-ji-qi-shi-xian.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>聚类分析在文本分析、商务应用、网页搜索、推荐系统、生物医学等多个领域都有着十分广泛的应用。</p>
+<!-- more -->
+<p>聚类是一种<strong>无监督</strong>学习方式，目的是把一个数据根据某种规则划分为多个子数据，一个子数据就称为一个聚类。</p>
+<p>目前聚类主要分为以下几类：</p>
+<ul>
+<li>基于划分的聚类算法</li>
+<li>基于密度的聚类算法</li>
+<li>基于层次的聚类算法</li>
+<li>基于网格的聚类算法</li>
+<li>基于模型的聚类算法</li>
+</ul>
+<p>文本聚类的基本流程：</p>
+<ul>
+<li>特征提取</li>
+<li>向量聚类</li>
+</ul>
+<p>如果能将文档表示为向量，就可以对其应用聚类算法。这种表示过程称为<strong>特征提取</strong>，而一旦将文档表示为向量，剩下的算法就与文档无关了。</p>
+<h2 id="文档的特征提取">文档的特征提取</h2>
+<h3 id="词袋模型">词袋模型</h3>
+<p><strong>词袋</strong>(bag-of-words )是NLP中最常用的文档表示模型，它将文档想象为一个装有词语的袋子， 通过袋子中每种词语的计数等统计量将文档表示为向量。比如下面的例子:</p>
+<pre><code>人 吃 鱼。
+美味 好 吃！
+</code></pre>
+<p>统计词频后如下:</p>
+<pre><code>人=1
+吃=2
+鱼=1
+美味=1
+好=1
+</code></pre>
+<p>那么两个句子就可以向量化，这 5 个维度分别表示这 5 种词语的词频。</p>
+<pre><code>[1,2,1,0,0]
+[0,2,0,1,1]
+</code></pre>
+<p>词袋模型不考虑词序，也正因为这个原因，词袋模型损失了词序中蕴含的语义，比如，对于词袋模型来讲，“人吃鱼”和“鱼吃人”是一样的，这就不对了。</p>
+<h3 id="词袋中的统计指标">词袋中的统计指标</h3>
+<p>词袋模型并非只是选取词频作为统计指标，而是存在许多选项。常见的统计指标如下:</p>
+<ul>
+<li>布尔词频: 词频非零的话截取为1，否则为0，适合长度较短的数据集</li>
+<li>TF-IDF: 适合主题较少的数据集</li>
+<li>词向量: 如果词语本身也是某种向量的话，则可以将所有词语的词向量求和作为文档向量。适合处理 OOV 问题严重的数据集。</li>
+<li>词频向量: 适合主题较多的数据集</li>
+</ul>
+<p>这里选用<strong>词频</strong>作为统计指标，向量d具体表示如下：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>=</mo><mo>(</mo><mi>T</mi><mi>F</mi><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>d</mi><mi>i</mi></msub><mo>)</mo><mo separator="true">,</mo><mi>T</mi><mi>F</mi><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>d</mi><mi>i</mi></msub><mo>)</mo><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><mi>T</mi><mi>F</mi><mo>(</mo><msub><mi>t</mi><mi>j</mi></msub><mo separator="true">,</mo><msub><mi>d</mi><mi>i</mi></msub><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">d_i=(TF(t_1,d_i),TF(t_1,d_i),...,TF(t_j,d_i))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>t代表单词，TF（t，d）表示单词t在文档d中的次数，同时将该向量处理为单位向量</p>
+<p>文本的向量化转换已经完成了，接下来就可以运用各类聚类算法进行计算了</p>
+<h2 id="聚类算法">聚类算法</h2>
+<h3 id="基于划分的算法k均值算法">基于划分的算法——K均值算法</h3>
+<p>K均值算法的思想是：</p>
+<p>1.在数据集中随机选取K个样本作为簇的中心，然后计算其他样本离这K个簇中心内的距离。</p>
+<p>2.将每个样本划分到与其距离最近的簇中心所在的簇中。</p>
+<p>3.将簇中所含样本的距离均值作为新的簇中心。</p>
+<p>4.再根据新划分的簇中心来计算每个样本离簇中心的距离。</p>
+<p>5.迭代计算，直到簇中心在每次迭代后变化不大。</p>
+<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/img_convert/f924bf86ca518414b921efd4c2aa402c.png" alt="img" loading="lazy"></figure>
+<p>距离的计算可以采用<strong>欧式距离</strong>，<strong>余弦距离</strong>。</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">假</mi><mi mathvariant="normal">设</mi><mi>n</mi><mi mathvariant="normal">为</mi><mi mathvariant="normal">空</mi><mi mathvariant="normal">间</mi><mi mathvariant="normal">有</mi><mi mathvariant="normal">两</mi><mi mathvariant="normal">点</mi><mspace linebreak="newline"></mspace><mi>a</mi><mo>=</mo><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo><mspace linebreak="newline"></mspace><mi>b</mi><mo>=</mo><mo>(</mo><msub><mi>y</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>2</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>y</mi><mi>n</mi></msub><mo>)</mo><mspace linebreak="newline"></mspace><mi mathvariant="normal">那</mi><mi mathvariant="normal">么</mi><mi>n</mi><mi mathvariant="normal">维</mi><mi mathvariant="normal">空</mi><mi mathvariant="normal">间</mi><mi mathvariant="normal">两</mi><mi mathvariant="normal">点</mi><mi mathvariant="normal">的</mi><mi mathvariant="normal">欧</mi><mi mathvariant="normal">式</mi><mi mathvariant="normal">距</mi><mi mathvariant="normal">离</mi><mi mathvariant="normal">为</mi><mi mathvariant="normal">：</mi></mrow><annotation encoding="application/x-tex">假设n为空间有两点\\a=(x_1,x_2,...,x_n)\\
+b=(y_1,y_2,...,y_n)\\
+那么n维空间两点的欧式距离为：
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord cjk_fallback">假</span><span class="mord cjk_fallback">设</span><span class="mord mathdefault">n</span><span class="mord cjk_fallback">为</span><span class="mord cjk_fallback">空</span><span class="mord cjk_fallback">间</span><span class="mord cjk_fallback">有</span><span class="mord cjk_fallback">两</span><span class="mord cjk_fallback">点</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">b</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord cjk_fallback">那</span><span class="mord cjk_fallback">么</span><span class="mord mathdefault">n</span><span class="mord cjk_fallback">维</span><span class="mord cjk_fallback">空</span><span class="mord cjk_fallback">间</span><span class="mord cjk_fallback">两</span><span class="mord cjk_fallback">点</span><span class="mord cjk_fallback">的</span><span class="mord cjk_fallback">欧</span><span class="mord cjk_fallback">式</span><span class="mord cjk_fallback">距</span><span class="mord cjk_fallback">离</span><span class="mord cjk_fallback">为</span><span class="mord cjk_fallback">：</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mo>=</mo><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mo>(</mo><msub><mi>x</mi><mi>k</mi></msub><mo>−</mo><msub><mi>y</mi><mi>k</mi></msub><msup><mo>)</mo><mn>2</mn></msup></mrow></msqrt><mspace linebreak="newline"></mspace><mi mathvariant="normal">余</mi><mi mathvariant="normal">弦</mi><mi mathvariant="normal">距</mi><mi mathvariant="normal">离</mi><mi mathvariant="normal">为</mi><mi mathvariant="normal">：</mi><mspace linebreak="newline"></mspace><mi>c</mi><mi>o</mi><mi>s</mi><mo>=</mo><mfrac><mrow><mi>a</mi><mi mathvariant="normal">.</mi><mi>b</mi></mrow><mrow><mi mathvariant="normal">∣</mi><mi>a</mi><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mi>b</mi><mi mathvariant="normal">∣</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">D=\sqrt{\sum_{k=1}^n(x_k-y_k)^2}
+\\余弦距离为：
+\\cos=\frac{a.b}{|a||b|}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:3.1812600000000004em;vertical-align:-1.302113em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8791470000000003em;"><span class="svg-align" style="top:-5.141260000000001em;"><span class="pstrut" style="height:5.141260000000001em;"></span><span class="mord" style="padding-left:1.056em;"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6513970000000002em;"><span style="top:-1.8478869999999998em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.300005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.302113em;"><span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.740108em;"><span style="top:-2.9890000000000003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span><span style="top:-3.8391470000000005em;"><span class="pstrut" style="height:5.141260000000001em;"></span><span class="hide-tail" style="min-width:0.742em;height:3.2212600000000005em;"><svg width='400em' height='3.2212600000000005em' viewBox='0 0 400000 3221' preserveAspectRatio='xMinYMin slice'><path d='M702 80H400000v40H742v3087l-4 4-4 4c-.667.7
+-2 1.5-4 2.5s-4.167 1.833-6.5 2.5-5.5 1-9.5 1h-12l-28-84c-16.667-52-96.667
+-294.333-240-727l-212 -643 -85 170c-4-3.333-8.333-7.667-13 -13l-13-13l77-155
+ 77-156c66 199.333 139 419.667 219 661 l218 661zM702 80H400000v40H742z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.302113em;"><span></span></span></span></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0em;vertical-align:0em;"></span><span class="mord cjk_fallback">余</span><span class="mord cjk_fallback">弦</span><span class="mord cjk_fallback">距</span><span class="mord cjk_fallback">离</span><span class="mord cjk_fallback">为</span><span class="mord cjk_fallback">：</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">c</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.30744em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathdefault">a</span><span class="mord">∣</span><span class="mord">∣</span><span class="mord mathdefault">b</span><span class="mord">∣</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="mord">.</span><span class="mord mathdefault">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h4 id="实现">实现</h4>
+<p>HanLP 中，聚类算法实现为 ClusterAnalyzer。</p>
+<p>假设该音乐网站将 6 位用户点播的歌曲的流派记录下来，并且分别拼接为 6 段文本。给定用户名称与这 6 段播放历史，要求将这 6 位用户划分为 3 个簇。实现代码如下:</p>
+<pre><code class="language-python">from pyhanlp import *
+
+ClusterAnalyzer = JClass('com.hankcs.hanlp.mining.cluster.ClusterAnalyzer')
+
+if __name__ == '__main__':
+    analyzer = ClusterAnalyzer()
+    analyzer.addDocument(&quot;赵一&quot;, &quot;流行, 流行, 流行, 流行, 流行, 流行, 流行, 流行, 流行, 流行, 蓝调, 蓝调, 蓝调, 蓝调, 蓝调, 蓝调, 摇滚, 摇滚, 摇滚, 摇滚&quot;)
+    analyzer.addDocument(&quot;钱二&quot;, &quot;爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲&quot;)
+    analyzer.addDocument(&quot;张三&quot;, &quot;古典, 古典, 古典, 古典, 民谣, 民谣, 民谣, 民谣&quot;)
+    analyzer.addDocument(&quot;李四&quot;, &quot;爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 爵士, 金属, 金属, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲, 舞曲&quot;)
+    analyzer.addDocument(&quot;王五&quot;, &quot;流行, 流行, 流行, 流行, 摇滚, 摇滚, 摇滚, 嘻哈, 嘻哈, 嘻哈&quot;)
+    analyzer.addDocument(&quot;马六&quot;, &quot;古典, 古典, 古典, 古典, 古典, 古典, 古典, 古典, 摇滚&quot;)
+    print(analyzer.kmeans(3))
+</code></pre>
+<p>结果</p>
+<pre><code class="language-python">[[李四, 钱二], [王五, 赵一], [张三, 马六]]
+</code></pre>
+<h3 id="基于密度的算法dbscan">基于密度的算法——DBSCAN</h3>
+<p>DBSCAN算法思想是：</p>
+<p>1.从一个没有被访问过的任意起始数据点开始。这个点的邻域是用距离 ε（ε 距离内的所有点都是邻域点）提取的。</p>
+<p>2.如果在这个邻域内有足够数量的点，则当前数据点成为新簇的第一个点。否则，该点将会被标记为噪声。在这两种情况下，该点都被标记为<strong>已访问</strong>。</p>
+<p>3.对于新簇中的第一个点，其 ε 距离邻域内的点也成为该簇的一部分。并且对所有刚刚添加到簇中的新点进行重复。</p>
+<p>4.迭代，直到簇中所有的点都被确定，即簇的 ε 邻域内的所有点都被访问和标记过。</p>
+<p>5.当完成了当前的簇后，寻找另一个未访问的点，重复上诉操作。直到所有的点都已经被访问，每个点都属于某个簇或噪声。</p>
+<figure data-type="image" tabindex="2"><img src="https://image.jiqizhixin.com/uploads/editor/7793c4db-f49c-4bfa-a101-772da3e48aa2/640.jpeg" alt="img" loading="lazy"></figure>
+<h4 id="实现-2">实现</h4>
+<p>sklearn中DBSCAN对象重要参数如下:</p>
+<ul>
+<li>
+<p>eps：从一个观察值到另一个观察值得最远距离，超过这个距离将不再认为二者是邻居</p>
+</li>
+<li>
+<p>min_samples：最小限度的邻居数量，如果一个观察值在其周围小于eps距离的范围内有超过这个数量的邻居，就被认为是核心观察值</p>
+</li>
+<li>
+<p>metric：eps所用的距离度量，比如minkowski(闵可夫斯基距离)或者euclidean(欧式距离)。注意，如果使用闵可夫斯基距离，就可以用参数p设定闵可夫斯基中的幂次。</p>
+</li>
+</ul>
+<pre><code class="language-python">from sklearn.cluster import DBSCAN
+import numpy as np
+X = np.array([[1, 2], [2, 2], [2, 3],
+              [8, 7], [8, 8], [25, 80]])
+clustering = DBSCAN(eps=3, min_samples=2).fit(X)
+print(clustering.labels_)
+</code></pre>
+<p>结果</p>
+<pre><code>array([ 0,  0,  0,  1,  1, -1]) #0，1代表两个簇，-1为噪点
+</code></pre>
+<h3 id="基于层次的算法agnesdiana">基于层次的算法——AGNES，DIANA</h3>
+<p>AGNES 是一种自下向上层次聚类算法。</p>
+<p>AGNES算法思想：</p>
+<p>1、将每个样本当成一个初始簇<br>
+2、选择一个测量两个簇之间的距离，也就是第一个簇中的数据点与第二个簇中的数据点之间的平均距离。<br>
+4、将有最小距离的两个簇进行合并，生成新的簇的集合<br>
+5、直到达到定义的簇的数目</p>
+<figure data-type="image" tabindex="3"><img src="https://image.jiqizhixin.com/uploads/editor/715ff9df-e003-425e-b62a-ed994aba6706/640.gif" alt="img" loading="lazy"></figure>
+<h4 id="实现-3">实现</h4>
+<p>sklearn中AGNES对象重要参数如下:</p>
+<ul>
+<li><strong>n_clusters</strong>:分裂的簇的数量。默认为2</li>
+<li><strong>affinity</strong>：所用的距离度量，例如cosine(余弦距离)或者euclidean(欧式距离)</li>
+<li><strong>distance_threshold</strong>：超过该链接距离阈值，集群将不会合并。默认为None。如果不为None，那么<code>n_clusters</code> 一定为 <code>None</code> 同时 <code>compute_full_tree</code> 为 <code>True</code>.</li>
+</ul>
+<pre><code class="language-python">from sklearn.cluster import AgglomerativeClustering
+import numpy as np
+X = np.array([[1, 2], [1, 4], [1, 0],
+               [4, 2], [4, 4], [4, 0]])
+clustering = AgglomerativeClustering().fit(X)
+print(clustering.labels_)
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">array([1, 1, 1, 0, 0, 0])
+</code></pre>
+<p>而<strong>DIANA</strong>与AGNES相反，它是先将所有样本置于一个簇中，将临近点中的最远距离的点进行分裂。直到最后达到设定的簇数</p>
+<h3 id="基于网格的聚类sting">基于网格的聚类——STING</h3>
+<p>将空间区域划分为矩形单元。针对不同级别的分辨率，通常存在多个级别的矩形单元，同时高层的每个单元被划分为多个低一层的单元。根据单元属性的<strong>相关统计信息</strong>（例如平均值，最大值，和最小值）进行划分网格，而且网格也是分层次的，下一层是上一层的继续划分。高一层单元的统计参数可以很容易地从低层单元的参数计算出来。在一个网格内的数据点即为一个簇。</p>
+<p>相关统计信息有：</p>
+<ul>
+<li>属性无关的变量 ：
+<ul>
+<li>count</li>
+</ul>
+</li>
+<li>属性相关的变量 ：
+<ul>
+<li>m（平均值）</li>
+<li>s（标准偏差）</li>
+<li>min（最小值）</li>
+<li>max（最大值）</li>
+<li>单元中属性值遵循的分布类型 distribution，例如正态的，均衡的，指数的，或无</li>
+</ul>
+</li>
+</ul>
+<p>数据被装载进数据库，最底层单元的变量 count，m，s，min，和 max 直接进行计算</p>
+<p>算法思想：</p>
+<p>1.在层次结构中选定一层作为查询处理的开始点。通常，该层包含少量的单元。</p>
+<p>2.对当前层次的每个单元，我们计算置信度区间（或者估算其概率），用以反映该单元与给定查询的关联程度。不相关的单元就不再考虑。</p>
+<p>3.对于相关单元，进行低一层的处理，这个处理过程反复进行，直到达到最底层。</p>
+<p>4.此时，如果查询要求被满足，那么返回相关单元的区域。</p>
+<p>5.若查询不满足，对相关单元进行检索数据和进一步的处理，直到它们满足查询要求</p>
+<figure data-type="image" tabindex="4"><img src="https://pic4.zhimg.com/80/v2-cb8863de4498068d274b7aec9274a457_720w.jpg" alt="img" loading="lazy"></figure>
+<figure data-type="image" tabindex="5"><img src="https://pic4.zhimg.com/80/v2-f5fc1ec024e90ea3b6b416e0e84a8583_720w.jpg" alt="img" loading="lazy"></figure>
+<h3 id="基于模型的聚类高斯混合模型">基于模型的聚类——高斯混合模型</h3>
+<p>K-means无法将两个均值相同（聚类中心点相同）的类进行聚类，而高斯混合模型（Gaussian Mixture Model, GMM）就是为了解决这一缺点而提出的</p>
+<p>GMM概率密度函数：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><mi>p</mi><mo>(</mo><mi>k</mi><mo>)</mo><mi>p</mi><mo>(</mo><mi>x</mi><mi mathvariant="normal">∣</mi><mi>k</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>a</mi><mi>k</mi></msub><mi>p</mi><mo>(</mo><mi>x</mi><mi mathvariant="normal">∣</mi><msub><mi>μ</mi><mi>k</mi></msub><mo separator="true">,</mo><mo>∑</mo><mi>k</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">P(x)=\sum_{k=1}^Kp(k)p(x|k)=\sum_{k=1}^Ka_kp(x|μ_k,\sum k)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:3.1304490000000005em;vertical-align:-1.302113em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283360000000002em;"><span style="top:-1.8478869999999998em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.300005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.07153em;">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.302113em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mclose">)</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mord">∣</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:3.1304490000000005em;vertical-align:-1.302113em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283360000000002em;"><span style="top:-1.8478869999999998em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.300005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.07153em;">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.302113em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mord">∣</span><span class="mord"><span class="mord mathdefault">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop op-symbol large-op" style="position:relative;top:-0.000004999999999977245em;">∑</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mclose">)</span></span></span></span></span></p>
+<p>其中，k：预先设定的簇的个数，ak为属于第k个簇的高斯概率，p(x|k)为第k个簇的高斯概率，均值向量为μk，Σk为协方差矩阵</p>
+<p>算法思想：</p>
+<p>1.设置簇k的个数，即初始化高斯混合模型的成分个数。（随机初始化每个簇的高斯分布均值和方差。也可观察数据给出一个相对精确的均值和方差）</p>
+<ol>
+<li>
+<p>计算每个数据点属于每个高斯模型的概率，即计算后验概率。（点越靠近高斯分布的中心，则概率越大，即属于该簇可能性更高）</p>
+</li>
+<li>
+<p>计算 α,μ,Σ 参数使得数据点的概率最大化，使用数据点概率的加权来计算这些新的参数，权重就是数据点属于该簇的概率。</p>
+</li>
+<li>
+<p>重复迭代2和3直到收敛。</p>
+</li>
+</ol>
+<h4 id="实现-4">实现</h4>
+<p>sklearn中GaussianMixture重要参数如下:</p>
+<ul>
+<li><strong>n_components</strong>：混合高斯模型个数，默认为 1</li>
+<li><strong>max_iter</strong>：最大迭代数，默认为100</li>
+<li><strong>tol</strong>：迭代停止阈值，默认为 0.001</li>
+</ul>
+<pre><code class="language-python">import numpy as np
+from sklearn.mixture import GaussianMixture
+X = np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])
+gm = GaussianMixture(n_components=2, random_state=0).fit(X)
+label=gm.predict(X)
+print(label)
+probs=gm.predict_proba(X)
+print(probs)
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">[1 1 1 0 0 0] #簇
+[[0. 1.]#每个元素在每个簇中的概率
+ [0. 1.]
+ [0. 1.]
+ [1. 0.]
+ [1. 0.]
+ [1. 0.]]
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>各种算法的使用场景</p>
+<figure data-type="image" tabindex="6"><img src="https://voluntexi.github.io//post-images/1660882299646.jpg" alt="" loading="lazy"></figure>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%96%87%E6%A1%A3%E7%9A%84%E7%89%B9%E5%BE%81%E6%8F%90%E5%8F%96">文档的特征提取</a>
+<ul>
+<li><a href="#%E8%AF%8D%E8%A2%8B%E6%A8%A1%E5%9E%8B">词袋模型</a></li>
+<li><a href="#%E8%AF%8D%E8%A2%8B%E4%B8%AD%E7%9A%84%E7%BB%9F%E8%AE%A1%E6%8C%87%E6%A0%87">词袋中的统计指标</a></li>
+</ul>
+</li>
+<li><a href="#%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95">聚类算法</a>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E5%88%92%E5%88%86%E7%9A%84%E7%AE%97%E6%B3%95k%E5%9D%87%E5%80%BC%E7%AE%97%E6%B3%95">基于划分的算法——K均值算法</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0">实现</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E5%AF%86%E5%BA%A6%E7%9A%84%E7%AE%97%E6%B3%95dbscan">基于密度的算法——DBSCAN</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-2">实现</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E5%B1%82%E6%AC%A1%E7%9A%84%E7%AE%97%E6%B3%95agnesdiana">基于层次的算法——AGNES，DIANA</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-3">实现</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E7%BD%91%E6%A0%BC%E7%9A%84%E8%81%9A%E7%B1%BBsting">基于网格的聚类——STING</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%81%9A%E7%B1%BB%E9%AB%98%E6%96%AF%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B">基于模型的聚类——高斯混合模型</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-4">实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/xin-xi-chou-qu-ji-qi-shi-xian/">
+              <h3 class="post-title">
+                信息抽取及其实现
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

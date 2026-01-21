@@ -1,0 +1,264 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>题解：区间的个数 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="题解：区间的个数 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="这道题首先的一个难点就是读懂题意
+
+我首先读了几遍才明白了具体意思 意思如下：
+
+根据例题输入：
+也就是说在nums数组下标 0&lt;=i&lt;j&lt;nums.size()中 寻找和区间
+nums[j]+~nums[i]中 的值在l..." />
+    <meta name="keywords" content="算法" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              题解：区间的个数
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-11-07
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Er6OWlLlY/" class="post-tag">
+                  # 算法
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/ti-jie-qu-jian-de-ge-shu.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><strong>这道题首先的一个难点就是读懂题意</strong></p>
+<!-- more -->
+<p>我首先读了几遍才明白了具体意思 意思如下：</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1655959708595.png" alt="" loading="lazy"></figure>
+<p>根据例题输入：</p>
+<p>也就是说在nums数组下标 0&lt;=i&lt;j&lt;nums.size()中 寻找和区间</p>
+<p>nums[j]+~nums[i]中 的值在lower和upper区间之间~</p>
+<p>依此首先我们就会想到暴力法：</p>
+<pre><code class="language-c++">         int count=0;
+         for(int i=0;i&lt;nums.size();i++)
+         {
+             cout&lt;&lt;nums[i]&lt;&lt;&quot; &quot;;
+             long n=0;
+             for(int j=i;j&lt;nums.size();j++)
+             {
+                 n+=nums[j];
+             if(lower&lt;=n&amp;&amp;n&lt;=upper)  count++；
+             }
+          }
+          return count;
+</code></pre>
+<p>但是呢，好歹这是一个<font  color=red ><strong>困难题</strong></font> 哪有这么简单</p>
+<p>很明显暴力法会超时~</p>
+<p>于是我们可以转换思路</p>
+<ul>
+<li>
+<p>首先题目要求的是 <strong>lower&lt;=区间[i,j]的和&lt;=upper</strong></p>
+</li>
+<li>
+<p>可以转换成：<strong>lower&lt;=sum.at(j)-sum.at(i)的和&lt;=upper</strong></p>
+</li>
+<li>
+<p>通过变换:<strong>lower-sum.at(j)&lt;=-sum.at(i)&lt;=upper-sum.at(j)</strong></p>
+</li>
+<li>
+<p>去掉符号：**sum.at(j)-lower&gt;=sum.at(i)&gt;=sum.at(j)-upper **</p>
+</li>
+<li>
+<p>所以最后关键东东来了 就是 <strong>sum.at(j)-upper &lt;= sum.at(i) &lt;= sum.at(j)-lower</strong></p>
+</li>
+<li>
+<p>我们于是想到了用 <code>mutiset</code> 自动排序的特性</p>
+</li>
+<li>
+<p>并且mutiset 恰好有lower_bound,upper_bound这两个折半的查找函数~</p>
+</li>
+<li>
+<p>最后通过distance来结合就可以了~</p>
+</li>
+</ul>
+<pre><code class="language-c++">     multiset&lt;long&gt; helper;
+     int count=0;
+     helper.insert(0);
+     long long sum=0;
+     for (int i:nums)
+     {
+         sum+=i;
+         count+=distance(helper.lower_bound(sum-upper),helper.upper_bound(sum-lower));
+         helper.insert(sum);
+     }
+     return count;
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/ti-jie-dong-tai-gui-hua-shi-pin-pin-jie/">
+              <h3 class="post-title">
+                题解：动态规划:视频拼接
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,522 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>信息抽取及其实现 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="信息抽取及其实现 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="本文分别介绍抽取新词、关键词、关键短语和自动摘要的无监督学习方法。
+
+信息抽取是一个宽泛的概念，指的是从非结构化文本中提取结构化信息的一类技术。这类技术依然分为基于规则的正则匹配、有监督学习和无监督学习等各种实现方法。我们将使用一些简单实用..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              信息抽取及其实现
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-08-16
+              </span>
+              <span>
+                24 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>本文分别介绍抽取新词、关键词、关键短语和自动摘要的无监督学习方法。</p>
+<!-- more -->
+<p>信息抽取是一个宽泛的概念，指的是从非结构化文本中提取结构化信息的一类技术。这类技术依然分为基于规则的正则匹配、有监督学习和无监督学习等各种实现方法。我们将使用一些简单实用的无监督学习方法。由于不需要标注语料库，所以可以利用海量的非结构化文本。</p>
+<h2 id="新词抽取">新词抽取</h2>
+<p>所谓新词，就是处于语料库外的词汇</p>
+<h3 id="抽取步骤">抽取步骤</h3>
+<ul>
+<li>提取出文本中的词语，无论新旧。</li>
+<li>用词典过滤掉已有的词语，于是得到新词。</li>
+</ul>
+<p>其中，提取出文本中的词语是关键的一步，如何能够让计算机识别词语呢？</p>
+<p>例如：“小提琴”究竟算一个词语，还是“小+提琴”两个词语呢？</p>
+<p><strong>解决思路：</strong></p>
+<p>给定一段文本，随机取一个片段，如果这个片段左右的搭配很丰富，并且片段内部成分搭配很固定，则可以认为这是一个词。将这样的片段筛选出来，按照频次由高到低排序，排在前面的有很高概率是词。</p>
+<p>如果文本足够大，再用通用的词典过滤掉“旧词”，就可以得到“新词”。</p>
+<p>片段外部左右搭配的丰富程度，可以用<strong>信息熵</strong>来衡量，而片段内部搭配的固定程度可以用子序列的<strong>互信息</strong>来衡量。</p>
+<h4 id="信息熵">信息熵</h4>
+<p><strong>信息熵</strong>(entropy)指的是某条消息所含的信息量</p>
+<p>对于离散型的随机变量X，信息熵的计算方法如下：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>H</mi><mo>(</mo><mi>X</mi><mo>)</mo><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi>x</mi></munder><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>l</mi><mi>o</mi><mi>g</mi><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">H(X)=-\sum_xp(x)logp(x)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.3000100000000003em;vertical-align:-1.250005em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.050005em;"><span style="top:-1.8999949999999999em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">x</span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.250005em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span></span></span></span></span></p>
+<p>若log的底数为2的话，则信息熵的单位恰好为比特</p>
+<p>例子：若抛硬币正面概率为p(x=正)=0.5,则单次抛硬币实验结果的信息熵为：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>H</mi><mo>(</mo><mi>X</mi><mo>)</mo><mo>=</mo><mo>−</mo><mo>(</mo><mi>p</mi><mo>(</mo><mi>x</mi><mo>=</mo><mi mathvariant="normal">正</mi><mo>)</mo><mi>l</mi><mi>o</mi><mi>g</mi><mi>p</mi><mo>(</mo><mi>x</mi><mo>=</mo><mi mathvariant="normal">正</mi><mo>)</mo><mo>+</mo><mi>p</mi><mo>(</mo><mi>x</mi><mo>=</mo><mi mathvariant="normal">反</mi><mo>)</mo><mi>l</mi><mi>o</mi><mi>g</mi><mi>p</mi><mo>(</mo><mi>x</mi><mo>=</mo><mi mathvariant="normal">反</mi><mo>)</mo><mo>)</mo><mspace linebreak="newline"></mspace><mo>=</mo><mo>−</mo><mo>(</mo><mn>0.5</mn><mi>l</mi><mi>o</mi><mi>g</mi><mn>0.5</mn><mo>+</mo><mn>0.5</mn><mi>l</mi><mi>o</mi><mi>g</mi><mn>0.5</mn><mo>)</mo><mspace linebreak="newline"></mspace><mo>=</mo><mo>−</mo><mi>l</mi><mi>o</mi><mi>g</mi><mn>0.5</mn><mspace linebreak="newline"></mspace><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">H(X)=-(p(x=正)logp(x=正)+p(x=反)logp(x=反))
+\\=-(0.5log0.5+0.5log0.5)
+\\=-log0.5
+\\=1
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">正</span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">正</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">反</span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">反</span><span class="mclose">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mopen">(</span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">−</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span></p>
+<p>因此，需要1比特的信息量来存储每次抛硬币实验的结果。</p>
+<p><strong>具体到新词的提取中：</strong></p>
+<p>给定字符串 S 作为词语备选，X 定义为该字符串左边可能出现的字符(左邻字)，则称 H(X) 为 S 的左信息熵，类似的，定义右信息熵 H(Y)，例如语料库含有如下句子:</p>
+<ul>
+<li>
+<p>两只<strong>蝴蝶</strong>飞啊飞</p>
+</li>
+<li>
+<p>这些<strong>蝴蝶</strong>飞走了</p>
+</li>
+</ul>
+<p>对于“蝴蝶”，它的左邻字及其频次为“只”为1次,&quot;些&quot;为1次，有两种，和上例中硬币信息熵一样，因此它的左信息熵为1，而右边只为“飞”，因此右信息熵为0。</p>
+<p>当然，如果语料库中句子越多，那么左右信息熵也会不同。如果语料库中再收集一些句子，比如“蝴蝶效应”“蝴蝶蜕变”之类，就会观察到右信息熵会增大不少。</p>
+<p><strong>左右信息熵越大</strong>，说明字符串可能的搭配就越丰富，<strong>该字符串就是一个词的可能性就越大</strong>。</p>
+<p>光考虑左右信息熵是不够的，比如“吃了一顿”“看了一遍”“睡了一晚”“去了一趟”中的了一的左右搭配也很丰富。为了更好的效果，我们还必须考虑词语内部片段的凝聚程度，这种凝聚程度由<strong>互信息</strong>衡量。</p>
+<h4 id="互信息">互信息</h4>
+<p>互信息指的是离散变量X，Y相关程度，定义如下：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>I</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></munder><mi>p</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo><mi>l</mi><mi>o</mi><mi>g</mi><mfrac><mrow><mi>p</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo></mrow><mrow><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>p</mi><mo>(</mo><mi>y</mi><mo>)</mo></mrow></mfrac><mspace linebreak="newline"></mspace><mo>=</mo><mi>E</mi><mo>(</mo><mi>p</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo><mo>)</mo><mi>l</mi><mi>o</mi><mi>g</mi><mfrac><mrow><mi>p</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo></mrow><mrow><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>p</mi><mo>(</mo><mi>y</mi><mo>)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">I(x,y)=\sum_{x,y}p(x,y)log\frac{p(x,y)}{p(x)p(y)}
+\\=E(p(x,y))log\frac{p(x,y)}{p(x)p(y)}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.813113em;vertical-align:-1.386113em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0500050000000003em;"><span style="top:-1.8999949999999999em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span><span style="top:-3.050005em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.386113em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1660468700116.png" alt="" loading="lazy"></figure>
+<p>左圆圈表示H(X)，右圆圈表示H(Y)。它们的并集是联合分布的信息熵H(X,Y)，差集为条件嫡，交集就是互信息。可见互信息越大，两个随机变量的关联就越密切，或者说同时发生的可能性越大。</p>
+<p><strong>具体到新词的提取中：</strong></p>
+<p>例如语料库含有如下句子:</p>
+<ul>
+<li>
+<p>两只<strong>蝴蝶</strong>飞啊飞</p>
+</li>
+<li>
+<p>这些<strong>蝴蝶</strong>飞走了</p>
+</li>
+</ul>
+<p>互信息X代表字符串的前缀子串，Y代表句子去掉前缀剩下的后缀。例如”蝴蝶“，X=”蝴“,Y=”蝶“。此时两者的联合分布只有一个取值，”蝴蝶“,此时期望为1，那么互信息为：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>I</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mfrac><mrow><mi>p</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo></mrow><mrow><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>p</mi><mo>(</mo><mi>y</mi><mo>)</mo></mrow></mfrac><mspace linebreak="newline"></mspace><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mfrac><mrow><mi>p</mi><mo>(</mo><mi mathvariant="normal">蝴</mi><mo separator="true">,</mo><mi mathvariant="normal">蝶</mi><mo>)</mo></mrow><mrow><mi>p</mi><mo>(</mo><mi mathvariant="normal">蝴</mi><mo>)</mo><mi>p</mi><mo>(</mo><mi mathvariant="normal">蝶</mi><mo>)</mo></mrow></mfrac><mspace linebreak="newline"></mspace><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mfrac><mn>0.125</mn><mrow><mn>0.125</mn><mo>∗</mo><mn>0.125</mn></mrow></mfrac><mspace linebreak="newline"></mspace><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">I(x,y)=log\frac{p(x,y)}{p(x)p(y)}\\
+=log\frac{p(蝴,蝶)}{p(蝴)p(蝶)}
+\\=log\frac{0.125}{0.125*0.125}\\
+=3
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord cjk_fallback">蝴</span><span class="mclose">)</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord cjk_fallback">蝶</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord cjk_fallback">蝴</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord cjk_fallback">蝶</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.00744em;vertical-align:-0.686em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.32144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord">.</span><span class="mord">1</span><span class="mord">2</span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">1</span><span class="mord">2</span><span class="mord">5</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord">.</span><span class="mord">1</span><span class="mord">2</span><span class="mord">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">3</span></span></span></span></span></p>
+<p><strong>解释：</strong> 语料库总字数为16，count(蝴)=count(蝶)=2，因此p(蝴)=p(蝶)=0.125，count(蝴蝶)=2,而考虑语料库的字数，我们可以取总词频就为16。因此p(蝴,蝶)=0.125</p>
+<p>片段可能有多种组合方式，计算上可以选取所有组合方式中<strong>互信息最小</strong>的那一种为代表。有了左右信息熵和互信息之后，将两个指标低于一定阈值的片段过滤掉，剩下的片段按频次降序排序，截取最高频次的 N 个片段即完成了词语提取流程。</p>
+<h3 id="实现">实现</h3>
+<p>通过对《红楼梦》的新词抽取，提取前100个高频词，并将处于语料库中的词语进行剔除</p>
+<pre><code class="language-python">from pyhanlp import *
+import zipfile
+import os
+from pyhanlp.static import download, remove_file, HANLP_DATA_PATH
+# 获取测试数据路径，位于$root/data/test，根目录由配置文件指定。
+def test_data_path():
+    data_path = os.path.join(HANLP_DATA_PATH, 'test')
+    if not os.path.isdir(data_path):
+        os.mkdir(data_path)
+    return data_path
+    
+## 验证是否存在 MSR语料库，如果没有自动下载
+def ensure_data(data_name, data_url):
+    root_path = test_data_path()
+    dest_path = os.path.join(root_path, data_name)
+    if os.path.exists(dest_path):
+        return dest_path
+    if data_url.endswith('.zip'):
+        dest_path += '.zip'
+    download(data_url, dest_path)
+    if data_url.endswith('.zip'):
+        with zipfile.ZipFile(dest_path, &quot;r&quot;) as archive:
+            archive.extractall(root_path)
+        remove_file(dest_path)
+        dest_path = dest_path[:-len('.zip')]
+    return dest_path
+HLM_PATH = ensure_data(&quot;红楼梦.txt&quot;, &quot;http://file.hankcs.com/corpus/红楼梦.zip&quot;)
+def extract(corpus):
+    word_info_list = HanLP.extractWords(IOUtil.newBufferedReader(corpus), 100)
+    print(word_info_list)
+    word_info_list = HanLP.extractWords(IOUtil.newBufferedReader(corpus), 100, True)
+    print(word_info_list)
+
+
+if __name__ == '__main__':
+    extract(HLM_PATH)
+</code></pre>
+<p>其中函数 <strong>HanLP.extractWords（）</strong> 的参数如下</p>
+<pre><code># reader: 文本数据源
+# size: 控制返回多少个词
+# newWordsOnly: 为真时，程序将使用内部词库过滤掉“旧词”。
+# max_word_len: 控制识别结果中最长的词语长度
+# min_freq: 控制结果中词语的最低频率
+# min_entropy: 控制结果中词语的最低信息熵的值，一般取 0.5 左右,值越大，越短的词语就越容易提取
+# min_aggregation: 控制结果中词语的最低互信息值，一般取 50 到 200.值越大，越长的词语越容易提取
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">[什么, 凤姐, 贾母, 黛玉, 姑娘, 宝钗, 怎么, 丫头, 如今, 老太太, 贾政, 奶奶, 自己, 贾琏, 平儿, 老爷, 东西, 告诉, 咱们, 姨妈, 薛姨妈, 所以, 探春, 紫鹃, 鸳鸯, 湘云, 如此, 妹妹, 婆子, 贾珍, 李纨, 答应, 尤氏, 晴雯, 媳妇, 屋里, 打发, 刘姥姥, 小丫头, 林黛玉, 薛蟠, 香菱, 孩子, 姊妹, 到底, 连忙, 明白, 丫鬟, 麝月, 姨娘, 哥哥, 贾蓉, 小厮, 果然, 意思, 周瑞, 怎么样, 主意, 已经, 越发, 跟前, 瞧瞧, 房中, 喜欢, 贾赦, 惜春, 句话, 雨村, 贾芸, 吩咐, 况且, 悄悄, 嫂子, 兄弟, 素日, 芳官, 金桂, 贾环, 言语, 雪雁, 时候, 多少, 许多, 嬷嬷, 迎春, 林之孝, 糊涂, 十分, 女孩, 伏侍, 奴才, 预备, 衣服, 请安, 林姑娘, 收拾, 赵姨娘, 莺儿, 年纪, 父亲]#未剔除旧词
+[薛姨妈, 贾珍, 刘姥姥, 麝月, 贾蓉, 周瑞, 贾赦, 雨村, 贾芸, 芳官, 贾环, 林姑娘, 赵姨娘, 莺儿, 宝蟾, 两银子, 溃骸, 秦钟, 薛蝌, 几句, 岫烟, 赖大, 听了这话, 茗烟, 递与, 钏儿, 士隐, 荣府, 贾蔷, 冯紫英, 焙茗, 请了安, 宁府, 包勇, 金钏, 鲍二, 代儒, 嗳哟, 从小儿, 在床上, 既这么, 十六, 让坐, 李贵, 打谅, 既这样, 金钏儿, 日一早, 李嬷嬷, 族中, 唬了一跳, 蘅芜, 还了得, 王仁, 在炕上, 间屋, 藕官, 几句话, 尤三姐, 五百, 也未可知, 警幻, 越性, 手帕子, 十两银子, 李婶, 忽然想起, 小蹄子, 熙凤, 六十, 十九, 琏二奶奶, 珍大爷, 往那里去, 要知端, 些闲话, 孙女儿, 蒋玉菡, 榻上, Φ溃骸, 罢咧, 八九, 乱嚷, 几个钱, 点点头儿, 自己房中, 李十儿, 犹未, 既如此, 忙陪笑, 千万, 十七, 沁芳, 在外间, 几两银子, 王子腾, 马道婆, 铁槛寺, 李纹, 若论]#剔除旧词
+</code></pre>
+<h2 id="关键词提取">关键词提取</h2>
+<p>关键词提取就是提取文章中重要的单词，常见的方法有词频、TF-IDF，TextRank算法</p>
+<p>单文档提起可以用词频和TextRank，多文档可以使用TF-IDF来提取关键词。</p>
+<h3 id="词频统计">词频统计</h3>
+<p>通过统计文章中每种词语的词频并排序，可以初步获取部分关键词。</p>
+<p>不过文章中反复出现的词语却不一定是关键词，例如“的”。所以在统计词频之前需要去掉停用词。</p>
+<p><strong>流程：<strong>分词、停用词过滤、按词频顺序取前 n 个。其中，求 m 个元素中前 n (n&lt;=m) 大元素的问题通常通过</strong>最大堆</strong>解决，复杂度为 O(mlogn)。同时HanLP提供了相关的接口。</p>
+<h4 id="实现-2">实现</h4>
+<pre><code class="language-python">from pyhanlp import *
+TermFrequency = JClass('com.hankcs.hanlp.corpus.occurrence.TermFrequency')
+TermFrequencyCounter = JClass('com.hankcs.hanlp.mining.word.TermFrequencyCounter')
+
+from pyhanlp import *
+
+TermFrequency = JClass('com.hankcs.hanlp.corpus.occurrence.TermFrequency')
+TermFrequencyCounter = JClass('com.hankcs.hanlp.mining.word.TermFrequencyCounter')
+
+if __name__ == '__main__':
+    counter = TermFrequencyCounter()
+    counter.add(&quot;加油加油中国队！&quot;)  # 第一个文档
+    counter.add(&quot;中国观众高呼加油中国&quot;)  # 第二个文档
+    for termFrequency in counter:  # 输出每个词与词频
+        print(&quot;%s=%d&quot; % (termFrequency.getTerm(), termFrequency.getFrequency()))
+    print(counter.top(2))  # 取前两个
+    print(TermFrequencyCounter.getKeywordList(&quot;加油加油中国队！中国观众高呼加油中国&quot;, 3))
+</code></pre>
+<p>输出</p>
+<pre><code>中国=2
+中国队=1
+加油=3
+观众=1
+高呼=1
+[加油=3, 中国=2]
+
+[加油, 中国, 高呼]
+</code></pre>
+<h3 id="tf-idf">TF-IDF</h3>
+<p>所谓TF-IDF就是，字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。</p>
+<p><strong>TF-IDF的主要思想是</strong>：如果某个单词在一篇文章中出现的频率TF高，并且在其他文章中很少出现，则认为此词或者短语具有很好的类别区分能力，适合用来分类。</p>
+<p><strong>TF-IDF具体可以看这篇文章:<a href="https://www.ruanyifeng.com/blog/2013/03/tf-idf.html">TF-IDF与余弦相似性的应用</a></strong></p>
+<h4 id="实现-3">实现</h4>
+<pre><code class="language-python">from sklearn.feature_extraction.text import TfidfVectorizer
+documents=['This is the second document.',
+             'And the third one.',
+             'Is this the first document?']#语料库
+tf_idf=TfidfVectorizer()
+tf_idfMatrix=tf_idf.fit_transform(documents)
+tf_idfarray=tf_idfMatrix.toarray()
+# 得到语料库所有不重复的词
+print(tf_idf.get_feature_names_out())
+# 得到每个单词对应的id值
+print(tf_idf.vocabulary_)
+# 得到每个句子所对应的向量，向量里数字的顺序是按照词语的id顺序来的
+print(tf_idfarray)
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">['and' 'document' 'first' 'is' 'one' 'second' 'the' 'third' 'this']
+{'this': 8, 'is': 3, 'the': 6, 'second': 5, 'document': 1, 'and': 0, 'third': 7, 'one': 4, 'first': 2}
+[[0.         0.43306685 0.         0.43306685 0.         0.56943086
+  0.33631504 0.         0.43306685]
+ [0.54645401 0.         0.         0.         0.54645401 0.
+  0.32274454 0.54645401 0.        ]
+ [0.         0.43306685 0.56943086 0.43306685 0.         0.
+  0.33631504 0.         0.43306685]]
+</code></pre>
+<h3 id="textrank">TextRank</h3>
+<p>TextRank 是 PageRank 在文本中的应用,</p>
+<p>PageRank这个算法是基于图的，每个网页可以看作是一个图中的结点，用户可以通过A网页中的链接，跳转到B网页，这种互相跳转关系，可以理解为一种“投票”行为，A网页连接到B网页，表示A网页对B网页的认可，即A网页给B网页投了一票。给B网页投票（链接）的越多，B网页的价值也就越大这样，我们就可以构造出一个有向图了。然后，利用公式：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><msub><mi>V</mi><mi>i</mi></msub><mo>)</mo><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>d</mi><mo>)</mo><mo>+</mo><mi>d</mi><mo>∗</mo><munder><mo>∑</mo><mrow><msub><mi>v</mi><mi>j</mi></msub><mo>∈</mo><mi>I</mi><mi>n</mi><mo>(</mo><msub><mi>V</mi><mi>i</mi></msub><mo>)</mo></mrow></munder><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>O</mi><mi>u</mi><mi>t</mi><mo>(</mo><msub><mi>V</mi><mi>j</mi></msub><mo>)</mo><mi mathvariant="normal">∣</mi></mrow></mfrac><mi>S</mi><mo>(</mo><msub><mi>V</mi><mi>j</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">S(V_i)=(1-d)+d*\sum_{v_j\in In(V_i)}\frac{1}{|Out(V_j)|}S(V_j)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.859765em;vertical-align:-1.538325em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.050005em;"><span style="top:-1.808995em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:-0.03588em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span><span class="mrel mtight">∈</span><span class="mord mathdefault mtight" style="margin-right:0.07847em;">I</span><span class="mord mathdefault mtight">n</span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:-0.22222em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.538325em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.32144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault">u</span><span class="mord mathdefault">t</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord">∣</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.972108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>其中d是一个0~1的常数因子，一般取值为0.85，In(V)表示连接到V的节点集合，Out(V)表示从V连接到的节点的集合。一个网站，如果越多的网站链接到它，说明这个网站越有价值，为什么要加入一个权重呢？公式可以看到，权重是从某个网页链接出去的数量的倒数，数量越多，权重越小，好比是投票，某个人投出的票越多，说明这个人的票越没有含金量。</p>
+<p>TextRank就是在PageRank的基础上，将<strong>单词</strong>视为节点。每个单词的外链来自于自身前后固定大小的窗口内的所有单词。</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1660468723348.png" alt="" loading="lazy"></figure>
+<p>图中，假设窗口半径为2，词语”处理“的外链来自于”自然“、”语言“、”入门“、”非常“4个单词。</p>
+<p>根据窗口进行滑动，最终得到一个有向无权图</p>
+<p><img src="https://voluntexi.github.io//post-images/1660468729500.png" alt="" loading="lazy"><br>
+同时也可以建立无向无权图，<a href="http://web.eecs.umich.edu/~mihalcea/papers/mihalcea.emnlp04.pdf">textRank原论文</a>中对于关键词提取任务主要是构建的<strong>无向无权图</strong>，对于有向图，论文提到是基于词的前后顺序角度去考虑，即给定窗口。其实来说有向图效果比无向图差一些。</p>
+<p>然后用公式进行递归计算，直到最后结果收敛</p>
+<h4 id="实现-4">实现</h4>
+<pre><code class="language-python">from pyhanlp import *
+content = (
+&quot;程序员(英文Programmer)是从事程序开发、维护的专业人员。&quot;
+&quot;一般将程序员分为程序设计人员和程序编码人员，&quot;
+&quot;但两者的界限并不非常清楚，特别是在中国。&quot;
+&quot;软件从业人员分为初级程序员、高级程序员、系统&quot;
+&quot;分析员和项目经理四大类。&quot;)
+
+TextRankKeyword = JClass(&quot;com.hankcs.hanlp.summary.TextRankKeyword&quot;)
+keyword_list = HanLP.extractKeyword(content, 5)
+print(keyword_list)
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">[程序员, 程序, 分为, 人员, 软件]
+</code></pre>
+<h2 id="短语提取">短语提取</h2>
+<p>短语提取，也即固定多字词表达串的识别。短语提取经常用于搜索引擎的自动推荐，文档的简介生成等。</p>
+<p>利用<strong>互信息</strong>和<strong>左右信息熵</strong>，我们可以轻松地将新词提取算法拓展到短语提取。只需将新词提取时的字符替换为单词， 字符串替换为单词列表即可。为了得到单词，我们依然需要进行中文分词并将停用词进行过滤。</p>
+<h3 id="实现-5">实现</h3>
+<pre><code class="language-python">from pyhanlp import *
+text = '''新华社北京8月13日电 题：一个中国原则是国际社会的普遍共识——多国人士高度评价《台湾问题与新时代中国统一事业》白皮书
+新华社记者
+国务院台湾事务办公室、国务院新闻办公室10日发表《台湾问题与新时代中国统一事业》白皮书。多国人士表示，台湾是中国的一部分，一个中国原则是国际社会的普遍共识，这份白皮书展现了中方追求国家统一的坚定意志和坚强决心。
+厄瓜多尔外交部前副部长拉斐尔·金特罗表示，中方发表《台湾问题与新时代中国统一事业》白皮书，表明了中国推进国家统一进程的坚定决心。他指出：“了解台湾问题要从真正的历史着手，台湾自古就是中国的一部分，国际关系基本准则应得到遵守。”
+韩中城市友好协会会长权起植认为，白皮书明确表达了中方推进实现国家统一的立场和政策。“今天的中国国力不断壮大，国际影响力不断上升，有信心也有能力解决台湾问题，‘以台制华’的图谋注定破产”。
+马来西亚新亚洲战略研究中心主席翁诗杰说，美国的焦虑感日益增加，台湾问题长期以来被美方用作遏制中国的地缘政治工具。他指出，白皮书的发表及时而必要，台湾问题是中国的内政，应该由中国人自己解决。
+坦桑尼亚执政党革命党主管国际关系的副书记卢宾加代表该党发表声明说，革命党一贯支持一个中国原则，在台湾问题上支持中国反对外部势力挑衅。台湾是中国的一部分，坚决反对任何分裂中国的图谋。
+克罗地亚前总统约西波维奇指出，台湾是中国的一部分，支持中国维护国家主权和领土完整，克罗地亚始终坚定奉行一个中国政策。
+非洲对华友好协会联合会会长阿萨内·姆本格从白皮书中读出中国争取和平统一的诚意和维护国家主权和领土完整的决心。姆本格表示，非洲对华友好协会联合会坚定支持一个中国原则，强调违背这一原则的行为是危险的。
+拉脱维亚《今日报》主编安德烈·什维多夫告诉记者，白皮书发布非常及时，有理有据地表明了中国的一贯立场。联大第2758号决议和大量国际文件充分证明，一个中国原则法理事实清楚，不容曲解。
+居住在科威特的黎巴嫩作家和媒体人士哈姆扎·奥拉扬认为，白皮书系统阐述表明台湾过去、现在和将来都是中国的一部分，中方反对分裂行径合理合法。
+印度尼西亚国际战略研究中心研究员韦罗妮卡·莎拉斯瓦蒂指出，台湾是中国的一部分，世界各国都应尊重和支持中国维护主权和领土完整的努力，台湾问题不能成为外国势力干涉中国内政的理由或工具。
+“一些外部势力试图改变台海现状，支持‘台独’分裂分子，企图破坏地区的和平、安宁和经济发展。”柬埔寨贝尔泰国际大学资深教授约瑟夫·马修斯指出，台湾是中国的一部分，“以台制华”图谋注定失败。'''
+ 
+phrase_list = HanLP.extractPhrase(text, 5)
+print(phrase_list)
+
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">[台湾问题, 支持中国, 国家统一, 反对分裂, 中国原则]
+</code></pre>
+<h2 id="自动摘要">自动摘要</h2>
+<p>由于一篇文章中几乎不可能出现相同的两个句子，所以朴素的 PageRank 在句子颗粒度上行不通。为了将 PageRank 利用到句子颗粒度上去，我们引人 BM25 算法衡量句子的相似度，改进链接的权重计算。相似的句子将得到更高的投票。</p>
+<h3 id="bm25">BM25</h3>
+<p>BM25 是TF-IDF的一种改进变种。解决了如何衡量多个词语与文档的关联程度的问题</p>
+<p>形式化的定义 Q 为查询语句，由关键字 q1 到 qn 组成，D 为一个被检索的文档，BM25度量如下:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi><mi>M</mi><mn>25</mn><mo>(</mo><mi>D</mi><mo separator="true">,</mo><mi>Q</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>I</mi><mi>D</mi><mi>F</mi><mo>(</mo><msub><mi>q</mi><mi>i</mi></msub><mo>)</mo><mo>∗</mo><mfrac><mrow><mi>T</mi><mi>F</mi><mo>(</mo><msub><mi>q</mi><mi>i</mi></msub><mo separator="true">,</mo><mi>D</mi><mo>)</mo><mo>∗</mo><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow><mrow><mi>T</mi><mi>F</mi><mo>(</mo><msub><mi>q</mi><mi>i</mi></msub><mo separator="true">,</mo><mi>D</mi><mo>)</mo><mo>+</mo><mi>k</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>b</mi><mo>+</mo><mi>b</mi><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><mi>D</mi><mi mathvariant="normal">∣</mi></mrow><mrow><mi>a</mi><mi>v</mi><mi>g</mi><mi>D</mi><mi>L</mi></mrow></mfrac><mo>)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">BM25(D,Q)=\sum_{i=1}^nIDF(q_i)*\frac{TF(q_i,D)*(k+1)}{TF(q_i,D)+k(1-b+b*\frac{|D|}{avgDL})}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord">2</span><span class="mord">5</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">Q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.929066em;vertical-align:-1.277669em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6513970000000002em;"><span style="top:-1.872331em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.050005em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3000050000000005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.277669em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.808108em;vertical-align:-1.381108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.11em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault">b</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault">b</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">D</span><span class="mord mathdefault mtight">L</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">∣</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">D</span><span class="mord mtight">∣</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span><span style="top:-3.2399999999999998em;"><span class="pstrut" style="height:3.01em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.687em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.381108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>其中IDF和TF与<strong>TF-IDF</strong>定义相同，k和b是两个常数，avgDL是所有文档的平均长度。</p>
+<p>BM25大意是对查询语句Q中所有单词的IDF进行加权求和。k越大则TF对文档得分正面影响越大，b越大则TF对文档得分负面影响越大。</p>
+<h3 id="textrank-2">TextRank</h3>
+<p>有了BM25算法之后，将一个句子视作查询语句，相邻的句子视作待查询的文档，就能得到它们之间的相似度。以此相似度作为 PageRank 中的链接的权重，于是得到一种改进算法，称为TextRank。此时构造的是有权图(有向，无向都可以)。它的形式化计算方法如下:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi><mi>S</mi><mo>(</mo><msub><mi>V</mi><mi>i</mi></msub><mo>)</mo><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>d</mi><mo>)</mo><mo>+</mo><mi>d</mi><mo>∗</mo><munder><mo>∑</mo><mrow><msub><mi>v</mi><mi>j</mi></msub><mo>∈</mo><mi>I</mi><mi>n</mi><mo>(</mo><msub><mi>V</mi><mi>i</mi></msub><mo>)</mo></mrow></munder><mfrac><mrow><mi>B</mi><mi>M</mi><mn>25</mn><mo>(</mo><msub><mi>V</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>V</mi><mi>j</mi></msub><mo>)</mo></mrow><mrow><munder><mo>∑</mo><mrow><msub><mi>v</mi><mi>k</mi></msub><mo>∈</mo><mi>O</mi><mi>u</mi><mi>t</mi><mo>(</mo><msub><mi>V</mi><mi>j</mi></msub><mo>)</mo></mrow></munder><mi>B</mi><mi>M</mi><mn>25</mn><mo>(</mo><msub><mi>v</mi><mi>k</mi></msub><mo separator="true">,</mo><msub><mi>v</mi><mi>j</mi></msub><mo>)</mo></mrow></mfrac><mi>W</mi><mi>S</mi><mo>(</mo><msub><mi>V</mi><mi>j</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">WS(V_i)=(1-d)+d*\sum_{v_j\in In(V_i)}\frac{BM25(V_i,V_j)}{\sum_{v_k \in Out(V_j)}BM25(v_k,v_j)}WS(V_j)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.965325em;vertical-align:-1.538325em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.050005em;"><span style="top:-1.808995em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:-0.03588em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span><span class="mrel mtight">∈</span><span class="mord mathdefault mtight" style="margin-right:0.07847em;">I</span><span class="mord mathdefault mtight">n</span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:-0.22222em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.538325em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.22528999999999982em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3487714285714287em;margin-left:-0.03588em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15122857142857138em;"><span></span></span></span></span></span></span><span class="mrel mtight">∈</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">O</span><span class="mord mathdefault mtight">u</span><span class="mord mathdefault mtight">t</span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:-0.22222em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.49703em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord">2</span><span class="mord">5</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord">2</span><span class="mord">5</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.18303em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>其中，WS(Vi) 就是文档中第 i 个句子的得分，重复迭代该表达式若干次之后得到最终的分值，排序后输出前 N 个即得到关键句。代码如下:</p>
+<pre><code class="language-python">from pyhanlp import *
+text = '''新华社北京8月13日电 题：一个中国原则是国际社会的普遍共识——多国人士高度评价《台湾问题与新时代中国统一事业》白皮书
+新华社记者
+国务院台湾事务办公室、国务院新闻办公室10日发表《台湾问题与新时代中国统一事业》白皮书。多国人士表示，台湾是中国的一部分，一个中国原则是国际社会的普遍共识，这份白皮书展现了中方追求国家统一的坚定意志和坚强决心。
+厄瓜多尔外交部前副部长拉斐尔·金特罗表示，中方发表《台湾问题与新时代中国统一事业》白皮书，表明了中国推进国家统一进程的坚定决心。他指出：“了解台湾问题要从真正的历史着手，台湾自古就是中国的一部分，国际关系基本准则应得到遵守。”
+韩中城市友好协会会长权起植认为，白皮书明确表达了中方推进实现国家统一的立场和政策。“今天的中国国力不断壮大，国际影响力不断上升，有信心也有能力解决台湾问题，‘以台制华’的图谋注定破产”。
+马来西亚新亚洲战略研究中心主席翁诗杰说，美国的焦虑感日益增加，台湾问题长期以来被美方用作遏制中国的地缘政治工具。他指出，白皮书的发表及时而必要，台湾问题是中国的内政，应该由中国人自己解决。
+坦桑尼亚执政党革命党主管国际关系的副书记卢宾加代表该党发表声明说，革命党一贯支持一个中国原则，在台湾问题上支持中国反对外部势力挑衅。台湾是中国的一部分，坚决反对任何分裂中国的图谋。
+克罗地亚前总统约西波维奇指出，台湾是中国的一部分，支持中国维护国家主权和领土完整，克罗地亚始终坚定奉行一个中国政策。
+非洲对华友好协会联合会会长阿萨内·姆本格从白皮书中读出中国争取和平统一的诚意和维护国家主权和领土完整的决心。姆本格表示，非洲对华友好协会联合会坚定支持一个中国原则，强调违背这一原则的行为是危险的。
+拉脱维亚《今日报》主编安德烈·什维多夫告诉记者，白皮书发布非常及时，有理有据地表明了中国的一贯立场。联大第2758号决议和大量国际文件充分证明，一个中国原则法理事实清楚，不容曲解。
+居住在科威特的黎巴嫩作家和媒体人士哈姆扎·奥拉扬认为，白皮书系统阐述表明台湾过去、现在和将来都是中国的一部分，中方反对分裂行径合理合法。
+印度尼西亚国际战略研究中心研究员韦罗妮卡·莎拉斯瓦蒂指出，台湾是中国的一部分，世界各国都应尊重和支持中国维护主权和领土完整的努力，台湾问题不能成为外国势力干涉中国内政的理由或工具。
+“一些外部势力试图改变台海现状，支持‘台独’分裂分子，企图破坏地区的和平、安宁和经济发展。”柬埔寨贝尔泰国际大学资深教授约瑟夫·马修斯指出，台湾是中国的一部分，“以台制华”图谋注定失败。'''
+phrase_list = HanLP.extractSummary(text, 2) #输出前两个句子
+print(phrase_list)
+</code></pre>
+<p>输出</p>
+<pre><code>[一个中国原则是国际社会的普遍共识——多国人士高度评价《台湾问题与新时代中国统一事业》白皮书, 中方发表《台湾问题与新时代中国统一事业》白皮书]
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>同时我们也看到，新词提取与短语提取，关键词与关键句的提取，在原理上都是同一种算法在不同文本颗粒度上的应用。值得一提的是，这些算法都不需要标注语料的参与，然而必须指出的是，对于同一个任务，监督学习方法的效果通常远远领先于无监督学习方法。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%96%B0%E8%AF%8D%E6%8A%BD%E5%8F%96">新词抽取</a>
+<ul>
+<li><a href="#%E6%8A%BD%E5%8F%96%E6%AD%A5%E9%AA%A4">抽取步骤</a>
+<ul>
+<li><a href="#%E4%BF%A1%E6%81%AF%E7%86%B5">信息熵</a></li>
+<li><a href="#%E4%BA%92%E4%BF%A1%E6%81%AF">互信息</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E7%8E%B0">实现</a></li>
+</ul>
+</li>
+<li><a href="#%E5%85%B3%E9%94%AE%E8%AF%8D%E6%8F%90%E5%8F%96">关键词提取</a>
+<ul>
+<li><a href="#%E8%AF%8D%E9%A2%91%E7%BB%9F%E8%AE%A1">词频统计</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-2">实现</a></li>
+</ul>
+</li>
+<li><a href="#tf-idf">TF-IDF</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-3">实现</a></li>
+</ul>
+</li>
+<li><a href="#textrank">TextRank</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-4">实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E7%9F%AD%E8%AF%AD%E6%8F%90%E5%8F%96">短语提取</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0-5">实现</a></li>
+</ul>
+</li>
+<li><a href="#%E8%87%AA%E5%8A%A8%E6%91%98%E8%A6%81">自动摘要</a>
+<ul>
+<li><a href="#bm25">BM25</a></li>
+<li><a href="#textrank-2">TextRank</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/ming-ming-shi-ti-shi-bie-zai-hanlp-zhong-de-shi-xian/">
+              <h3 class="post-title">
+                命名实体识别在HanLP中的实现
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

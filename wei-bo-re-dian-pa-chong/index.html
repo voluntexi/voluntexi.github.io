@@ -1,0 +1,468 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>微博榜单爬虫 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="微博榜单爬虫 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="本文主要是介绍关于微博榜单的博文以及转发、评论等各种信息爬取。
+
+榜单博文爬取方面，使用的是微博移动端（https://m.weibo.cn）。
+因为对于该页面中微博移动版中热门内容、榜单的爬取，不需要使用到cookies。
+榜单和微博热门..." />
+    <meta name="keywords" content="网络爬虫" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              微博榜单爬虫
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-07-05
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/_of5dqwwh/" class="post-tag">
+                  # 网络爬虫
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic3.zhimg.com%2Fv2-8617dbabc38aaa87b878b6ee5d615f8f_1440w.jpg%3Fsource%3D172ae18b&amp;refer=http%3A%2F%2Fpic3.zhimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1658553842&amp;t=dcf4e4220f062ca915fedcc7b797c4c2" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>本文主要是介绍关于微博榜单的博文以及转发、评论等各种信息爬取。</p>
+<!-- more -->
+<p>榜单博文爬取方面，使用的是微博移动端（<a href="https://links.jianshu.com/go?to=https%3A%2F%2Fm.weibo.cn">https://m.weibo.cn</a>）。</p>
+<p>因为对于该页面中微博移动版中热门内容、榜单的爬取，不需要使用到<code>cookies</code>。</p>
+<p>榜单和微博热门的爬取中，具体的内容细节抓取基本差不多，本文以爬取汽车榜单为例进行解析。</p>
+<h2 id="微博汽车榜单博文爬取">微博—汽车榜单博文爬取</h2>
+<p>首先进入微博移动端（<a href="https://links.jianshu.com/go?to=https%3A%2F%2Fm.weibo.cn">https://m.weibo.cn</a>），打开开发者模式在网络中找到如下包<br>
+<img src="https://voluntexi.github.io//post-images/1657008908136.png" alt="" loading="lazy"><br>
+对应请求网址如下：</p>
+<pre><code class="language-python">https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_5188_-_ctg1_5188
+</code></pre>
+<p>这个请求网址里面代表的是汽车榜单中的相关内容，由于里面内容是随即滚动的，并且带一定的推荐功能，会随登陆账号的不同显示不一样，每次刷新也都会有不同的数据出现。</p>
+<p>进去后可以看到，移动端是用滑动的模式，而不是翻页的模式，那么怎么获取下一页的内容呢？</p>
+<p>该页面是可以直接用页数&amp;page加一的操作来更新的，但是在后面的用户评论的爬取却不是这个规则，当然这是后话了。</p>
+<h3 id="爬取过程详解">爬取过程详解</h3>
+<p>首先依据将前面找到的数据接口爬下数据，看看数据格式。</p>
+<p>在预览中可以看到包中的数据内容，直接使用requests就可以拿到页面数据，再提取对应的值，再将数据以Json格式存储就可以了。<br>
+<img src="https://voluntexi.github.io//post-images/1657008923326.png" alt="" loading="lazy"></p>
+<pre><code class="language-python">def crawler(url,page,name):
+   num=1
+   c=1
+   allData=[]
+   for i in range(page):
+      res=requests.get(&quot;{}&amp;page={}&quot;.format(url,i))
+      data=res.json()['data']['statuses']
+</code></pre>
+<h3 id="包中的具体数据解析">包中的具体数据解析</h3>
+<p>博文等相关数据存储在data-&gt;statuses中，里面0~17代表了，该页有18条微博，我们再点进去观察数据表示的含义</p>
+<pre><code class="language-python">ab_switcher: 4
+attitudes_count: 89
+bid: &quot;LAteeiwt5&quot;
+bmiddle_pic: &quot;http://wx3.sinaimg.cn/bmiddle/7fd514fdly1h3szgp0feaj235s2dchdv.jpg&quot;
+buttons: [{type: &quot;follow&quot;, name: &quot;关注&quot;,…}]
+can_edit: false
+comment_manage_info: {comment_permission_type: -1, approval_comment_type: 0, comment_sort_type: 0}
+comments_count: 16
+content_auth: 0
+created_at: &quot;Sat Jul 02 23:08:44 +0800 2022&quot;
+darwin_tags: []
+extern_safe: 0
+falls_pic_focus_point: []
+favorited: false
+from_cateid: &quot;5188&quot;
+hot_ext: &quot;source_type:5188|recommend_source:87|isPageUp:1|position:2&quot;
+hot_page: {fid: &quot;232532_mblog&quot;, feed_detail_type: 0}
+id: &quot;4786921664414715&quot;
+isLongText: false
+is_paid: false
+mblog_buttons: [{type: &quot;mblog_buttons_forward&quot;, name: &quot;转发&quot;, pic: &quot;&quot;,…},…]
+mblog_vip_type: 0
+mblogtype: 0
+mid: &quot;4786921664414715&quot;
+mlevel: 0
+negative_tags: [{tag: &quot;1042015:carBrand_c3f70203da24f043de5d59bf97bfc12d&quot;, type: &quot;3&quot;, name: &quot;大众&quot;,…},…]
+new_comment_style: 0
+number_display_strategy: {apply_scenario_flag: 3, display_text_min_number: 1000000, display_text: &quot;100万+&quot;}
+original_pic: &quot;https://wx3.sinaimg.cn/large/7fd514fdly1h3szgp0feaj235s2dchdv.jpg&quot;
+pending_approval_count: 0
+picStatus: &quot;0:1&quot;
+pic_flag: 1
+pic_focus_point: [{focus_point: {left: 0.3942028880119324, top: 0.3861003816127777, width: 0.28985506296157837,…},…}]
+pic_ids: [&quot;7fd514fdly1h3szgp0feaj235s2dchdv&quot;]
+pic_num: 1
+pic_rectangle_object: []
+pics: [{pid: &quot;7fd514fdly1h3szgp0feaj235s2dchdv&quot;,…}]
+recommend_source: 87
+region_name: &quot;发布于 北京&quot;
+region_opt: 1
+reposts_count: 0
+reprint_cmt_count: 0
+reward_scheme: &quot;sinaweibo://reward?bid=1000293251&amp;enter_id=1000293251&amp;enter_type=1&amp;oid=4786921664414715&amp;seller=2144670973&amp;share=18cb5613ebf3d8aadd9975c1036ab1f47&amp;sign=95f1971a1f966218fee334dd90f4fb43&quot;
+rid: &quot;1_0_0_6666695739198377824_0_0_0&quot;
+show_additional_indication: 0
+source: &quot;OPPO Find X5 Pro&quot;
+text: &quot;帅就完了，终于低下来了！ &quot;
+textLength: 24
+thumbnail_pic: &quot;https://wx3.sinaimg.cn/thumbnail/7fd514fdly1h3szgp0feaj235s2dchdv.jpg&quot;
+title: {text: &quot;&quot;}
+user: {id: 2144670973, screen_name: &quot;说车的小宇&quot;,…}
+visible: {type: 0, list_id: 0}
+</code></pre>
+<p>包含了十分完整且丰富的数据，在本文中所需的数据主要有：</p>
+<pre><code class="language-python">id=singleMess['user']['id'] //用户id
+messageid=singleMess['id'] //博文id
+mid=singleMess['mid'] //微博在web系统中的id值
+username=singleMess['user']['screen_name'] //博主用户名
+messagetime=singleMess['created_at'] //发博时间
+messagetime=getStandard(messagetime) 
+message=singleMess['text'] //博文内容
+like=singleMess['attitudes_count'] //点赞数
+transmit=singleMess['reposts_count'] //转发数
+commentNum=singleMess['comments_count'] //评论数
+</code></pre>
+<p>至此，榜单的博文等信息便可以抓取完毕，接下来是博文中的评论和转发信息。</p>
+<h2 id="微博博文评论抓取">微博—博文评论抓取</h2>
+<p>我们在汽车榜单中，随便点进去一个微博<br>
+<img src="https://voluntexi.github.io//post-images/1657008986016.png" alt="" loading="lazy"><br>
+在开发者模式中找到如下请求包<br>
+<img src="https://voluntexi.github.io//post-images/1657008993983.png" alt="" loading="lazy"><br>
+请求网址为：</p>
+<pre><code class="language-python">https://m.weibo.cn/comments/hotflow?id=4786436290642684&amp;mid=4786436290642684&amp;max_id_type=0
+</code></pre>
+<p>通过对请求网址的分析，id和mid对应为上节中爬取的相关数据，因此便可以通过将榜单中的博文的id和mid提取出来，然后修改该请求头的id和mid为提取的数值就可以实现对评论的爬取了。</p>
+<p>那么如何进行翻页的操作呢？</p>
+<p>我们观察这两个请求网址有什么不一样</p>
+<pre><code class="language-python">https://m.weibo.cn/comments/hotflow?id=4786436290642684&amp;mid=4786436290642684&amp;max_id_type=0//第一页
+
+https://m.weibo.cn/comments/hotflow?id=4786436290642684&amp;mid=4786436290642684&amp;max_id=138173583930408&amp;max_id_type=0 //第二页
+</code></pre>
+<p>发现多了一个&amp;max_id的数据，那么这个数据是如何获取的呢？</p>
+<p>我们再次回到第一页的网络包中，在预览中查看包中的数据</p>
+<pre><code class="language-python">{ok: 1, data: {data: [,…], total_number: 74,…}}
+data: {data: [,…], total_number: 74,…}
+data: [,…]
+max: 4
+max_id: 138173583930408
+max_id_type: 0
+status: {comment_manage_info: {comment_permission_type: -1, approval_comment_type: 0, comment_sort_type: 0}}
+total_number: 74
+ok: 1
+</code></pre>
+<p>里面的max_id的数据是不是就出来了呢？</p>
+<p><strong>总结：评论的翻页是通过对该页面的包中max_id 而对应到下一页的</strong></p>
+<h3 id="爬取过程详解-2">爬取过程详解</h3>
+<p>通过构造请求头，进行数据网址的请求，然后进行数据的解析就可以了，然后通过本页的max_id 的值来进行翻页操作。</p>
+<p>爬取代码如下：</p>
+<pre><code class="language-python">def getSingleMicroblogInfo(id,mid):
+   headers = {
+        &quot;user-agent&quot;:&quot;Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36&quot;,
+      &quot;cookie&quot;:'input your cookie'
+      }
+   microblog=[]
+   url = 'https://m.weibo.cn/comments/hotflow?id={}&amp;mid={}&amp;max_id_type=0'.format(id,mid)
+   num=1
+   while num&lt;=200:
+      res = requests.get(url,headers=headers)
+      data = res.json()['data']
+      max_id = data['max_id']
+      user_info = data['data']
+      for single_info in  user_info:
+         Retext=single_info['text']
+         Retext_id=single_info['id']
+         user_id=single_info['user']['id']
+         user_name=single_info['user']['screen_name']
+         user_messagetime = single_info['created_at']
+         user_messagetime=getStandard(user_messagetime)
+         comment_flag = 1
+         user_comment=[user_messagetime,user_id,user_name,Retext_id,Retext,comment_flag]
+         microblog.append(user_comment)
+         num+=1
+         time.sleep(1)
+      if max_id!=0:
+         url = 'https://m.weibo.cn/comments/hotflow?id={}&amp;mid={}&amp;max_id={}&amp;max_id_type=0'.format(id, mid, max_id)
+      else:
+         break
+   return microblog
+</code></pre>
+<h2 id="微博转发信息抓取">微博—转发信息抓取</h2>
+<p>点进转发界面</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1657009011409.png" alt="" loading="lazy"></figure>
+<p>同样如上节，到如下请求包<br>
+<img src="https://voluntexi.github.io//post-images/1657009017829.png" alt="" loading="lazy"></p>
+<p>转发的翻页和博文爬取一样通过&amp;page操作来进行</p>
+<p>具体数据的提取操作和评论的爬取相同，传入博文的id，也就不累赘了，直接上代码：</p>
+<pre><code class="language-python">def getTranspondInfo(id):
+   headers = {
+      &quot;user-agent&quot;: &quot;Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36&quot;,
+      &quot;cookie&quot;: 'input your cookie'
+   }
+   url = 'https://m.weibo.cn/api/statuses/repostTimeline?id={}&amp;page=1'.format(id)
+   res = requests.get(url, headers=headers)
+   data = res.json()['data']
+   page = data['max']
+   current_page = 1
+   num = 1
+   total_number = data['total_number']
+   microblog = []
+   transpondInfo = data['data']
+   while num &lt;= 100 and num&lt;total_number:
+      if current_page!=1:
+         res = requests.get(url, headers=headers)
+         data = res.json()['data']
+         total_number = data['total_number']
+         transpondInfo = data['data']
+      else:
+         pass
+      for single_info in transpondInfo:
+         Retext = single_info['text']
+         Retext_id = single_info['id']
+         user_id = single_info['user']['id']
+         user_name = single_info['user']['screen_name']
+         user_messagetime = single_info['created_at']
+         user_messagetime = getStandard(user_messagetime)
+         transpond_flag=2
+         user_comment = [user_messagetime, user_id, user_name, Retext_id, Retext, transpond_flag]
+         microblog.append(user_comment)
+         num += 1
+         time.sleep(1)
+      if current_page &lt;= page:
+         current_page += 1
+         url = 'https://m.weibo.cn/api/statuses/repostTimeline?id= {}&amp;page={}'.format(id, current_page)
+      else:
+         break
+   return microblog
+</code></pre>
+<h2 id="数据清洗">数据清洗</h2>
+<p>爬取中的数据发现存在大量的网址标签等信息，我们需要进行数据的清洗，去除这些不需要的数据</p>
+<pre><code class="language-python">def cleanData(df):
+    发文=[]
+    评论=[]
+    for item,item2 in zip(df['发文/转发内容'],df['转发/评论内容']):
+        scriptRegex = &quot;&lt;script[^&gt;]*?&gt;[\\s\\S]*?&lt;\\/script&gt;&quot;;
+        styleRegex = &quot;&lt;style[^&gt;]*?&gt;[\\s\\S]*?&lt;\\/style&gt;&quot;;
+        htmlRegex = &quot;&lt;[^&gt;]+&gt;&quot;;
+        spaceRegex = &quot;\\s*|\t|\r|\n&quot;;
+        item=re.sub(scriptRegex,'', str(item))  # 去除网址
+        item=re.sub(styleRegex,'', str(item))
+        item=re.sub(htmlRegex,'', str(item))
+        item=re.sub(spaceRegex,'', str(item))
+        item=re.sub('网页链接','', str(item))
+        item2 = re.sub(scriptRegex, '', str(item2))
+        item2= re.sub(styleRegex, '', str(item2))
+        item2 = re.sub(htmlRegex, '', str(item2))
+        item2 = re.sub(spaceRegex, '', str(item2))
+        item2 = re.sub('网页链接', '', str(item2))
+        发文.append(item)
+        评论.append(item2)
+    df['发文/转发内容']=发文
+    df['转发/评论内容']=评论
+</code></pre>
+<p>至此，爬取工作也就结束了。</p>
+<h2 id="爬取数据展示">爬取数据展示</h2>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1657786002729.jpg" alt="" loading="lazy"></figure>
+<h2 id="常用的榜单请求地址">常用的榜单请求地址</h2>
+<pre><code class="language-python">urls = [
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_8999_-_ctg1_8999_home', ## 榜单
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_2088_-_ctg1_2088', ## 科技
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_4288_-_ctg1_4288', ## 明星
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_3288_-_ctg1_3288', ## 电影
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_5288_-_ctg1_5288', ## 音乐
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_1988_-_ctg1_1988', ## 情感
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_4488_-_ctg1_4488', ## 时尚
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_1588_-_ctg1_1588', ## 美妆
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_4888_-_ctg1_4888', ## 游戏
+        'https://m.weibo.cn/api/feed/trendtop?containerid=102803_ctg1_5188_-_ctg1_5188', ## 数码
+        ]
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%BE%AE%E5%8D%9A%E6%B1%BD%E8%BD%A6%E6%A6%9C%E5%8D%95%E5%8D%9A%E6%96%87%E7%88%AC%E5%8F%96">微博—汽车榜单博文爬取</a>
+<ul>
+<li><a href="#%E7%88%AC%E5%8F%96%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3">爬取过程详解</a></li>
+<li><a href="#%E5%8C%85%E4%B8%AD%E7%9A%84%E5%85%B7%E4%BD%93%E6%95%B0%E6%8D%AE%E8%A7%A3%E6%9E%90">包中的具体数据解析</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BE%AE%E5%8D%9A%E5%8D%9A%E6%96%87%E8%AF%84%E8%AE%BA%E6%8A%93%E5%8F%96">微博—博文评论抓取</a>
+<ul>
+<li><a href="#%E7%88%AC%E5%8F%96%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3-2">爬取过程详解</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BE%AE%E5%8D%9A%E8%BD%AC%E5%8F%91%E4%BF%A1%E6%81%AF%E6%8A%93%E5%8F%96">微博—转发信息抓取</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97">数据清洗</a></li>
+<li><a href="#%E7%88%AC%E5%8F%96%E6%95%B0%E6%8D%AE%E5%B1%95%E7%A4%BA">爬取数据展示</a></li>
+<li><a href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E6%A6%9C%E5%8D%95%E8%AF%B7%E6%B1%82%E5%9C%B0%E5%9D%80">常用的榜单请求地址</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/">
+              <h3 class="post-title">
+                朴素贝叶斯在sklearn中的实现
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

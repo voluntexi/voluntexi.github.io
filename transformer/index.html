@@ -1,0 +1,380 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Transformer | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Transformer | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Transformer
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-12-01
+              </span>
+              <span>
+                13 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg-blog.csdnimg.cn%2F20210307173356317.png%3Fx-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5NjEwOTE1%2Csize_16%2Ccolor_FFFFFF%2Ct_70&amp;refer=http%3A%2F%2Fimg-blog.csdnimg.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1670754998&amp;t=7f66b9c8cf8c12113138065d2aa0ff0e" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN 的顺序结构，使得模型可以并行化训练，而且能够拥有全局信息。</p>
+<!-- more -->
+<h2 id="transformer整体结构">Transformer整体结构</h2>
+<figure data-type="image" tabindex="1"><img src="https://pic4.zhimg.com/80/v2-4544255f3f24b7af1e520684ae38403f_720w.webp" alt="img" loading="lazy"></figure>
+<p><strong>Transformer 由 Encoder 和 Decoder 两个部分组成</strong>，Encoder 和 Decoder 都包含 6 个 block。Transformer 的工作流程大体如下：</p>
+<p><strong>第一步：</strong> 获取输入句子的每一个单词的表示向量 <strong>X</strong>，<strong>X</strong>由单词的 Embedding 和单词位置的 Embedding 相加得到。</p>
+<figure data-type="image" tabindex="2"><img src="https://pic4.zhimg.com/80/v2-7dd39c44b0ae45d31a3ae7f39d3f883f_720w.webp" alt="img" loading="lazy"></figure>
+<p><strong>第二步：</strong> 将得到的单词表示向量矩阵 (如上图所示矩阵）作为输入矩阵传入Encorder中，在经过了6个编码器后输出transformer对所有句子的编码信息矩阵C，其大小和输入矩阵相同。</p>
+<img src="https://pic3.zhimg.com/80/v2-45db05405cb96248aff98ee07a565baa_720w.webp" alt="img" style="zoom: 50%;" />
+<p><strong>第三步</strong>：将 Encoder 输出的编码信息矩阵 <strong>C</strong>传递到Decoder 中，Decoder 依次会根据当前翻译过的i个单词,翻译下一个单词 i+1，如下图所示。在使用的过程中，翻译单词的时候需要通过 <strong>Mask (掩盖)</strong> 操作遮盖住该单词之后的所有单词。</p>
+<figure data-type="image" tabindex="3"><img src="https://pic2.zhimg.com/80/v2-5367bd47a2319397317562c0da77e455_720w.webp" alt="img" loading="lazy"></figure>
+<p>上图 Decoder 接收了 Encoder 的编码矩阵 <strong>C</strong>，然后首先输入一个翻译开始符 &quot;<Begin>&quot;，掩盖“<Begin>”后的所有单词，来预测单词 &quot;I&quot;；然后输入 &quot;<Begin>&quot; 和单词 &quot;I&quot;，预测单词 &quot;have&quot;，以此类推。</p>
+<h2 id="transformer详解">Transformer详解</h2>
+<h3 id="transformer-的输入"><strong>Transformer 的输入</strong></h3>
+<p>Transformer 中单词的输入表示 <strong>x</strong>由<strong>单词 Embedding</strong> 和<strong>位置 Embedding</strong> （Positional Encoding）相加得到。</p>
+<p><strong>单词 Embedding</strong></p>
+<p>单词的 Embedding 就是将词语向量化，向量化的方式有很多种，可以采用 Word2Vec、Glove、FastText 等得到，也可以在 Transformer 中训练得到。</p>
+<p><strong>位置 Embedding</strong></p>
+<p>Transformer 中除了单词的 Embedding，还需要使用位置 Embedding 表示单词出现在句子中的位置。因为 Transformer 中需要使用位置 Embedding 保存单词在序列中的<strong>相对或绝对位置。</strong></p>
+<p>位置编码公式：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mi>E</mi><mo>(</mo><mi>p</mi><mi>o</mi><mi>s</mi><mo separator="true">,</mo><mn>2</mn><mi>i</mi><mo>)</mo><mo>=</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo>(</mo><mi>p</mi><mi>o</mi><mi>s</mi><mi mathvariant="normal">/</mi><mn>1000</mn><msup><mn>0</mn><mrow><mn>2</mn><mi>i</mi><mi mathvariant="normal">/</mi><msub><mi>d</mi><mrow><mi>m</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></msup><mo>)</mo><mspace linebreak="newline"></mspace><mi>P</mi><mi>E</mi><mo>(</mo><mi>p</mi><mi>o</mi><mi>s</mi><mo separator="true">,</mo><mn>2</mn><mi>i</mi><mo>+</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>c</mi><mi>o</mi><mi>s</mi><mo>(</mo><mi>p</mi><mi>o</mi><mi>s</mi><mi mathvariant="normal">/</mi><mn>1000</mn><msup><mn>0</mn><mrow><mn>2</mn><mi>i</mi><mi mathvariant="normal">/</mi><msub><mi>d</mi><mrow><mi>m</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">PE(pos,2i)=sin(pos/10000^{2i/d_{model}})\\
+PE(pos,2i+1)=cos(pos/10000^{2i/d_{model}})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord mathdefault">i</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.188em;vertical-align:-0.25em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mord">/</span><span class="mord">1</span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathdefault mtight">i</span><span class="mord mtight">/</span><span class="mord mtight"><span class="mord mathdefault mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3487714285714287em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">d</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15122857142857138em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.188em;vertical-align:-0.25em;"></span><span class="mord mathdefault">c</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mord">/</span><span class="mord">1</span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathdefault mtight">i</span><span class="mord mtight">/</span><span class="mord mtight"><span class="mord mathdefault mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3487714285714287em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">d</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15122857142857138em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>其中，pos 表示单词在句子中的位置，d 表示 PE的维度(就是词 Embedding的维度)，也就是偶数位置采用sin，奇数位置采用cos。</p>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1668162923351.png" alt="" loading="lazy"></figure>
+<p>将单词的词 Embedding 和位置 Embedding 相加，就可以得到单词的表示向量 <strong>x</strong>，<strong>x</strong> 就是 Transformer 的输入。</p>
+<figure data-type="image" tabindex="5"><img src="https://voluntexi.github.io//post-images/1668162930413.png" alt="" loading="lazy"></figure>
+<h3 id="encoder结构">Encoder结构</h3>
+<figure data-type="image" tabindex="6"><img src="https://voluntexi.github.io//post-images/1668162940048.png" alt="" loading="lazy"></figure>
+<p>上图是 Transformer 的 Encoder 部分结构，可以看到是由 <strong>Multi-Head Attention, Add &amp; Norm, Feed Forward, Add &amp; Norm</strong> 组成的。</p>
+<h4 id="self-attention自注意力机制">Self-Attention（自注意力机制）</h4>
+<img src="https://pic4.zhimg.com/80/v2-f6380627207ff4d1e72addfafeaff0bb_720w.webp" alt="img" style="zoom:67%;" />
+<p>上图是论文中 Transformer 的内部结构图，左侧为 Encoder，右侧为 Decoder。红色圈中的部分为 <strong>Multi-Head Attention</strong>，是由多个 <strong>Self-Attention</strong>组成的，可以看到 Encoder包含一个 Multi-Head Attention，Decoder包含两个 Multi-Head Attention (其中有一个用到 Masked)。</p>
+<p><strong>Self-Attention</strong>是 Transformer 的重点，首先详细了解一下 Self-Attention 的内部逻辑。</p>
+<p><strong>Self-Attention 结构</strong></p>
+<p>公式如下：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>(</mo><mi>Q</mi><mo separator="true">,</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo>)</mo><mo>=</mo><mi>s</mi><mi>o</mi><mi>f</mi><mi>t</mi><mi>m</mi><mi>a</mi><mi>x</mi><mo>(</mo><mfrac><mrow><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mfrac><mo>)</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">Attention(Q,K,V)=softmax(\frac{QK^T}{\sqrt{d_k}})V
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault">t</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mord mathdefault">i</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mopen">(</span><span class="mord mathdefault">Q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.448331em;vertical-align:-0.93em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">t</span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">x</span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5183309999999999em;"><span style="top:-2.25278em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.85722em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.81722em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg width='400em' height='1.08em' viewBox='0 0 400000 1080' preserveAspectRatio='xMinYMin slice'><path d='M95,702c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,
+-10,-9.5,-14c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54c44.2,-33.3,65.8,
+-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10s173,378,173,378c0.7,0,
+35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429c69,-144,104.5,-217.7,106.5,
+-221c5.3,-9.3,12,-14,20,-14H400000v40H845.2724s-225.272,467,-225.272,467
+s-235,486,-235,486c-2.7,4.7,-9,7,-19,7c-6,0,-10,-1,-12,-3s-194,-422,-194,-422
+s-65,47,-65,47z M834 80H400000v40H845z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.18278000000000005em;"><span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.93em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span></span></p>
+<p>其中<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>d</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\ d_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>是设置的常数，其目的是为了使得结果在softmax中变化更明显；Q,K,V三个矩阵通过输入矩阵和随机初始化的权重矩阵WQ,WK，WV进行相乘得到。</p>
+<img src="https://pic3.zhimg.com/80/v2-4f4958704952dcf2c4b652a1cd38f32e_720w.webp" alt="img" style="zoom:50%;" />
+<p>经过softmax后最终得到Attention矩阵Z</p>
+<img src="https://pic4.zhimg.com/80/v2-7ac99bce83713d568d04e6ecfb31463b_720w.webp" alt="img" style="zoom:67%;" />
+<p>由于在经过 Softmax 后矩阵的第 1 行中各个数值表示单词 1 与其他所有单词的attention系数，其实矩阵 Z 第 j 行的输出 Z[j] 就是所有单词 i 的值 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>V</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\ V_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.22222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 根据 attention 系数的比例加在一起得到，如下图所示：</p>
+<img src="https://pic3.zhimg.com/80/v2-27822b2292cd6c38357803093bea5d0e_720w.webp" alt="img" style="zoom: 80%;" />
+<p><strong>Multi-Head Attention</strong></p>
+<p>Multi-Head Attention 是由多个 <strong>Self-Attention</strong> 组合形成的</p>
+<p>将输入<strong>X</strong>分别传递到 h 个不同的 Self-Attention 中，计算得到 h 个输出矩阵<strong>Z</strong>。下图是 h=8 时候的情况，此时会得到 8 个输出矩阵<strong>Z</strong>。</p>
+<img src="https://pic1.zhimg.com/80/v2-6bdaf739fd6b827b2087b4e151c560f4_720w.webp" alt="img" style="zoom:67%;" />
+<p>得到 8 个输出矩阵 <strong>Z</strong>1 到 <strong>Z</strong>8 之后，Multi-Head Attention 将它们拼接在一起 (<strong>Concat</strong>)，然后传入一个 <strong>Linear</strong>层，得到 Multi-Head Attention 最终的输出 <strong>Z</strong>。</p>
+<figure data-type="image" tabindex="7"><img src="https://pic4.zhimg.com/80/v2-35d78d9aa9150ae4babd0ea6aa68d113_720w.webp" alt="img" loading="lazy"></figure>
+<p>使得最后输出的矩阵维度和输入矩阵维度相同</p>
+<h4 id="add-norm"><strong>Add &amp; Norm</strong></h4>
+<p>Add &amp; Norm 层由 Add 和 Norm 两部分组成，其计算公式如下：</p>
+<p>在<strong>Multi-Head Attention</strong>之后的<strong>Add&amp;Norm</strong>：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi><mi>a</mi><mi>y</mi><mi>e</mi><mi>r</mi><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mo>(</mo><mi>X</mi><mo>+</mo><mi>M</mi><mi>u</mi><mi>l</mi><mi>t</mi><mi>i</mi><mi>H</mi><mi>e</mi><mi>a</mi><mi>d</mi><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">LayerNorm(X+MultiHeadAttention(x))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">L</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">m</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault">u</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">t</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.08125em;">H</span><span class="mord mathdefault">e</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">A</span><span class="mord mathdefault">t</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mord mathdefault">i</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>其中 <strong>X</strong>表示<strong>输入矩阵</strong> ，MultiHeadAttention(<strong>X</strong>) 表示在经过<strong>Multi-Head Attention</strong>之后的输出矩阵<strong>Z</strong></p>
+<p>在<strong>Feed Forward</strong>之后的<strong>Add&amp;Norm</strong>：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi><mi>a</mi><mi>y</mi><mi>e</mi><mi>r</mi><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mo>(</mo><mi>X</mi><mo>+</mo><mi>F</mi><mi>e</mi><mi>e</mi><mi>d</mi><mi>F</mi><mi>o</mi><mi>r</mi><mi>w</mi><mi>a</mi><mi>r</mi><mi>d</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">LayerNorm(X+FeedForward(x))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">L</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">m</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault">e</span><span class="mord mathdefault">e</span><span class="mord mathdefault">d</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>其中 <strong>X</strong>表示经过<strong>Multi-Head Attention</strong>之后的输出Z，MultiHeadAttention(<strong>X</strong>) 表示在经过<strong>Feed Forward</strong>之后的输出</p>
+<p><strong>Add</strong>指 X+F(x)结构,结构图示如下：</p>
+<figure data-type="image" tabindex="8"><img src="https://voluntexi.github.io//post-images/1668162949453.png" alt="" loading="lazy"></figure>
+<p><strong>Norm</strong>指 Layer Norm(x)，LayerNorm把一个样本的所有词义向量（如下图红色部分）视为一个分布（有几个句子就有几个分布），并将其标准化。这意味着:</p>
+<ul>
+<li>同一句子中词义向量（下图中的V1, V2, …, VL）的相对大小是保留的，或者也可以说LayerNorm不改变词义向量的方向，只改变它的模。</li>
+<li>不同句子的词义向量则是失去了可比性。</li>
+</ul>
+<figure data-type="image" tabindex="9"><img src="https://voluntexi.github.io//post-images/1758118324495.jpg" alt="" loading="lazy"></figure>
+<h4 id="feed-forward"><strong>Feed Forward</strong></h4>
+<p>Feed Forward 层比较简单，是一个两层的全连接层，第一层的激活函数为 Relu，第二层不使用激活函数，对应的公式如下。</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>e</mi><mi>n</mi><mi>c</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>r</mi><mo>=</mo><mi>m</mi><mi>a</mi><mi>x</mi><mo>(</mo><mn>0</mn><mo separator="true">,</mo><mi>X</mi><msub><mi>W</mi><mn>1</mn></msub><mo>+</mo><msub><mi>b</mi><mn>1</mn></msub><mo>)</mo><msub><mi>W</mi><mn>2</mn></msub><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">encoder=max(0,XW_1+b_1)W_2+b_2
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">c</span><span class="mord mathdefault">o</span><span class="mord mathdefault">d</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">x</span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>encoder为经过一层Encoder后的输出</p>
+<h3 id="组成-encoder"><strong>组成 Encoder</strong></h3>
+<p>通过上面描述的 Multi-Head Attention, Feed Forward, Add &amp; Norm 就可以构造出一层 Encoder ，接收输入矩阵 <strong>X</strong>(n×d)，并输出一个矩阵 <strong>O</strong>(n×d)。通过多层 Encoder  叠加就可以组成最终的<strong>编码器</strong>。</p>
+<p>第一层的 Encoder的输入为句子单词的表示向量矩阵，后续每层 Encoder  的输入是前一层输出，最后一层 Encoder  输出的矩阵就是 <strong>编码信息矩阵 C</strong>，这一矩阵后续会用到 Decoder 中。</p>
+<img src="https://pic3.zhimg.com/80/v2-45db05405cb96248aff98ee07a565baa_720w.webp" alt="img" style="zoom:50%;" />
+<h3 id="decoder-结构"><strong>Decoder 结构</strong></h3>
+<img src="https://pic3.zhimg.com/80/v2-f5049e8711c3abe8f8938ced9e7fc3da_720w.webp" alt="img" style="zoom:50%;" />
+<p>上图红色部分为 Transformer 的一层 Decoder  结构，与 Encoder 相似，但是存在一些区别：</p>
+<ul>
+<li>包含两个 Multi-Head Attention 层。
+<ul>
+<li>第一个 Multi-Head Attention 层采用了 Masked 操作。</li>
+<li>第二个 Multi-Head Attention 层的<strong>K, V</strong>矩阵使用 Encoder 的<strong>编码信息矩阵C</strong>进行计算（就是将矩阵C与权重矩阵WK,WV相乘），而<strong>Q</strong>使用上一个 Decoder block 的输出计算。</li>
+</ul>
+</li>
+<li>最后有一个 Softmax 层计算下一个翻译单词的概率。</li>
+</ul>
+<h4 id="第一个-multi-head-attention">第一个 Multi-Head Attention</h4>
+<p>第一个 Multi-Head Attention 采用了 <strong>Masked</strong> 操作，因为在翻译的过程中是顺序翻译的，即翻译完第 i 个单词，才可以翻译第 i+1 个单词。通过 Masked 操作可以防止第 i 个单词知道 i+1 个单词之后的信息。下面以 &quot;我有一只猫&quot; 翻译成 &quot;I have a cat&quot; 为例，了解一下 Masked 操作。</p>
+<figure data-type="image" tabindex="10"><img src="https://pic1.zhimg.com/80/v2-4616451fe8aa59b2df2ead30fa31dc98_720w.webp" alt="img" loading="lazy"></figure>
+<p>在 Decoder 的时候，是需要根据之前的翻译，求解当前最有可能的翻译，如上图所示。首先根据输入 &quot;<Begin>&quot; 预测出第一个单词为 &quot;I&quot;，然后根据输入 &quot;<Begin> I&quot; 预测下一个单词 &quot;have&quot;。</p>
+<p>Decoder 在<strong>训练的过程</strong>中使用 <strong>Teacher Forcing</strong> 并且并行化<strong>训练</strong>。</p>
+<p>将正确的单词序列 (&lt;Begin&gt; I have a cat) 和对应输出 (I have a cat <end>) 传递到 Decoder。那么在预测第 i 个输出时，就要将第 i+1 之后的单词掩盖住，<strong>注意 Mask 操作是在 Self-Attention 的 Softmax 之前使用的，下面用 0 1 2 3 4 5 分别表示 &quot;  &lt;Begin&gt; I have a cat &lt;end&gt;&quot;</strong>。</p>
+<p><strong>第一步：</strong> 通过Encoder将待输出的词进行词嵌入操作加上由上一层Decoder的输出经过<strong>Positional Encoding</strong>得到<strong>输入矩阵X</strong>,然后构建 <strong>Mask矩阵</strong> ，输入矩阵包含 &quot;&lt;Begin&gt; I have a cat&quot; (0, 1, 2, 3, 4) 五个单词的表示向量，<strong>Mask矩阵</strong> 是一个 5×5 的矩阵。 <strong>Mask矩阵</strong> 的作用是让矩阵只能使用当前位置之前的信息。</p>
+<img src="https://pic1.zhimg.com/80/v2-b26299d383aee0dd42b163e8bda74fc8_720w.webp" alt="img" style="zoom:67%;" />
+<p><strong>第二步：</strong> 接下来的操作和Encoder的 Self-Attention 一样，通过输入矩阵 <strong>X</strong>计算得到 <strong>Q</strong>, <strong>K</strong>, <strong>V</strong> 矩阵。然后计算 <strong>Q</strong> 和 <strong>K</strong>T 的乘积 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\ QK^T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.035771em;vertical-align:-0.19444em;"></span><span class="mspace"> </span><span class="mord mathdefault">Q</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span>。</p>
+<img src="https://pic4.zhimg.com/80/v2-a63ff9b965595438ed0c0e0547cd3d3b_720w.webp" alt="img" style="zoom:67%;" />
+<p><strong>第三步：</strong> 在得到 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\ QK^T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.035771em;vertical-align:-0.19444em;"></span><span class="mspace"> </span><span class="mord mathdefault">Q</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span> 之后与 <strong>Mask</strong>矩阵相乘得到遮挡住每一个单词之后的信息矩阵，遮挡操作如下：</p>
+<figure data-type="image" tabindex="11"><img src="https://pic2.zhimg.com/80/v2-35d1c8eae955f6f4b6b3605f7ef00ee1_720w.webp" alt="img" loading="lazy"></figure>
+<p>得到 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><mi>M</mi><mi>a</mi><mi>s</mi><mi>k</mi><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\ Mask QK^T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.035771em;vertical-align:-0.19444em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault">a</span><span class="mord mathdefault">s</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mord mathdefault">Q</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span> 之后进行 Softmax，使得每一行的和都为 1。但是单词 0 在单词 1, 2, 3, 4 上的 attention score 都为 0。</p>
+<p><strong>第四步：</strong> 使用 <strong>Mask QK</strong>T 与矩阵 <strong>V</strong>相乘，得到输出 <strong>Z</strong>，则单词 1 的输出向量 <strong>Z</strong>1 是只包含单词 1 信息的。</p>
+<figure data-type="image" tabindex="12"><img src="https://pic4.zhimg.com/80/v2-58f916c806a6981e296a7a699151af87_720w.webp" alt="img" loading="lazy"></figure>
+<p><strong>第五步：</strong> 通过上述步骤就可以得到一个 Mask Self-Attention 的输出矩阵 <strong>Z</strong>i，然后和 Encoder 类似，通过 Multi-Head Attention 拼接多个输出 <strong>Z</strong>i 然后计算得到第一个 Multi-Head Attention 的输出 <strong>Z</strong>，<strong>Z</strong>与输入 <strong>X</strong> 维度一样。</p>
+<h4 id="第二个-multi-head-attention">第二个 Multi-Head Attention</h4>
+<p>Decoder中第二个Multi-Head Attention 与Encoder主要的区别在于其中 Self-Attention 的 <strong>K</strong>, <strong>V</strong>矩阵不是使用 上一个 Decoder  的输出计算的，而是使用 <strong>Encoder 的编码信息矩阵 C</strong> 计算的。</p>
+<p>根据 Encoder 的输出 <strong>C</strong>，将 <strong>C</strong> 与权重矩阵<strong>WK,WV</strong>相乘得到 <strong>K</strong>, <strong>V</strong>，根据Masked ，Add&amp;Norm操作后的输出 <strong>Z</strong> 计算 <strong>Q</strong> ，后续的计算方法与之前描述的一致。</p>
+<blockquote>
+<p>这样做的好处是在 Decoder 的时候，每一位单词都可以利用到 Encoder 所有单词的信息 。</p>
+</blockquote>
+<h4 id="softmax-预测输出单词">Softmax 预测输出单词</h4>
+<p>在经过了Decoder最后一层后，就利用 Softmax 预测下一个单词，在之前的网络层我们可以得到一个最终的输出 <strong>Z</strong>，因为 Mask 的存在，使得单词 0 的输出 <strong>Z</strong>[0] 只包含单词 0 的信息，如下。</p>
+<img src="https://pic2.zhimg.com/80/v2-335cfa1b345bdd5cf1e212903bb9b185_720w.webp" alt="img" style="zoom:67%;" />
+<p>Softmax 根据输出矩阵的每一行预测下一个单词</p>
+<img src="https://pic2.zhimg.com/80/v2-0938aa45a288b5d6bef6487efe53bd9d_720w.webp" alt="img" style="zoom:67%;" />
+<h3 id="组成encoder">组成Encoder</h3>
+<p>与 Encoder 一样，Decoder 是由多层 Decoder 组合而成。只有在最后一层Decoder后，进行softmax进行预测。</p>
+<p><strong>注意：小细节⚠️</strong></p>
+<blockquote>
+<p>训练时：第i个decoder的输入 = encoder输出 + ground truth embeding<br>
+预测时：第i个decoder的输入 = encoder输出 + 第(i-1)个decoder输出</p>
+<p>训练时因为知道ground truth embeding，相当于知道正确答案，网络可以一次训练完成。<br>
+预测时，首先输入start，输出预测的第一个单词 然后start和新单词组成新的query，再输入decoder来预测下一个单词，循环往复 直至end</p>
+</blockquote>
+<blockquote>
+<p>预测阶段还要进行下三角矩阵的掩码。</p>
+</blockquote>
+<figure data-type="image" tabindex="13"><img src="https://voluntexi.github.io//post-images/1758118364406.png" alt="" loading="lazy"></figure>
+<blockquote>
+<p>因为如果不进行掩码，在第二步中，的attention除了与自身，还有与词1的，这就会导致在第二步中预测的词1与第一步不同。遵循这个规律，第三步中预测的词1、2与第二步中的也不同，而我们的做法是每次选择性忽略重复的预测的词，只摘取出最新预测的词语拼接然后继续预测，所以我们一定要保持每一步中重复预测的词语是一致的，</p>
+<p>解码器mask设计思路的原因：1、预测阶段要保持重复预测词一致——&gt;必须保持每步attention的值不变——&gt;掩码掉未来词——&gt;mask下三角矩阵；2、恰好也可以使模型在训练阶段的传播过程与预测阶段一致。</p>
+</blockquote>
+<h2 id="transformer-总结">Transformer 总结</h2>
+<figure data-type="image" tabindex="14"><img src="https://voluntexi.github.io//post-images/1668162969570.png" alt="" loading="lazy"></figure>
+<ul>
+<li>Transformer 与 RNN 不同，可以比较好地<strong>并行训练。</strong></li>
+<li>Transformer 本身是不能利用单词的顺序信息的，因此需要在输入中添加位置 Embedding，否则 Transformer 就是一个词袋模型了。</li>
+<li>Transformer 的重点是 <strong>Self-Attention</strong> 结构，其中用到的 <strong>Q, K, V</strong>矩阵通过输出进行线性变换得到。</li>
+<li>Transformer 中 Multi-Head Attention 中有多个 Self-Attention，可以捕获单词之间多种维度上的相关系数 attention score。</li>
+</ul>
+<h2 id="参考文献">参考文献</h2>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1706.03762">《Attention Is All You Need》 </a><br>
+<a href="https://baijiahao.baidu.com/s?id=1651219987457222196&amp;wfr=spider&amp;for=pc">《Transformer 模型详解》</a><br>
+<a href="https://blog.csdn.net/zhaojc1995/article/details/109276945">《深入理解transformer源码_赵队的博客-CSDN博客》</a></p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#transformer%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84">Transformer整体结构</a></li>
+<li><a href="#transformer%E8%AF%A6%E8%A7%A3">Transformer详解</a>
+<ul>
+<li><a href="#transformer-%E7%9A%84%E8%BE%93%E5%85%A5"><strong>Transformer 的输入</strong></a></li>
+<li><a href="#encoder%E7%BB%93%E6%9E%84">Encoder结构</a>
+<ul>
+<li><a href="#self-attention%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6">Self-Attention（自注意力机制）</a></li>
+<li><a href="#add-norm"><strong>Add &amp; Norm</strong></a></li>
+<li><a href="#feed-forward"><strong>Feed Forward</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%84%E6%88%90-encoder"><strong>组成 Encoder</strong></a></li>
+<li><a href="#decoder-%E7%BB%93%E6%9E%84"><strong>Decoder 结构</strong></a>
+<ul>
+<li><a href="#%E7%AC%AC%E4%B8%80%E4%B8%AA-multi-head-attention">第一个 Multi-Head Attention</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA-multi-head-attention">第二个 Multi-Head Attention</a></li>
+<li><a href="#softmax-%E9%A2%84%E6%B5%8B%E8%BE%93%E5%87%BA%E5%8D%95%E8%AF%8D">Softmax 预测输出单词</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%84%E6%88%90encoder">组成Encoder</a></li>
+</ul>
+</li>
+<li><a href="#transformer-%E6%80%BB%E7%BB%93">Transformer 总结</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/cnn/">
+              <h3 class="post-title">
+                CNN
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

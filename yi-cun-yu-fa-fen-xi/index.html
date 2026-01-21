@@ -1,0 +1,503 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>依存语法分析 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="依存语法分析 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="语法分析(syntactic parsing )其目标是分析句子的语法结构并将其表示为容易理解的结构(通常是树形结构)。
+
+短语结构树
+语言具备有自顶而下的层级关系，固定数量的语法结构能够生成无数句子。
+比如，通过下列两个语法规律，我们就能..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              依存语法分析
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-09-01
+              </span>
+              <span>
+                11 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><strong>语法分析</strong>(syntactic parsing )其目标是分析句子的<strong>语法结构</strong>并将其表示为容易理解的结构(通常是树形结构)。</p>
+<!-- more -->
+<h2 id="短语结构树">短语结构树</h2>
+<p>语言具备有自顶而下的层级关系，固定数量的语法结构能够生成无数句子。</p>
+<p>比如，通过下列两个语法规律，我们就能够生成所有名词短语。</p>
+<ul>
+<li>名词短语可以由名词和名词短语组成。eg：“上海+浦东”，“机场+航站楼”</li>
+<li>名词短语还可以由名词和名词组成。eg：“上海+浦东+机场+航站楼”</li>
+</ul>
+<p>在语言学中，这样的语法被称为<strong>上下文无关文法</strong>，它由如下组件构成:</p>
+<ul>
+<li>终结符结合 Σ，比如汉语的一个词表。</li>
+<li>非终结符集合 V，比如“名词短语”“动词短语”等短语结构组成的集合。V 中至少包含一个特殊的非终结符，即句子符或初始符，计作 S。</li>
+<li>推导规则 R，即推导非终结符的一系列规则: V -&gt; V U Σ。</li>
+</ul>
+<p>我们可以从 S 出发，逐步推导非终结符。一个非终结符至少产生一个下级符号，如此一层一层地递推下去，我们就得到了一棵语法树。但在NLP中，我们称其为<strong>短语结构树</strong>。</p>
+<hr>
+<p>短语结构语法描述了如何自顶而下的生成一个句子，反过来，句子也可以用短语结构语法来递归的分解。</p>
+<p>例如“上海 浦东 开发 与 法制 建设 同步”，分解成如下图的短语结构树:</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1661845698690.png" alt="" loading="lazy"></figure>
+<p>解释：句子中主语为由两个名词组成“上海 浦东”“开发 与 法制 建设”，谓语为”同步“，再将每个名词进行分解为词语，即可得。</p>
+<p>图中的字母标记含义如下:</p>
+<table>
+<thead>
+<tr>
+<th>标记</th>
+<th>释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP-HLN</td>
+<td>单句-标题</td>
+</tr>
+<tr>
+<td>NP-SBJ</td>
+<td>名词短语-主语</td>
+</tr>
+<tr>
+<td>NP-PN</td>
+<td>名词短语-代词</td>
+</tr>
+<tr>
+<td>NP</td>
+<td>名词短语</td>
+</tr>
+<tr>
+<td>VP</td>
+<td>动词短语</td>
+</tr>
+</tbody>
+</table>
+<h2 id="依存语法树">依存语法树</h2>
+<p>不同于短语结构树，依存句法树关注的是<strong>句子中词语之间的语法联系</strong>，并且将其约束为树形结构。</p>
+<p><strong>依存句法理论</strong>：词与词之间存在主从关系。在句子中，如果一个词修饰另一个词，则称修饰词为<strong>从属词</strong>，被修饰的词语称为<strong>支配词</strong>,两者之间的语法关系称为<strong>依存关系</strong>。比如句子“大梦想”中形容词“大”与名词“梦想&quot;之间的依存关系如图所示:</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1661845706869.png" alt="" loading="lazy"></figure>
+<p>图中的箭头方向由<strong>支配词</strong>指向<strong>从属词</strong>，如果将一个句子中所有词语的依存关系以有向边的形式表示出来，就会得到一棵树，称为<strong>依存句法树</strong>。</p>
+<p>比如句子“弱小的我也有大梦想”的依存句法树如图所示。</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1661845713693.png" alt="" loading="lazy"></figure>
+<p>依存句法树也有 4 个约束性的公理。</p>
+<ul>
+<li>有且只有一个词语(ROOT，虚拟根节点，简称虚根)不依存于其他词语。</li>
+<li>除此之外所有单词必须依存于其他单词。</li>
+<li>每个单词不能依存于多个单词。</li>
+<li>如果单词 A 依存于 B，那么位置处于 A 和 B 之间的单词 C 只能依存于 A、B 或 AB 之间的单词。</li>
+</ul>
+<p>这 4 条公理分别约束了依存句法树的根节点唯一性、 连通、无环和投射性。</p>
+<h3 id="中文依存句法树库"><strong>中文依存句法树库</strong></h3>
+<p>目前最有名的开源自由的依存树库有：</p>
+<ul>
+<li>UD( Universal Dependencies)，官网：https://universaldependencies.org</li>
+<li>CTB，只不过需要额外利用一些工具将短语结构树转换为依存句法树，官网：https://catalog.ldc.upenn.edu/LDC2005T01</li>
+</ul>
+<h3 id="依存句法树的可视化">依存句法树的可视化</h3>
+<p>工具如下:</p>
+<ul>
+<li>南京大学汤光超开发的 Dependency Viewer。导入 .conll 扩展名的树库文件即可。</li>
+<li>brat 标注工具。</li>
+</ul>
+<p>可视化工具可以帮助我们理解句法树的结构，比较句子之间的不同。</p>
+<h2 id="依存句法分析的方法">依存句法分析的方法</h2>
+<p>通常输入词语和词性，输出一棵依存句法树。</p>
+<h3 id="基于图的依存句法分析">基于图的依存句法分析</h3>
+<p>依存句法树其实是<strong>完全图</strong>的一个子图，如果为完全图中的每条边是否属于句法树的可能性打分，然后就可以利用 Prim 算法找出最大生成树，作为依存句法树。这样将整棵树的分数分解( factorize )为每条边上的分数之和，然后在图上搜索最优解的方法统称为基于图的算法。</p>
+<h3 id="基于转移的依存句法分析">基于转移的依存句法分析</h3>
+<p>我们以“人 吃 鱼”这个句子为例子，手动构建依存句法树。</p>
+<ul>
+<li>从“吃”连线到“人”建立依存关系，主谓关系。</li>
+<li>从“吃”连线到“鱼”建立依存关系，动宾关系。</li>
+</ul>
+<p>如果机器学习模型能够根据句子的某些特征准确地预测这些转移动作，那么计算机就能够根据这些动作拼装出正确的依存句法树了。这种拼装动作称为<strong>转移</strong>( transition),而这类算法统称为<strong>基于转移的依存句法分析</strong>。</p>
+<h4 id="arc-eager-转移系统">Arc-Eager 转移系统</h4>
+<p>一个转移系统 S 由 4 个部件构成: S = (C,T,Cs,Ct)，其中:</p>
+<ul>
+<li>C 是系统状态的集合</li>
+<li>T 是所有可执行的转移动作的集合。</li>
+<li>Cs 是一个初始化函数</li>
+<li>Ct 为一系列终止状态，系统进入该状态后即可停机输出最终的动作序列。</li>
+</ul>
+<p>而系统状态又由 3 元祖构成: C = (σ,β,A) 其中:</p>
+<ul>
+<li>σ 为一个存储单词的栈。</li>
+<li>β 为存储单词的队列</li>
+<li>A 为已确定的依存弧的集合。</li>
+</ul>
+<p>Arc-Eager 转移系统的转移动作集合详见下表:</p>
+<table>
+<thead>
+<tr>
+<th>动作名称</th>
+<th>条件</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shift</td>
+<td>队列 β 非空</td>
+<td>将β队首单词 i 压栈</td>
+</tr>
+<tr>
+<td>LeftArc</td>
+<td>栈顶单词 i 没有支配词</td>
+<td>将σ栈顶单词 i 的支配词设为队首单词 j，即 i 作为 j 的子节点</td>
+</tr>
+<tr>
+<td>RightArc</td>
+<td>队首单词 j 没有支配词</td>
+<td>将β队首单词 j 的支配词设为栈顶单词 i，即 j 作为 i 的子节点</td>
+</tr>
+<tr>
+<td>Reduce</td>
+<td>栈顶单词 i 已有支配词</td>
+<td>将σ栈顶单词 i 出栈</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实例</strong>：以“人 吃 鱼”案例，Arc-Eager 的执行步骤如下:</p>
+<p><img src="https://voluntexi.github.io//post-images/1661845723796.png" alt="" loading="lazy"><br>
+此时集合 A 中的依存弧为一颗依存句法树。</p>
+<h4 id="训练">训练</h4>
+<p>对基于转移的依存句法分析器而言，它学习和预测的对象是一系列转移动作。然而依存句法树库是一棵树，并不是现成的转移动作序列。这时候就需要一个算法将语料库中的依存句法树转移为正确地转移动作序列。</p>
+<p>可以使用<strong>感知机</strong>进行训练得到转移动作序列，感知机能够迭代的优化模型，使得分值最高的可以正确的抵达句法树的转义序列。</p>
+<p>训练步骤如下：</p>
+<ul>
+<li>
+<p>读入一个训练样本，提取特征，创建 ArcEager 的初始系统状态集合C。</p>
+</li>
+<li>
+<p>若 C 不是终止状态，反复进行转移序列，修正参数。</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1661845729593.png" alt="" loading="lazy"></figure>
+<ul>
+<li>算法终止，返回返回模型参数 w。</li>
+</ul>
+<h3 id="实现">实现</h3>
+<p>HanLP中对依存句法分析提供了API</p>
+<pre><code class="language-python">from pyhanlp import *
+import zipfile
+import os
+from pyhanlp.static import download, remove_file, HANLP_DATA_PATH
+##获取测试数据路径，根目录由配置文件指定
+def test_data_path():
+    data_path = os.path.join(HANLP_DATA_PATH, 'test')
+    if not os.path.isdir(data_path):
+        os.mkdir(data_path)
+    return data_path
+
+
+## 验证是否存在语料库，如果没有自动下载
+def ensure_data(data_name, data_url):
+    root_path = test_data_path()
+    dest_path = os.path.join(root_path, data_name)
+    if os.path.exists(dest_path):
+        return dest_path
+    
+    if data_url.endswith('.zip'):
+        dest_path += '.zip'
+    download(data_url, dest_path)
+    if data_url.endswith('.zip'):
+        with zipfile.ZipFile(dest_path, &quot;r&quot;) as archive:
+            archive.extractall(root_path)
+        remove_file(dest_path)
+        dest_path = dest_path[:-len('.zip')]
+    return dest_path
+
+
+## 模型，语料库加载
+KBeamArcEagerDependencyParser = JClass('com.hankcs.hanlp.dependency.perceptron.parser.KBeamArcEagerDependencyParser')
+CTB_ROOT = ensure_data(&quot;ctb8.0-dep&quot;, &quot;http://file.hankcs.com/corpus/ctb8.0-dep.zip&quot;)
+CTB_TRAIN = CTB_ROOT + &quot;/train.conll&quot;
+CTB_DEV = CTB_ROOT + &quot;/dev.conll&quot;
+CTB_TEST = CTB_ROOT + &quot;/test.conll&quot;
+CTB_MODEL = CTB_ROOT + &quot;/ctb.bin&quot;
+BROWN_CLUSTER = ensure_data(&quot;wiki-cn-cluster.txt&quot;, &quot;http://file.hankcs.com/corpus/wiki-cn-cluster.zip&quot;)
+
+
+parser = KBeamArcEagerDependencyParser.train(CTB_TRAIN, CTB_DEV, BROWN_CLUSTER, CTB_MODEL)#模型训练
+print(parser.parse(&quot;人吃鱼&quot;))#进行句法分析
+score = parser.evaluate(CTB_TEST)##标准化评测
+print(&quot;UAS=%.1f LAS=%.1f\n&quot; % (score[0], score[1]))
+
+</code></pre>
+<p>结果</p>
+<pre><code class="language-python">1 人 人 N NN _ 2 nsubj _ _
+2 吃 吃 V VV _ 0 ROOT _ _
+3 鱼 鱼 N NN _ 2 dobj _ _
+UAS=83.3% LAS=81.0% #83.3的词被准确预测，81的依存弧被准确预测
+</code></pre>
+<h2 id="实例基于依存句法分析的意见抽取">实例：基于依存句法分析的意见抽取</h2>
+<p>可以利用依存句法分析实现一个意见抽取的例子，提取下列商品评论中的属性和买家评价。</p>
+<p>电池非常棒，机身不长，长的是待机，但是屏幕分辨率不高。</p>
+<p>通过依存句法分析，再通过依存弧是否是“属性关系”，寻找支配词的子节点中的主题词，以该主题词作为名词的意见。</p>
+<pre><code class="language-python">from pyhanlp import *
+
+CoNLLSentence = JClass('com.hankcs.hanlp.corpus.dependency.CoNll.CoNLLSentence')
+CoNLLWord = JClass('com.hankcs.hanlp.corpus.dependency.CoNll.CoNLLWord')
+IDependencyParser = JClass('com.hankcs.hanlp.dependency.IDependencyParser')
+KBeamArcEagerDependencyParser = JClass('com.hankcs.hanlp.dependency.perceptron.parser.KBeamArcEagerDependencyParser')
+
+
+def main():
+    parser = KBeamArcEagerDependencyParser()
+    tree = parser.parse(&quot;电池非常棒，机身不长，长的是待机，但是屏幕分辨率不高。&quot;)
+    print(tree)
+    extactOpinion3(tree)
+
+# 检测名词词语的依存弧是否是“属性关系”，
+# 如果是，则寻找支配词的子节点中的主题词
+# 以该主题词作为名词的意见。
+def extactOpinion3(tree):
+    for word in tree.iterator():
+        if word.POSTAG == &quot;NN&quot;:
+            if word.DEPREL == &quot;nsubj&quot;:  
+
+                if tree.findChildren(word.HEAD, &quot;neg&quot;).isEmpty():
+                    print(&quot;%s = %s&quot; % (word.LEMMA, word.HEAD.LEMMA))
+                else:
+                    print(&quot;%s = 不%s&quot; % (word.LEMMA, word.HEAD.LEMMA))
+            elif word.DEPREL == &quot;attr&quot;:
+                top = tree.findChildren(word.HEAD, &quot;top&quot;)  # ②主题
+
+                if not top.isEmpty():
+                    print(&quot;%s = %s&quot; % (word.LEMMA, top.get(0).LEMMA))
+
+
+if __name__ == '__main__':
+    main()
+</code></pre>
+<p>输出</p>
+<pre><code class="language-python">1	电池	电池	N	NN	_	3	nsubj	_	_
+2	非常	非常	A	AD	_	3	advmod	_	_
+3	棒	棒	V	VA	_	0	ROOT	_	_
+4	，	，	P	PU	_	3	punct	_	_
+5	机身	机身	N	NN	_	7	nsubj	_	_
+6	不	不	A	AD	_	7	neg	_	_
+7	长	长	V	VA	_	3	conj	_	_
+8	，	，	P	PU	_	7	punct	_	_
+9	长	长	V	VA	_	11	top	_	_
+10	的	的	D	DEC	_	9	cpm	_	_
+11	是	是	V	VC	_	7	conj	_	_
+12	待机	待机	N	NN	_	11	attr	_	_
+13	，	，	P	PU	_	3	punct	_	_
+14	但是	但是	A	AD	_	18	advmod	_	_
+15	屏幕	屏幕	N	NN	_	16	nn	_	_
+16	分辨率	分辨率	N	NN	_	18	nsubj	_	_
+17	不	不	A	AD	_	18	neg	_	_
+18	高	高	V	VA	_	3	conj	_	_
+19	。	。	P	PU	_	3	punct	_	_
+
+电池 = 棒
+机身 = 不长
+待机 = 长
+分辨率 = 不高
+</code></pre>
+<p>可以看到物品的4 个属性评价被完整正确地提取出来了。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E7%9F%AD%E8%AF%AD%E7%BB%93%E6%9E%84%E6%A0%91">短语结构树</a></li>
+<li><a href="#%E4%BE%9D%E5%AD%98%E8%AF%AD%E6%B3%95%E6%A0%91">依存语法树</a>
+<ul>
+<li><a href="#%E4%B8%AD%E6%96%87%E4%BE%9D%E5%AD%98%E5%8F%A5%E6%B3%95%E6%A0%91%E5%BA%93"><strong>中文依存句法树库</strong></a></li>
+<li><a href="#%E4%BE%9D%E5%AD%98%E5%8F%A5%E6%B3%95%E6%A0%91%E7%9A%84%E5%8F%AF%E8%A7%86%E5%8C%96">依存句法树的可视化</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BE%9D%E5%AD%98%E5%8F%A5%E6%B3%95%E5%88%86%E6%9E%90%E7%9A%84%E6%96%B9%E6%B3%95">依存句法分析的方法</a>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E4%BE%9D%E5%AD%98%E5%8F%A5%E6%B3%95%E5%88%86%E6%9E%90">基于图的依存句法分析</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E8%BD%AC%E7%A7%BB%E7%9A%84%E4%BE%9D%E5%AD%98%E5%8F%A5%E6%B3%95%E5%88%86%E6%9E%90">基于转移的依存句法分析</a>
+<ul>
+<li><a href="#arc-eager-%E8%BD%AC%E7%A7%BB%E7%B3%BB%E7%BB%9F">Arc-Eager 转移系统</a></li>
+<li><a href="#%E8%AE%AD%E7%BB%83">训练</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E7%8E%B0">实现</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E4%BE%8B%E5%9F%BA%E4%BA%8E%E4%BE%9D%E5%AD%98%E5%8F%A5%E6%B3%95%E5%88%86%E6%9E%90%E7%9A%84%E6%84%8F%E8%A7%81%E6%8A%BD%E5%8F%96">实例：基于依存句法分析的意见抽取</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/wen-ben-ju-lei-ji-qi-shi-xian/">
+              <h3 class="post-title">
+                文本聚类算法及其实现
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

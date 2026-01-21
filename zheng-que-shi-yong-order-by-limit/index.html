@@ -1,0 +1,400 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>正确使用 ORDER BY + LIMIT | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="正确使用 ORDER BY + LIMIT | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="当我们想在分页查询中对数据进行排序展示时，通常会使用 ORDER BY 进行排序。然而，当用于排序的字段并非唯一时，可能会在翻页时遇到数据重复的问题，下面是对这个问题的具体分析和解决方案。
+
+问题场景
+在 MySQL 中，我们通常使用 li..." />
+    <meta name="keywords" content="代码" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              正确使用 ORDER BY + LIMIT
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-08-20
+              </span>
+              <span>
+                11 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/dai-ma/" class="post-tag">
+                  # 代码
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/zheng-que-shi-yong-order-by-limit.webp" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>当我们想在分页查询中对数据进行排序展示时，通常会使用 <code>ORDER BY</code> 进行排序。然而，当用于排序的字段并非唯一时，可能会在翻页时遇到数据重复的问题，下面是对这个问题的具体分析和解决方案。</p>
+<!-- more -->
+<h2 id="问题场景">问题场景</h2>
+<p>在 MySQL 中，我们通常使用 limit 进行分页查询。例如，<code>limit(0,10)</code> 表示获取第一页的 10 条数据，<code>limit(10,10)</code> 表示获取第二页的 10 条数据。</p>
+<p>当我们想在分页查询中对数据进行排序展示时，通常会使用 <code>order by</code> 进行排序。然而，当用于排序的字段并非唯一时，可能会在翻页时遇到数据重复的问题：翻到第二页时，可能再次看到第一页的记录。这种情况会导致数据重复的问题。</p>
+<h3 id="问题复现">问题复现</h3>
+<p>首先创建一个数据表，插入一些数据</p>
+<pre><code class="language-sql">create table table_name
+(
+    id   int         null,
+    name varchar(10) null
+);
+INSERT INTO table_name (id, name) VALUES (0, '3d');
+INSERT INTO table_name (id, name) VALUES (1, '1d');
+INSERT INTO table_name (id, name) VALUES (1, '2d');
+INSERT INTO table_name (id, name) VALUES (1, '3d');
+INSERT INTO table_name (id, name) VALUES (1, '4d');
+INSERT INTO table_name (id, name) VALUES (1, '5d');
+INSERT INTO table_name (id, name) VALUES (1, '6d');
+INSERT INTO table_name (id, name) VALUES (1, '7d');
+INSERT INTO table_name (id, name) VALUES (1, '8d');
+INSERT INTO table_name (id, name) VALUES (2, '4d');
+</code></pre>
+<p>这里我们首先不使用 <code>limit </code>进行分页，直接 <code>order by id</code> 进行查询数据，</p>
+<pre><code class="language-sql">select * from table_name order by id;
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1724140562616.png" alt="" loading="lazy"></figure>
+<p>然后进行 limit 分页</p>
+<pre><code class="language-sql">select * from table_name order by id limit 0,2;
+</code></pre>
+<pre><code class="language-sql">select * from table_name order by id limit 2,2;
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1724140618696.png" alt="" loading="lazy"></figure>
+<center>第一页数据</center>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1724140627474.png" alt="" loading="lazy"></figure>
+<center>第二页数据</center>
+<p>可以看到 <code>id</code> 为 1 ，<code>name </code>为 2d 的数据出现了两次</p>
+<h2 id="问题分析">问题分析</h2>
+<p>查阅 MySQL 官方文档，发现官方对 <code>LIMIT</code> 的说明如下，我这里选择关键部分进行说明：</p>
+<ul>
+<li>
+<p>If you combine <code>LIMIT </code> <code>row_count</code> with <code>ORDER BY</code>, MySQL stops sorting as soon as it has found the first <code>row_count</code> rows of the sorted result, rather than sorting the entire result. If ordering is done by using an index, this is very fast. If a <strong>filesort</strong> must be done, all rows that match the query without the <code>LIMIT</code> clause are selected, and most or all of them are sorted, before the first <code>row_count</code> are found. After the initial rows have been found, MySQL does not sort any remainder of the result set.One manifestation of this behavior is that an <code>ORDER BY</code> query with and without <code>LIMIT</code> may return rows in different order, as described later in this section.</p>
+<p>也就是说如果将 <code>LIMIT </code> <code>row_count</code>  与 <code>ORDER BY</code> 结合使用，并且是走的索引，MySQL 会在找到排序结果的前 <code>row_count</code> 行后就停止排序，而不是对整个结果进行排序，结果会非常快，因为利用的是索引的有序性。</p>
+<p>如果是走的 <strong>filesort</strong> ，MySQL 将会找到与 <code>Select </code> 匹配的所有行（也就是原语句不包含 <code>LIMIT</code> ），这些行将作为待排序的数据，进行 <strong>filesort</strong> 直到满足 <code>Limit </code>条件的行数。满足的行数一旦找到，则不会对剩余的数据进行排序。</p>
+</li>
+<li>
+<p>If multiple rows have identical values in the <code>ORDER BY</code> columns, the server is free to return those rows in any order, and may do so differently depending on the overall execution plan. In other words, the sort order of those rows is nondeterministic with respect to the nonordered columns.</p>
+<p>One factor that affects the execution plan is <code>LIMIT</code>, so an <code>ORDER BY</code> query with and without <code>LIMIT</code> may return rows in different orders. Consider this query, which is sorted by the <code>category</code> column but nondeterministic with respect to the <code>id</code> and <code>rating</code> columns:</p>
+<p>如果多个行在 <code>ORDER BY</code> 列中具有相同的值，则 MySQL 可以自由地以任何顺序返回这些行，并且可以根据总体执行计划以<strong>不同的方式</strong>返回。换句话说，相对于不确定排序的序列，这些行的排序顺序是不确定的。</p>
+</li>
+</ul>
+<h2 id="filesort">filesort</h2>
+<p>MySQL 的 <code>filesort</code> 通常有两种排序方式：</p>
+<ul>
+<li>如果待排序的数据量小于排序缓冲区的大小，排序将在内存中完成（快速排序）。</li>
+<li>如果待排序的数据量大于排序缓冲区的大小，排序将使用临时文件在外部完成（合并排序）。</li>
+</ul>
+<p>在 <code>filesort</code> 排序后，根据上述 MySQL 官方文档的说明，返回的查询结果都是从排序后的结果集中按顺序提取的。因此，无论是否存在 <code>LIMIT</code> 子句，结果中都不应出现重复的数据。</p>
+<p><strong>那么，为什么会出现数据重复的问题呢？</strong></p>
+<p>问题的根源在于 MySQL <strong>5.6</strong> 版本及其以后的优化。在这些版本中，当排序字段没有索引且列值不唯一时，MySQL 对 <code>ORDER BY + LIMIT</code> 语句进行了优化，采用了优先队列算法。</p>
+<p>这种优化通过优先队列处理 <code>ORDER BY + LIMIT</code> 的语句，可能导致在某些情况下出现数据重复的问题。这种行为的具体机制可以通过查阅 MySQL 官网对 <code>filesort.cc</code> 的伪代码来了解。</p>
+<pre><code class="language-c">while (get_next_sortkey())
+   {
+     if (using priority queue)
+       push sort key into queue
+     else
+     {
+       try to put sort key into buffer;
+       if (no free space in sort buffer)
+       {
+         do {
+           allocate new, larger buffer;
+           retry putting sort key into buffer;
+         } until (record fits or no space for new buffer)
+         if (no space for new buffer)
+         {
+           sort record pointers (all buffers);
+           dump sorted sequence to 'tempfile';
+           dump Merge_chunk describing sequence location into 'chunk_file';
+         }
+       }
+       if (key was packed)
+         tell sort buffer the actual number of bytes used;
+     }
+   }
+   if (buffer has some elements &amp;&amp; dumped at least once)
+     sort-dump-dump as above;
+   else
+     don't sort, leave sort buffer to be sorted by caller.
+</code></pre>
+<p>优化的逻辑如下<a href="https://dev.mysql.com/worklog/task/?id=1393">MySQL :: WL#1393: Optimizing filesort with small limit</a></p>
+<pre><code class="language-sql">Many web customers have to do
+&quot;SELECT ... ORDER BY non_index_column LIMIT X&quot;,
+
+When X *  is smaller than sort_buff_size we can use
+the following algoritm to speed up the sort:
+
+- Create a queue to hold 'limit' keys.
+- Scan through the table and store the first (last if DESC) keys in the queue
+- Return values from queue
+
+This is much faster than the current algoritm that works as:
+</code></pre>
+<p>在 MySQL 中，如果排序使用合并或快速排序，则需要对所有数据进行排序，然后取的前几个条目，这就会导致的数据将会被浪费掉。</p>
+<p>如果使用优先队列，优先队列其实就是通过堆来实现的。只需遍历此堆中的所有数据即可得到结果。</p>
+<h3 id="优先队列">优先队列</h3>
+<p>堆排序是一种<strong>不稳定的排序算法</strong>，其不稳定性源于以下两个方面：</p>
+<ol>
+<li><strong>建堆阶段</strong>：在这个阶段，待排序元素被构建成一个堆（通常是大顶堆或小顶堆）。构建堆的过程从最后一个非叶子节点开始，逐步向上调整，使每个节点都满足堆的性质。在此过程中，可能需要交换节点的位置来维持堆的性质。这些交换操作会改变相同键值元素的相对顺序，导致排序的不稳定性。</li>
+<li><strong>排序阶段</strong>：每次从堆顶取出最大（或最小）元素，并将其放置在已排序部分的末尾。然后，对剩余的未排序部分进行堆调整，并重复此过程，直到所有元素都被正确放置。在这一过程中，交换操作进一步破坏了相同键值元素的相对顺序，导致排序的不稳定性。</li>
+</ol>
+<p>总结而言，堆排序通过不断调整元素位置来实现排序，而这些调整可能会改变相同键值元素的相对顺序，因此堆排序是不稳定的排序算法。</p>
+<h3 id="sql-语句分析">SQL 语句分析</h3>
+<p>按照我们前面 SQL 语句的例子：</p>
+<pre><code class="language-sql">select * from table_name order by id limit 0,2;
+</code></pre>
+<p>在 MySQL 中，<code>LIMIT</code> 的语法为 <code>LIMIT offset, row_count</code>，其中 <code>offset</code> 是要跳过的行数，<code>row_count</code> 是要返回的行数。</p>
+<p>在这个查询中，MySQL 会构建一个大小为 <code>offset + row_count</code>的最小堆，在这个例子中也就是 2 。在读取数据和排序过程中，MySQL 会维护这个堆，最终返回排序结果为这个堆中跳过 <code>offset </code>大小后 <code>row_count </code>的数据。</p>
+<p>而由于堆排序的<strong>不稳定性</strong>，相同键值的元素可能会因交换操作而改变相对顺序进行排序的结果进行返回。从而导致数据重复的问题</p>
+<h2 id="验证">验证</h2>
+<p>前面我们执行的 MySQL 语句走的就是 filesort</p>
+<pre><code class="language-sql">explain select * from table_name order by id limit 0,2;
+</code></pre>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;select_type&quot;: &quot;SIMPLE&quot;,
+    &quot;table&quot;: &quot;table_name&quot;,
+    &quot;partitions&quot;: null,
+    &quot;type&quot;: &quot;ALL&quot;,
+    &quot;possible_keys&quot;: null,
+    &quot;key&quot;: null,
+    &quot;key_len&quot;: null,
+    &quot;ref&quot;: null,
+    &quot;rows&quot;: 10,
+    &quot;filtered&quot;: 100,
+    &quot;Extra&quot;: &quot;Using filesort&quot;
+  }
+]
+</code></pre>
+<p>进一步验证 MySQL 是否在这个语句上优化使用了优先队列</p>
+<pre><code class="language-sql">SET optimizer_trace='enabled=on';
+select * from table_name order by id limit 0,2;
+SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G;
+</code></pre>
+<p>部分输出如下：</p>
+<pre><code>    &quot;filesort_priority_queue_optimization&quot;: {
+      &quot;limit&quot;: 2,
+      &quot;chosen&quot;: true
+    },
+</code></pre>
+<p>可以看到<code>filesort_priority_queue_optimization.chosen = true</code>，确实是走的优先队列</p>
+<h2 id="解决方案">解决方案</h2>
+<p>综上所述，我们以及找到问题的原因了。简单来说就是 <code>ORDER BY + LIMIT</code> 排序的<strong>字段数据不唯一，并且没有索引</strong>会导致 MySQL 排序走了 filesort ，而 MySQL 5.6 对 filesort 的优化最终导致了重复数据的问题。</p>
+<p>根据分析，我们可以从三个方面去解决这个问题：</p>
+<ol>
+<li><strong>更换 MySQL 版本：</strong> 由于优先队列是在 MySQL <strong>5.6</strong> 版本及其以后应用的，所以将 MySQL 版本更换到 5.6 以下就会解决这个问题；</li>
+<li><strong>给 <code>ORDER BY</code>排序的字段加索引：</strong> <code>ORDER BY</code> 中的字段添加索引，可以避免 MySQL 走 <code>filesort</code>，而是直接根据索引的有序性进行排序，从而避免数据重复。然而，添加索引会增加表的存储空间和维护成本。</li>
+<li><strong>确保排序字段唯一</strong>：通过在 <code>ORDER BY</code> 中添加一些唯一的字段，确保每个排序结果的数据都是唯一的。</li>
+</ol>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li>
+<p><a href="https://dev.mysql.com/doc/refman/8.4/en/limit-optimization.html">MySQL :: MySQL 8.4 Reference Manual :: 10.2.1.19 LIMIT Query Optimization</a></p>
+</li>
+<li>
+<p><a href="https://dba.stackexchange.com/questions/331837/duplicate-results-in-mysql-query-when-try-to-sort-on-null-field-by-with-limit-an">Duplicate results in mysql query when try to sort on null field by with limit and offset - Database Administrators Stack Exchange</a></p>
+</li>
+<li>
+<p><a href="https://blog.kalvad.com/sql-paging-requires-a-deterministic-sort-order-a-classic-example-of-s-e-p-somebody-elses-problem/">SQL - Is Your Sort Order Deterministic? A classic example of S.E.P. (Somebody Else’s Problem)</a></p>
+</li>
+<li>
+<p><a href="https://www.sobyte.net/post/2021-09/mysql-paging-sorting-data-duplicates/">MySQL Paging Sorting with Data Duplication Problem (MySQL Priority Queue) - SoByte</a></p>
+</li>
+<li>
+<p><a href="https://dev.mysql.com/doc/dev/mysql-server/latest/filesort_8cc.html">MySQL: sql/filesort.cc File Reference</a></p>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E9%97%AE%E9%A2%98%E5%9C%BA%E6%99%AF">问题场景</a>
+<ul>
+<li><a href="#%E9%97%AE%E9%A2%98%E5%A4%8D%E7%8E%B0">问题复现</a></li>
+</ul>
+</li>
+<li><a href="#%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90">问题分析</a></li>
+<li><a href="#filesort">filesort</a>
+<ul>
+<li><a href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97">优先队列</a></li>
+<li><a href="#sql-%E8%AF%AD%E5%8F%A5%E5%88%86%E6%9E%90">SQL 语句分析</a></li>
+</ul>
+</li>
+<li><a href="#%E9%AA%8C%E8%AF%81">验证</a></li>
+<li><a href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88">解决方案</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/prompt-learning/">
+              <h3 class="post-title">
+                Prompt Learning
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

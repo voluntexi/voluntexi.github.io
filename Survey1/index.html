@@ -1,0 +1,254 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>An Empirical Survey on Long Document Summarization,Part 1：Introduction and Datasets | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="An Empirical Survey on Long Document Summarization,Part 1：Introduction and Datasets | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="论文《An Empirical Survey on Long Document Summarization》对长文本摘要领域通过模型、数据集和评价指标三个方面进行了全面的概述，文本是该论文阅读笔记第一部分，描述了长文本的概念，介绍了目前的数..." />
+    <meta name="keywords" content="文本摘要,NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              An Empirical Survey on Long Document Summarization,Part 1：Introduction and Datasets
+            </h2>
+            <div class="post-info">
+              <span>
+                2023-04-12
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/wen-ben-zhai-yao/" class="post-tag">
+                  # 文本摘要
+                </a>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/Survey1.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>论文《An Empirical Survey on Long Document Summarization》对长文本摘要领域通过模型、数据集和评价指标三个方面进行了全面的概述，文本是该论文阅读笔记第一部分，描述了长文本的概念，介绍了目前的数据集。</p>
+<!-- more -->
+<h2 id="介绍">介绍</h2>
+<p>文本摘要就是一个缩短源文本，同时保持主要思想不变的过程，在当今数据大爆炸的时代，这有助于减少处理信息所需的时间，有助于更快地搜索信息。文本摘要目前已经引起了研究界的极大兴趣和关注，但文本摘要仍然是一项具有挑战性的任务，特别是在长文本摘要方面。直观上，长文本摘要比短文本摘要更难，这是由于短文本和长文本之间的词汇量之间的差异。随着长度的增加，文本中重要的内容也会增加，这导致自动摘要模型在有限的输出长度中捕获所有突出信息的任务更具挑战性（通常大模型输入大小限制为1024个token）。此外，短文本通常是通用文本，例如新闻文章，而长文本通常是特定领域的文章，包含了复杂公式和术语的论文。</p>
+<h2 id="什么是长文本">什么是长文本</h2>
+<p>为了更好的区分短文本和长文本，论文从三个不同的基本方面对摘要任务问题进行了概念化：</p>
+<h3 id="文本的长度">文本的长度</h3>
+<p>文本被认定为“长”，那肯定是因为源文本中的词语的数量是巨大的，并且对于普通人来说阅读全文需要相当多的时间。虽然这个定义是“直观”的意义，但在传统机器学习时期中，由于硬件和模型限制，当文本内容超过了模型一次能处理的数量时，文本被认为是长文本的。例如，以前将新闻领域的<strong>CNN/DM和NYT</strong>数据集视为长文本，而在目前的研究背景下，它们现在则被认为是<strong>短文本</strong>数据集。</p>
+<p>目前来说，平均源文本长度超过3000个词汇的数据集则被认为是“长文本”，这是由于目前的摘要模型仅能一次处理512~1024个词汇的文本。</p>
+<h3 id="文本的信息">文本的信息</h3>
+<p>通常来说，非冗余的信息内容将随着文本长度的增加而增加。但对于长文本的摘要不一定如此，随着源文本长度的增加，摘要相对于源文本的相对长度呈指数级地变短。由于这种约束，长文本的摘要将不可避免地丢失对原文本的中心思想，由于用户偏好差异性，用户无法就短文本新闻领域中给定摘要的内容达成一致。当涉及到长文本摘要时，这个问题会加剧，因为摘要相对于源文本的相对长度较短，以及文本随着内容广度的增加，用户偏好差异性将会增加，使得长文本摘要任务明显比短文本更难。</p>
+<h3 id="文本相关度">文本相关度</h3>
+<p>与短文本相比，长文本通常被构造成便于用户理解的部分。尽管都是围绕着长文本的关键点叙述，但每一节的内容都有一定程度的不同。这使得长文本摘要任务更加繁重，因为摘要模型不能在不考虑其对最终摘要输出的流畅性、冗余性和语义一致性的影响的情况下连接不同部分的文本。</p>
+<h2 id="数据集">数据集</h2>
+<p>数据集用于评估一个长文本模型的性能，但是不同的数据集具有不同的内在特征，这些特征往往会使得不同的模型在不同数据集性能有不同的差异性。因此，只有对数据集进行一个全面的理解，才能更好的评估模型真正的性能和适用性。</p>
+<p><strong>Short-document datasets：</strong> 主要有CNN-DM, NWS, XSUM,Reddit-TIFU和 WikiHow这几种公开数据集，前三个数据集是因为它们的流行程度，而Reddit-TIFU和WikiHow则是来确保来自其他领域的短文本也被包括在内。</p>
+<p>CNN-DM、NWS和XSUM数据集是新闻领域的摘要，其中源文本表示新闻文章，而摘要表示人工生成的摘要。</p>
+<p>Reddit-TIFU是从reddit子版块r/TIFU 中收集的数据集，而WikiHow是使用WikiHow网页段落的第一句作为摘要，其余部分作为文本而创建的。</p>
+<p><strong>Long document datasets：</strong> 主要有arXiv、PubMed、BIGPATENT、BillSum和GovReport这几种公开数据集，arXiv、PubMed是从arXiv.org和PubMed.com中收集到的科研论文，这两个数据集也是早期长文本摘要的主要数据集。BIGPATENT拥有超过130万份美国的文本摘要记录、专利文献的摘要数据集。BillSum 是一个总结国会和加州州法案的数据集，其中写作的内容结构和风格特征与其他领域的文本有很大不同。GovReport是收集美国政府的报告而成，明显长于其他长文本数据集。</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1681200434873.png" alt="" loading="lazy"></figure>
+<p>以上是对上述数据集的统计具体统计标准可在<strong>原论文3.2小节</strong>中查看，同时上述数据集均可在<a href="https://huggingface.co/datasets">Hugging Face – The AI community building the future.</a>中下载</p>
+<h3 id="数据集的内在特征">数据集的内在特征</h3>
+<p><strong>发现1.长文本数据集的长度:</strong> 除了BillSum之外，所有其他长文本数据集的平均源文本长度至少为3000。而一个基于Transformer的预训练模型，通常具有1024长度的输入限制，也就是说需要在长文本数据集中截断至少一半的源文本。因此，如果在短文本数据集效果良好的预训练模型，它们不太可能为长文本生成高质量的摘要。</p>
+<p><strong>发现2.高压缩比的意义:</strong> 长文本摘要数据集的词语级和句子级压缩比分别比短文本数据集大1.4倍和2.2倍。这表明长文本摘要数据集在摘要中存在更大的信息损失，这增加了长文本摘要任务的相对难度，因为模型将必须清楚地识别来自源的关键信息，同时排除文本中不太重要的内容。此外，如果在长文本的摘要中存在更大的信息损失，则所生成的摘要将不可避免地错过重要的信息，从而降低了摘要方法满足生成的摘要的有效性。</p>
+<p><strong>发现3.数据集的抽象性和多样性:</strong> 除了BIGPATENT,所有长文本数据集比短的文本数据集有更大的覆盖范围和密度值，这表明一个<strong>长文本摘要模型,只是提取词汇从原始源文本的文本片段仍然可以生成一个摘要,参考总结更相似。</strong></p>
+<p><strong>发现4.长文本有更小的Layout偏差:</strong> 与短文本摘要领域的实践不同，短文本领域的模型通常通过利用布局偏差而受益，而<strong>长文本摘要模型实现截断策略以仅处理长文本的主要内容的一小部分，可能会遭受显著的性能下降。</strong></p>
+<p><strong>发现5.固有特性之间的关系：</strong> 论文发现作者在撰写不受约束的生成式摘要时会更加冗长，并且撰写摘要内容时不会添加信息。而假设当作者必须写简明摘要时，他们会被迫更多地解释原始内容，以确保摘要可以在受约束的摘要长度内覆盖显著内容。</p>
+<h2 id="总结">总结</h2>
+<p>从长文本数据集之间的内在特征来看，<strong>arXiv和BIGPATENT具有比其他数据集更高的压缩比，但提取密度值更低，这表明其中两个数据集需要一个摘要模型来生成一个明显更短的摘要</strong>，该摘要与源文本的编写方式不同。如上所述，这可能是因为对于在受约束的摘要长度内覆盖更多内容的摘要，必须更多地解释原始内容。arXiv基准数据集的提取覆盖率和密度度量之间的差异值也证明了这一点，这表明arXiv科学论文的摘要具有与源文本高匹配的标记和术语（高覆盖率），但具有低匹配短语（低密度）。<strong>总的来说，BIGPATENT数据集是最适合长文本监督训练的抽象摘要的基准数据集</strong>，因为它的覆盖率和密度低，大量的训练样本对作为监督信号，以及重要内容的高度一致性。然而，只有少数完全监督的抽象长文本摘要工作在BIGPATENT上评估了他们的模型。</p>
+<h2 id="参考文献">参考文献</h2>
+<blockquote>
+<p><a href="https://arxiv.org/pdf/2207.00939.pdf">An Empirical Survey on Long Document Summarization: Datasets, Models and Metrics</a></p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%8B%E7%BB%8D">介绍</a></li>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%95%BF%E6%96%87%E6%9C%AC">什么是长文本</a>
+<ul>
+<li><a href="#%E6%96%87%E6%9C%AC%E7%9A%84%E9%95%BF%E5%BA%A6">文本的长度</a></li>
+<li><a href="#%E6%96%87%E6%9C%AC%E7%9A%84%E4%BF%A1%E6%81%AF">文本的信息</a></li>
+<li><a href="#%E6%96%87%E6%9C%AC%E7%9B%B8%E5%85%B3%E5%BA%A6">文本相关度</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E9%9B%86">数据集</a>
+<ul>
+<li><a href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E7%9A%84%E5%86%85%E5%9C%A8%E7%89%B9%E5%BE%81">数据集的内在特征</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/">
+              <h3 class="post-title">
+                对预训练模型进行微调
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>题解：字符串转整数 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="题解：字符串转整数 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="最近刚学了正则表达式和STL就碰见了这道题
+
+在没学习正则和STL之前 我可能会直接暴力遍历提取把~
+但是现在有了更为巧妙的两种方法
+挺有意思的~
+方法一：正则表达式
+这里引用一下正则表达式的说明：正则表达式(regular express..." />
+    <meta name="keywords" content="算法" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              题解：字符串转整数
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-11-15
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Er6OWlLlY/" class="post-tag">
+                  # 算法
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/zi-fu-chuan-zhuan-zheng-shu.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><strong>最近刚学了正则表达式和STL就碰见了这道题</strong></p>
+<!-- more -->
+<p>在没学习正则和STL之前 我可能会直接<font  color=red ><strong>暴力遍历</strong></font>提取把~</p>
+<p>但是现在有了更为巧妙的两种方法</p>
+<p>挺有意思的~</p>
+<h1 id="方法一正则表达式"><strong>方法一：正则表达式</strong></h1>
+<p>这里引用一下正则表达式的说明：正则表达式(regular expression)描述了一种字符串匹配的模式（pattern），可以用来检查一个串是否含有某种子串、将匹配的子串替换或者从某个串中取出符合某个条件的子串等。</p>
+<p>真的很强大，感兴趣可以学习一哈哈~~</p>
+<p>思路</p>
+<ul>
+<li>
+<p>先将字符串左侧的空格去除</p>
+<pre><code class="language-c++">while(str[0]==' ') str.erase(0,1);
+</code></pre>
+</li>
+<li>
+<p>利用正则表达式提取</p>
+<pre><code class="language-C++">smatch tmpMatch;//储存匹配的正则
+
+regex tmpRegex(&quot;^[\\+\\-\\d]\\d*&quot;); //c++中要用\\进行转义
+
+regex_search(str, tmpMatch, tmpRegex);//提取
+</code></pre>
+</li>
+<li>
+<p>转化成long</p>
+<pre><code class="language-c++">Stringstream ss;//流 
+
+string tmpStr = tmpMatch[0];
+
+ss &lt;&lt; tmpStr;
+
+cout &lt;&lt; tmpStr &lt;&lt; endl;
+
+long longResult;
+
+ss &gt;&gt; longResult;
+</code></pre>
+</li>
+<li>
+<p>判断是否越界</p>
+<pre><code class="language-c++"> result = max(min(longResult, long(INT_MAX)), long(INT_MIN));
+</code></pre>
+</li>
+<li>
+<p>返回值 result</p>
+<h1 id="方法二直接使用输入输出流"><strong>方法二：直接使用输入输出流</strong></h1>
+</li>
+</ul>
+<p><font  color=red ><strong>这就是STL的魅力~</strong></font></p>
+<pre><code class="language-c++">if(s.size()==0) return 0;
+
+   stringstream a;
+
+   int n;
+
+   a&lt;&lt;s;
+
+   a&gt;&gt;n;
+
+   return n;
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%96%B9%E6%B3%95%E4%B8%80%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><strong>方法一：正则表达式</strong></a></li>
+<li><a href="#%E6%96%B9%E6%B3%95%E4%BA%8C%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E6%B5%81"><strong>方法二：直接使用输入输出流</strong></a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/ti-jie-qu-jian-de-ge-shu/">
+              <h3 class="post-title">
+                题解：区间的个数
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

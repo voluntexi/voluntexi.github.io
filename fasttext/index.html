@@ -1,0 +1,382 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FastText | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="FastText | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="FastText是在word2vec的cbow和skip-gram基础上得到模型，其最大的特点是模型简洁，训练速度快且文本分类准确率也令人满意
+
+fastText 训练词向量的时候一般是使用Skip-gram模型的变种。在用作文本分类的时候..." />
+    <meta name="keywords" content="深度学习,NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              FastText
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-10-29
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/snv-Knj4H/" class="post-tag">
+                  # 深度学习
+                </a>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://img1.baidu.com/it/u=56699197,1185385684&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=PNG?w=952&amp;h=500" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>FastText是在word2vec的cbow和skip-gram基础上得到模型，其最大的特点是模型简洁，训练速度快且文本分类准确率也令人满意</p>
+<!-- more -->
+<p>fastText 训练词向量的时候<strong>一般</strong>是使用Skip-gram模型的变种。在用作文本分类的时候，<strong>一般</strong>是使用CBOW的变种</p>
+<h2 id="前置知识">前置知识</h2>
+<h3 id="n-gram特征">N-gram特征</h3>
+<p>fastText在做<strong>词向量</strong>的时候引入了<strong>subword n-gram</strong>的概念来解决词形变化的问题。它将一个单词打散到<strong>char</strong>级别，并且利用字符级别的n-gram信息来捕捉字符间的顺序关系，希望能够以此丰富单词内部更细微的语义。</p>
+<p>而当fastText做<strong>文本分类</strong>的时候，变为了<strong>word n-grams</strong>。它将一个短语打散到<strong>word</strong>级别。</p>
+<p><strong>举个例子</strong></p>
+<ul>
+<li>做词向量的时候</li>
+</ul>
+<p>对于一个词“where“，为了表达单词前后边界，我们加入&lt;&gt;两个字符，即变形为“&lt; where &gt;。假设我们希望抽取3-gram信息，可以得到如下集合：G = { &lt; w h,w h e,h e r,e r e,r e &gt;}。在实践中，我们往往会同时提取单词的多种n-gram信息，如2/3/4/5-gram。这样，原始的一个句子，就被一个char级别的n-gram集合所表达。</p>
+<p><strong>对应到中文，其实就是偏旁部首。</strong> 阿里曾发布fasttext的一个中文版本，训练的就是偏旁部首。</p>
+<ul>
+<li>做文本分类的时候</li>
+</ul>
+<p>对于一个短语“我 爱 北京 天安门“，同样加入&lt;&gt;两个字符，变为“&lt; 我 爱 北京 天安门 &gt;”，那么2-gram得到如下集合，G={&lt; 我，我 爱，爱 北京，北京 天安门，天安门 &gt;}。</p>
+<h2 id="fasttext生成词向量">FastText生成词向量</h2>
+<p>关于FastText词向量，原论文<a href="https://arxiv.org/pdf/1607.04606.pdf">《Enriching Word Vectors with Subword Information》</a></p>
+<p><strong>FastText生成词向量</strong>是在<strong>skip-gram模型</strong>基础上提出来的，需要回顾一下word2ve中的skip-gram模型（<strong>参考上一篇文章</strong>）</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1666013463818.png" alt="" loading="lazy"></figure>
+<p>如上图为Word2vec原Skip-Gram模型。</p>
+<p>FastText构建词向量与word2vec中Skip-Gram模型唯一不同的就是在<strong>输入层</strong>。</p>
+<ul>
+<li><strong>FastText取n-gram求和作为词向量，后者取One-Hot词向量；</strong></li>
+<li><strong>输入向量矩阵</strong><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>W</mi><mrow><mi>V</mi><mo>×</mo><mi>N</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\ W_{V×N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.891661em;vertical-align:-0.208331em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.328331em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.22222em;">V</span><span class="mbin mtight">×</span><span class="mord mathdefault mtight" style="margin-right:0.10903em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.208331em;"><span></span></span></span></span></span></span></span></span></span><strong>中，FastText的N为所有语料的n-grams总数，而Word2vec则为语料word总数。</strong></li>
+</ul>
+<p>其余过程就和skip-Gram过程相同了，乘上一个矩阵w，获得向量，然后乘上另一个矩阵w*，进行softmax最后输出属于每个标签的概率，再进行反向传播。最后的w矩阵和最初的1*V向量相乘作为表示的词向量。</p>
+<h3 id="fasttext的输入">FastText的输入</h3>
+<p><strong>例如</strong></p>
+<p>比如对于词汇表D中的 where 词：<br>
+原词：&lt; w h e r e &gt; ，分别获得其3，4，5，6-gram</p>
+<ul>
+<li>3-grams: &lt; w h , w h e , h e r , e r e , r e &gt;</li>
+<li>4-grams: &lt; w h e, w h e r , h e r e, e r e &gt;</li>
+<li>5-grams: &lt; w h e r , w h e r e , h e r e &gt;</li>
+<li>6-grams: &lt; w h e r e , w h e r e &gt;</li>
+</ul>
+<p>然后将原词的和字符级n-grams的one-hot编码进行累加得到输入向量<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>x</mi><mrow><mi>w</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>e</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\ x_{where}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02691em;">w</span><span class="mord mathdefault mtight">h</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>,</p>
+<p>即将&lt; where&gt;和3-grams,4-grams,5-grams,6-grams的<strong>one-hot向量</strong>相加得到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>x</mi><mrow><mi>w</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>e</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\ x_{where}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02691em;">w</span><span class="mord mathdefault mtight">h</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
+<p><strong>如果遇到了OOV怎么办？只使用n-grams的向量和来表示就可以</strong></p>
+<pre><code class="language-c++">void Dictionary::computeSubwords(const std::string&amp; word,std::vector&lt;int32_t&gt;&amp; ngrams,std::vector&lt;std::string&gt;* substrings)const {
+  for (size_t i = 0; i &lt; word.size(); i++) {
+    std::string ngram;
+    if ((word[i] &amp; 0xC0) == 0x80) {
+      continue; // 遇到10开头字节跳过，保证中文从第一个字节开始读
+    }
+    for (size_t j = i, n = 1; j &lt; word.size() &amp;&amp; n &lt;= args_-&gt;maxn; n++) {
+      ngram.push_back(word[j++]);
+      while (j &lt; word.size() &amp;&amp; (word[j] &amp; 0xC0) == 0x80) {
+        ngram.push_back(word[j++]); // 如果是中文，读取该字符的所有字节
+      }
+      if (n &gt;= args_-&gt;minn &amp;&amp; !(n == 1 &amp;&amp; (i == 0 || j == word.size()))) {// subword满足长度，
+        int32_t h = hash(ngram) % args_-&gt;bucket;//将字符通过hash，得到的hash值加入到ngrams里面
+        pushHash(ngrams, h);
+        if (substrings) {
+          substrings-&gt;push_back(ngram);
+        }
+      }
+    }
+  }
+}
+</code></pre>
+<p>在<strong>fastText</strong>源代码中，将n-gram进行hash，hash到同一位置的多个n-gram会共享一个embedding。这样降低了学习的embedding规模，够极大的节省了空间。</p>
+<h2 id="fasttext进行文本分类">FastText进行文本分类</h2>
+<p>关于FastText文本分类，原论文<a href="https://arxiv.org/pdf/1607.01759v2.pdf">《[Enriching Word Vectors with Subword Information]》</a></p>
+<p><strong>fasttext</strong>文本分类的模型，该模型类似word2vec的cbow模型.</p>
+<p>与Word2vec的CBOW仅有两个区别：</p>
+<ul>
+<li>
+<p>输出是预测<strong>类别标签</strong>而不是预测中心词。</p>
+</li>
+<li>
+<p>使用句子中<strong>所有单词</strong>及其n-gram作为输入，进行embedding，而不再是单单的针对滑动窗口中的单词进行one-hot。</p>
+<p>其中输入的n-gram向量和fastText进行词向量过程是一致的，不过此时n-gram变为了词语级别而不是字符级别</p>
+</li>
+</ul>
+<p>其余过程就和cbow过程相同了，乘上一个矩阵w，对向量进行<strong>加权平均</strong>，然后乘上另一个矩阵w*，进行softmax最后输出属于每个标签的概率，再进行反向传播。</p>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1666058452800.png" alt="" loading="lazy"></figure>
+<p><strong>例如</strong></p>
+<p>对于一个短语“我 爱 北京 天安门“，同样加入&lt;&gt;两个字符，变为“&lt; 我 爱 北京 天安门 &gt;”</p>
+<ul>
+<li>2-gram得到如下集合，{&lt; 我，我 爱，爱 北京，北京 天安门，天安门 &gt;}。</li>
+<li>3-gram得到如下集合，{&lt;我爱，我 爱 北京，爱 北京 天安门，北京 天安门 &gt;}</li>
+<li>4-gram得到如下集合，{&lt; 我 爱 北京，我 爱 北京 天安门，爱 北京 天安门 &gt;}</li>
+<li>5-gram得到如下集合，{&lt; 我 爱 北京 天安门，我 爱 北京 天安门 &gt;}</li>
+</ul>
+<p>然后将原句的和词语级n-grams的one-hot编码进行累加得到输入向量<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>x</mi><mrow><mi>w</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>e</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\ x_{where}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02691em;">w</span><span class="mord mathdefault mtight">h</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>,</p>
+<p>将&lt; 我 爱 北京 天安门 &gt;和2-gram,3-grams,4-grams,5-grams的<strong>one-hot向量</strong>相加求平均得到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext> </mtext><msub><mi>h</mi><mrow><mi>d</mi><mi>o</mi><mi>c</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\ h_{doc}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathdefault">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">d</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1666058548367.png" alt="" loading="lazy"></figure>
+<h2 id="优化">优化</h2>
+<p>与word2vec一样，可以通过<strong>层次softmax</strong>进行优化。</p>
+<p>与word2vec不同的是，fastText层次优化的叶子结点为文档标签的类别而不是中心词概率，以训练集中标签的频率进行排序，频率越高则越靠近根节点。</p>
+<h2 id="gensim实现">Gensim实现</h2>
+<p>FastText生成词向量在gensim中调用如下为：</p>
+<pre><code class="language-python">class gensim.models.fasttext.FastText(sentences=None, corpus_file=None, sg=0, hs=0, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, word_ngrams=1, sample=0.001, seed=1, workers=3, min_alpha=0.0001, negative=5, ns_exponent=0.75, cbow_mean=1, hashfxn=&lt;built-in function hash&gt;, iter=5, null_word=0, min_n=3, max_n=6, sorted_vocab=1, bucket=2000000, trim_rule=None, batch_words=10000, callbacks=())
+
+</code></pre>
+<p>数与word2vec遵循相同的模式。FastText支持原始word2vec中的下列参数：</p>
+<ul>
+<li>model: 训练架构.  （允许的值: cbow, skipgram (默认 cbow)</li>
+<li>vector_size: 需要学习的嵌入的大小 (默认 100)</li>
+<li>alpha: 初始学习率 (默认 0.025)</li>
+<li>window: 上下文窗口大小 (默认 5)</li>
+<li>min_count: 忽略出现次数小于某个值的单词 (默认 5)</li>
+<li>loss: 训练目标. （允许的值: ns, hs, softmax (默认 ns)</li>
+<li>sample: 高频词的下采样阈值 (默认 0.001)</li>
+<li>negative: 要抽样的否定词数, for ns (默认 5)</li>
+<li>iter: epochs的数量 (默认 5)</li>
+<li>sorted_vocab: 按下降频率排序的单词 (默认 1)</li>
+</ul>
+<p>threads: 使用的线程数量 (默认 12)<br>
+<strong>此外, FastText 还有3个额外参数:</strong></p>
+<ul>
+<li>min_n: char ngrams的最小长度 (默认 3)</li>
+<li>max_n: char ngrams的最大长度 (默认 6)</li>
+<li>bucket: 用于散列ngrams的buckets数量 (默认 200000)</li>
+</ul>
+<pre><code class="language-python">from pprint import pprint as print
+from gensim.models.fasttext import FastText as Fasttext
+from gensim.test.utils import datapath
+if __name__ == '__main__':
+    corpus_file = datapath('lee_background.cor')
+    model = Fasttext(vector_size=60)
+    # build the vocabulary
+    model.build_vocab(corpus_file=corpus_file)
+    # train the model
+    model.train(
+        corpus_file=corpus_file, epochs=model.epochs,
+        total_examples=model.corpus_count, total_words=model.corpus_total_words
+    )
+    print(model.wv['爱丽丝']) 
+</code></pre>
+<pre><code class="language-python">E:\python310\python.exe E:\fastText.py 
+array([ 0.00829479,  0.00071116,  0.00169409, -0.0025965 ,  0.00328374,
+       -0.00180369,  0.00734048,  0.00590759,  0.00469353,  0.00143918,
+       -0.00479525, -0.00138552,  0.00741526, -0.00677875, -0.0017609 ,
+       -0.00018423,  0.00386455,  0.0009411 ,  0.00489743,  0.00577713,
+       -0.00434757, -0.00546971,  0.00332852,  0.00614409, -0.00440957,
+       -0.00459056, -0.00591491,  0.00492364, -0.00173003,  0.00622221,
+        0.00049063,  0.00308326,  0.00337223, -0.00502754, -0.00046228,
+        0.00731711, -0.00710381, -0.00627137,  0.00071484,  0.00328238,
+       -0.00096842, -0.00138118, -0.00020508, -0.00524326, -0.00524897,
+        0.00445769, -0.00016085, -0.00373317, -0.00042375,  0.00661727,
+        0.00350993,  0.00502089, -0.00400781, -0.00213982, -0.00387585,
+       -0.00850575,  0.00332142,  0.00020067, -0.00368993,  0.00553988],
+      dtype=float32)
+
+进程已结束,退出代码0
+
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>fastText是word2vec的优化模型</p>
+<p><strong>相比于Bert等方法，fastText具有如下优点：</strong></p>
+<ul>
+<li>训练速度快，精度相当；</li>
+<li>不需要预训练的词向量；</li>
+<li>N-gram特征关注了词序信息；</li>
+<li>层次化Softmax优化了时间效率。</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86">前置知识</a>
+<ul>
+<li><a href="#n-gram%E7%89%B9%E5%BE%81">N-gram特征</a></li>
+</ul>
+</li>
+<li><a href="#fasttext%E7%94%9F%E6%88%90%E8%AF%8D%E5%90%91%E9%87%8F">FastText生成词向量</a>
+<ul>
+<li><a href="#fasttext%E7%9A%84%E8%BE%93%E5%85%A5">FastText的输入</a></li>
+</ul>
+</li>
+<li><a href="#fasttext%E8%BF%9B%E8%A1%8C%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB">FastText进行文本分类</a></li>
+<li><a href="#%E4%BC%98%E5%8C%96">优化</a></li>
+<li><a href="#gensim%E5%AE%9E%E7%8E%B0">Gensim实现</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/word2vec/">
+              <h3 class="post-title">
+                Word2Vec
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

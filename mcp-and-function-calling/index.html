@@ -1,0 +1,447 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MCP &amp;&amp; Function Calling | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1769005591865">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="MCP &amp;&amp; Function Calling | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Function Calling 和 MCP 通过一组外部工具，帮助 LLM 获取其无法直接知晓的信息或者难以执行的操作。本文分别对他们进行说明，并对比异同
+
+背景
+如今，随着 LLM的发展，参数都达到了千亿级别，虽然LLM 的模型参数蕴含..." />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1769005591865" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              MCP &amp;&amp; Function Calling
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-05-26
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/Non44iZPB/" class="post-tag">
+                  # NLP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/mcp-and-function-calling.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Function Calling 和 MCP 通过一组外部工具，帮助 LLM 获取其<strong>无法直接知晓的信息</strong>或者<strong>难以执行的操作</strong>。本文分别对他们进行说明，并对比异同</p>
+<!-- more -->
+<h2 id="背景">背景</h2>
+<p>如今，随着 LLM的发展，参数都达到了千亿级别，虽然LLM 的模型参数蕴含丰富的通用知识，但仍然无法掌握两类信息：</p>
+<ul>
+<li>LLM 无法访问专属内容，例如文件系统中的文件、数据库里的订单，或私有 wiki 和笔记中的文本。</li>
+<li>无法联网，LLM 无法获取实时信息，例如当前股价、最新财报、明日天气预报或前沿科技新闻。</li>
+</ul>
+<p>此外，LLM 属于生成任务，仅仅生成 token ，无法直接执行一些精细且需操作的具体任务，这也不是当前 LLM 的强项：</p>
+<ul>
+<li>比如调用其他服务的 API 帮你完成订餐和购票。</li>
+</ul>
+<p>Function Calling 和 MCP  分别提供了一套标准协议来解决这些问题。简而言之，它们都是通过一组外部工具，帮助 LLM 获取其<strong>无法直接知晓的信息</strong>或者<strong>难以执行的操作</strong>。</p>
+<h2 id="function-calling">Function Calling</h2>
+<p>Function Calling由OpenAI 提出，它的运用能让大模型能够调用特定函数的能力，这对于构建更强大的 Agent 特别有用，因为它可以让模型不仅仅是生成文本，还可以执行实际的操作（例如数据库查询、文件读写等）</p>
+<p><strong>下面是Open AI官网让模型调用函数获天气的例子：</strong></p>
+<p><strong>第一步：</strong> 实现模型调用函数：</p>
+<pre><code class="language-python">import requests
+
+def get_weather(latitude, longitude):
+    response = requests.get(f&quot;https://api.open-meteo.com/v1/forecast?latitude={latitude}&amp;longitude={longitude}&amp;current=temperature_2m,wind_speed_10m&amp;hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&quot;)
+    data = response.json()
+    return data['current']['temperature_2m']
+</code></pre>
+<p><strong>第二步：</strong> 定义目前可供模型选择的函数以及对应参数的描述</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+tools = [{
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;name&quot;: &quot;get_weather&quot;,
+    &quot;description&quot;: &quot;Get current temperature for a given location.&quot;,
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;location&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;description&quot;: &quot;City and country e.g. Bogotá, Colombia&quot;
+            }
+        },
+        &quot;required&quot;: [
+            &quot;location&quot;
+        ],
+        &quot;additionalProperties&quot;: False
+    }
+}]
+
+response = client.responses.create(
+    model=&quot;gpt-4.1&quot;,
+    input=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is the weather like in Paris today?&quot;}],
+    tools=tools
+)
+
+print(response.output)
+</code></pre>
+<p><strong>第三步：</strong> 模型会根据用户的输入，选择函数，并提取对应的数据作为参数</p>
+<pre><code class="language-python">[{
+    &quot;type&quot;: &quot;function_call&quot;,
+    &quot;id&quot;: &quot;fc_12345xyz&quot;,
+    &quot;call_id&quot;: &quot;call_12345xyz&quot;,
+    &quot;name&quot;: &quot;get_weather&quot;,
+    &quot;arguments&quot;: &quot;{\&quot;location\&quot;:\&quot;Paris, France\&quot;}&quot;
+}]
+</code></pre>
+<p><strong>第四步：</strong> 执行函数</p>
+<pre><code class="language-python">tool_call = response.output[0]
+args = json.loads(tool_call.arguments)
+
+result = get_weather(args[&quot;latitude&quot;], args[&quot;longitude&quot;])
+</code></pre>
+<p><strong>第五步：</strong> 将函数执行的结果加入到对模型的输入，模型根据此结果生成回答</p>
+<pre><code class="language-python">input_messages.append(tool_call)  # append model's function call message
+input_messages.append({                               # append result message
+    &quot;type&quot;: &quot;function_call_output&quot;,
+    &quot;call_id&quot;: tool_call.call_id,
+    &quot;output&quot;: str(result)
+})
+
+response_2 = client.responses.create(
+    model=&quot;gpt-4.1&quot;,
+    input=input_messages,
+    tools=tools,
+)
+print(response_2.output_text)
+</code></pre>
+<p><strong>最终模型输出结果</strong></p>
+<pre><code>&quot;The current temperature in Paris is 14°C (57.2°F).&quot;
+</code></pre>
+<p>可以看到，通过Function Calling ，让大模型可以进行对应函数的调用，了解当天的天气了！</p>
+<p>那么为什么还要提出 MCP 呢？</p>
+<h2 id="mcp">MCP</h2>
+<p>MCP（Model Context Protocol，模型上下文协议） ，是2024年11月由 <strong>Anthropic</strong> 推出的一种开放标准，旨在统一大模型与外部数据源和工具之间的<strong>通信协议</strong>。</p>
+<p>MCP 的主要目的在于解决当前 AI 模型因数据孤岛限制而无法充分发挥潜力的难题，MCP 使得 AI 应用能够安全地访问和操作本地及远程数据，为 AI 应用提供了连接万物的接口。</p>
+<blockquote>
+<p><strong>Anthropic</strong> 也就是最近推出最强编程大模型—— Claude4 的公司</p>
+<p>MCP is an open protocol that standardizes how applications provide context to LLMs. Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect your devices to various peripherals and accessories, MCP provides a standardized way to connect AI models to different data sources and tools.</p>
+</blockquote>
+<p>通过MCP，开发者不需要为每一个系统（比如CRM、数据库、文件存储等）单独开发新的插件或连接器。只要系统支持MCP，任何使用这个协议的AI都可以和它通信。这样就避免了需要为多个模型和多个工具分别进行定制集成的问题。</p>
+<h2 id="mcp-结构">MCP 结构</h2>
+<p>这是官网给出的MCP架构图：<br>
+<img src="https://voluntexi.github.io//post-images/1748236685028.png" alt="" loading="lazy"><br>
+可以看到，MCP 由三个核心组件构成：Host 、Client 和 Server</p>
+<h3 id="mcp-server">MCP Server</h3>
+<p>MCP 服务器是一个程序，<strong>提供 LLM 可以使用的工具和数据</strong>。与传统的远程 API 服务器不同，MCP 服务器可以作为用户设备上的本地应用程序运行，也可以部署到远程服务器。当一个 LLM 决定在处理任务时需要使用某个工具时，它将使用 MCP 服务器提供的工具来获取所需数据并返回给 LLM。</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1748236881257.png" alt="" loading="lazy"></figure>
+<h3 id="mcp-client">MCP Client</h3>
+<p>MCP 客户端是连接 LLM 和 MCP 服务器的桥梁。嵌入在 LLM 中，它负责：</p>
+<ul>
+<li>接收来自 LLM 的请求</li>
+<li>将请求转发至适当的 MCP 服务器</li>
+<li>将 MCP 服务器的结果返回给 LLM</li>
+</ul>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1748236888008.png" alt="" loading="lazy"></figure>
+<h3 id="mcp-主机">MCP 主机</h3>
+<p>像 Claude Desktop、Cursor 等这样的程序，或希望通过 MCP 访问数据的 AI 工具，它们为用户提供与 LLM 交互的界面，同时集成 MCP 客户端以连接到 MCP 服务器，使用 MCP 服务器提供的工具扩展 LLM 功能。</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1748236891512.png" alt="" loading="lazy"></figure>
+<p>MCP的示例工作流程如下：</p>
+<figure data-type="image" tabindex="4"><img src="https://voluntexi.github.io//post-images/1748236757123.png" alt="" loading="lazy"></figure>
+<h3 id="mcp-与-function-calling-的区别"><strong>MCP 与 Function Calling 的区别</strong></h3>
+<table>
+<thead>
+<tr>
+<th><strong>Feature</strong></th>
+<th><strong>Function Calling</strong></th>
+<th><strong>MCP (Model Context Protocol)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>目的</strong></td>
+<td>将用户提示转换为结构化函数调用（可本地调用）👆</td>
+<td>标准化执行和响应处理（更灵活，需进行通信）👆</td>
+</tr>
+<tr>
+<td><strong>使用对象</strong></td>
+<td>LLM厂商</td>
+<td>外部厂商、个人都可以提供👆</td>
+</tr>
+<tr>
+<td><strong>输出格式</strong></td>
+<td>不同LLM有不同标准</td>
+<td>统一的标准（正如Type-C）👆</td>
+</tr>
+<tr>
+<td><strong>灵活性</strong></td>
+<td>不同的LLM以不同的构建方式</td>
+<td>多个工具之间的可以交互👆</td>
+</tr>
+</tbody>
+</table>
+<h2 id="构建一个简单的mcp-server">构建一个简单的MCP Server</h2>
+<h3 id="代码">代码</h3>
+<ul>
+<li><code>pip install fastmcp</code></li>
+<li><code>@mcp.tool()</code> 提供tool，并在注释中写好函数的功能以及需要什么参数，返回的结果</li>
+<li><code>mcp.run()</code>，运行 MCP Server</li>
+</ul>
+<pre><code>from fastmcp import FastMCP
+
+mcp = FastMCP(&quot;Demo&quot;)
+
+@mcp.tool()
+def add(a: int, b: int):
+    '''
+    获取两数之和
+    Args:
+        a: 相加的数
+        b: 相加的数
+    Returns:
+        相加的结果
+    '''
+    return a + b
+if __name__ == &quot;__main__&quot;:
+    mcp.run()
+</code></pre>
+<h3 id="与mcp-client通信">与MCP Client通信</h3>
+<p>以cursor为例：</p>
+<p>点击 MCP -&gt; Add new global MCP server</p>
+<figure data-type="image" tabindex="5"><img src="https://voluntexi.github.io//post-images/1748236742721.png" alt="" loading="lazy"></figure>
+<p>然后配置如下：</p>
+<pre><code class="language-json">{
+
+ &quot;mcpServers&quot;: {
+
+  &quot;Demo&quot;:{
+
+   &quot;command&quot;:&quot;cmd&quot;,
+
+   &quot;args&quot;:[&quot;/c&quot;,&quot;fastmcp&quot;,&quot;run&quot;,&quot;E:/PythonProject1/MCP_demo/server.py&quot;]
+
+  }
+
+ }
+
+}
+</code></pre>
+<ul>
+<li>
+<p>&quot;Demo&quot;：MCP Server 名称</p>
+</li>
+<li>
+<p>&quot;command&quot;：执行的命令</p>
+</li>
+<li>
+<p>&quot;args&quot;：执行的参数</p>
+</li>
+</ul>
+<p>在cursor中进行测试：</p>
+<figure data-type="image" tabindex="6"><img src="https://voluntexi.github.io//post-images/1748236735603.png" alt="" loading="lazy"></figure>
+<p>由于这是一个很简单的 MCP Server 所以仅仅是在本地执行，没有进行联网通信。</p>
+<p><strong>这样看是不是和 Function Call 很像？</strong></p>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li>
+<p><a href="https://docs.anthropic.com/en/docs/agents-and-tools/mcp">Model Context Protocol (MCP) - Anthropic</a></p>
+</li>
+<li>
+<p><a href="https://blog.fotiecodes.com/function-calling-vs-model-context-protocol-mcp-what-you-need-to-know-cm88zfwik000108ji0a1d54fc">Function Calling vs. Model Context Protocol (MCP): What You Need to Know</a></p>
+</li>
+<li>
+<p><a href="https://blog.logto.io/what-is-mcp">What is MCP (Model Context Protocol) and how it works · site.title</a></p>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%83%8C%E6%99%AF">背景</a></li>
+<li><a href="#function-calling">Function Calling</a></li>
+<li><a href="#mcp">MCP</a></li>
+<li><a href="#mcp-%E7%BB%93%E6%9E%84">MCP 结构</a>
+<ul>
+<li><a href="#mcp-server">MCP Server</a></li>
+<li><a href="#mcp-client">MCP Client</a></li>
+<li><a href="#mcp-%E4%B8%BB%E6%9C%BA">MCP 主机</a></li>
+<li><a href="#mcp-%E4%B8%8E-function-calling-%E7%9A%84%E5%8C%BA%E5%88%AB"><strong>MCP 与 Function Calling 的区别</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E6%9E%84%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84mcp-server">构建一个简单的MCP Server</a>
+<ul>
+<li><a href="#%E4%BB%A3%E7%A0%81">代码</a></li>
+<li><a href="#%E4%B8%8Emcp-client%E9%80%9A%E4%BF%A1">与MCP Client通信</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/kv-cache/">
+              <h3 class="post-title">
+                KV Cache
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
