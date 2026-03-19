@@ -1,0 +1,266 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenClaw部署 | 威伦特</title>
+<link rel="shortcut icon" href="https://voluntexi.github.io//favicon.ico?v=1773925622997">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://voluntexi.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="OpenClaw部署 | 威伦特 - Atom Feed" href="https://voluntexi.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="OpenClaw 是一款运行在自有设备上的个人 AI 助手，所有数据均保存在自己的机器上，同时支持连接 WhatsApp、Telegram、Slack、Discord、Google Chat、Signal、iMessage、Microsof..." />
+    <meta name="keywords" content="教程" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://voluntexi.github.io/">
+  <img class="avatar" src="https://voluntexi.github.io//images/avatar.png?v=1773925622997" alt="">
+  </a>
+  <h1 class="site-title">
+    威伦特
+  </h1>
+  <p class="site-description">
+    解码生命
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          文章
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              OpenClaw部署
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-02-01
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://voluntexi.github.io/jiao-cheng/" class="post-tag">
+                  # 教程
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://voluntexi.github.io//post-images/openclaw-bu-shu.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>OpenClaw 是一款运行在自有设备上的个人 AI 助手，所有数据均保存在自己的机器上，同时支持连接 WhatsApp、Telegram、Slack、Discord、Google Chat、Signal、iMessage、Microsoft Teams 等多个平台（国内软件生态还需改善！）。该项目在 GitHub 上拥有超过 135,000 颗星。本文将介绍如何在本地平台（Windows）上部署 OpenClaw。<br>
+介绍先到这里，下面开始介绍如何进行部署</p>
+<!-- more -->
+<h2 id="前置条件">前置条件</h2>
+<p>部署OpenClaw开始前，确保准备好这两样：</p>
+<ol>
+<li>
+<p>安装Node.js（版本≥22）.</p>
+</li>
+<li>
+<p>大模型调用API</p>
+<blockquote>
+<p>OpenClaw本身不提供AI能力，需要接入外部大模型。本文以<strong>OpenRouter</strong>为例（它聚合了多个主流模型API）。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="安装nodejs">安装Node.js</h3>
+<p>Node的安装十分方便，首先进入网址：<a href="https://nodejs.org/zh-cn/download">Node.js — 下载 Node.js®</a>，点击<code>Winodws 安装程序（.msi）</code>进行下载。<br>
+<img src="https://voluntexi.github.io//post-images/1769936252483.png" alt="" loading="lazy"><br>
+下载完毕后，打开文件一路点<code>next</code>即安装完成<br>
+<img src="https://voluntexi.github.io//post-images/1769936261632.png" alt="" loading="lazy"></p>
+<h2 id="获取openrouter-api密钥">获取OpenRouter API密钥</h2>
+<p>进入<a href="https://openrouter.ai/">OpenRouter</a>官网，点击<code>Sign Up</code>注册一个账号，然后点击<code>Get Api Key</code>，进入页面，点击<code>Create Api Key</code>创建一个Api Key。</p>
+<figure data-type="image" tabindex="1"><img src="https://voluntexi.github.io//post-images/1769936269150.png" alt="" loading="lazy"></figure>
+<h2 id="安装openclaw">安装OpenClaw</h2>
+<p>打开命令提示符（cmd），可 <code>win + R</code> 输入 <code>cmd</code>，然后执行以下命令：</p>
+<pre><code class="language-powershell">npm install -g openclaw@latest
+</code></pre>
+<pre><code class="language-powershell">openclaw onboard --install-daemon
+</code></pre>
+<p>这时会进入<strong>交互式配置界面</strong>，根据提示一步步设置：</p>
+<p><img src="https://voluntexi.github.io//post-images/1769936282403.png" alt="" loading="lazy"><br>
+配置过程中有几个关键点需要注意：</p>
+<ol>
+<li>
+<p>在出现 <code>Model/auth provider</code>的时候，选择我们注册的 <strong>OpenRouter</strong>，随后输入我们在OpenRouter中创建的 <code>API key</code></p>
+</li>
+<li>
+<p>在调用模型的选择上，如果OpenRouter账户没有绑定支付方式，<strong>务必选择带有“free”字样的模型</strong>。</p>
+</li>
+</ol>
+<blockquote>
+<p>推荐选择： openrouter/tngtech/tng-r1t-chimera:free</p>
+</blockquote>
+<p>后续的skills等配置就可以按照自己的需要进行选择了。</p>
+<h3 id="启动并体验">启动并体验</h3>
+<p>在完成配置后，输入：</p>
+<pre><code class="language-powershell">openclaw gateway --port 18789 --verbose
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://voluntexi.github.io//post-images/1769936290382.png" alt="" loading="lazy"></figure>
+<p>然后打开浏览器访问：<strong><a href="https://link.zhihu.com/?target=http%3A//127.0.0.1%3A18789">http://127.0.0.1:18789</a></strong></p>
+<p>你会看到 ClawdBot 的 <strong>Web 控制台</strong>，接下来就可以愉快的开启你的OpenClaw之旅了~</p>
+<figure data-type="image" tabindex="3"><img src="https://voluntexi.github.io//post-images/1769936295157.png" alt="" loading="lazy"></figure>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E7%BD%AE%E6%9D%A1%E4%BB%B6">前置条件</a>
+<ul>
+<li><a href="#%E5%AE%89%E8%A3%85nodejs">安装Node.js</a></li>
+</ul>
+</li>
+<li><a href="#%E8%8E%B7%E5%8F%96openrouter-api%E5%AF%86%E9%92%A5">获取OpenRouter API密钥</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85openclaw">安装OpenClaw</a>
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8%E5%B9%B6%E4%BD%93%E9%AA%8C">启动并体验</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://voluntexi.github.io/hnsw/">
+              <h3 class="post-title">
+                HNSW
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '5f187cc029307ed395eb',
+    clientSecret: 'e99c3ac1d57961f0f19a3cd58bc611932d26cd1b',
+    repo: 'voluntexi.github.io',
+    owner: 'voluntexi',
+    admin: ['voluntexi'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  属于 <a href="https://github.com/voluntexi" target="_blank">@威伦特</a><script async defer src="https://analytics.umami.is/script.js" data-website-id="95248820-3fb8-420e-8f5b-87e136cbc08d"></script>
+  <a class="rss" href="https://voluntexi.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
