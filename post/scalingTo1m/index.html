@@ -1,0 +1,227 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>Scaling Transformer to 1M tokens and beyond with RMT | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Scaling Transformer to 1M tokens and beyond with RMT | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="当我还在用最大一次只能处理1024个上下文的BART模型做实验时，已经有能处理上百万上下文的方法了🤡">
+<link rel="canonical" href="https://voluntexi.github.io/post/scalingTo1m/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Scaling Transformer to 1M tokens and beyond with RMT","url":"https://voluntexi.github.io/post/scalingTo1m/","description":"当我还在用最大一次只能处理1024个上下文的BART模型做实验时，已经有能处理上百万上下文的方法了🤡","image":"/post-images/scalingTo1m.png","datePublished":"2023-07-07T22:16:06+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/scalingTo1m/","name":"Scaling Transformer to 1M tokens and beyond with RMT","position":2}]}</script>
+<meta property="og:title" content="Scaling Transformer to 1M tokens and beyond with RMT">
+<meta property="og:description" content="当我还在用最大一次只能处理1024个上下文的BART模型做实验时，已经有能处理上百万上下文的方法了🤡">
+<meta property="og:url" content="https://voluntexi.github.io/post/scalingTo1m/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="/post-images/scalingTo1m.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/scalingTo1m/">
+<meta name="twitter:title" content="Scaling Transformer to 1M tokens and beyond with RMT">
+<meta name="twitter:description" content="当我还在用最大一次只能处理1024个上下文的BART模型做实验时，已经有能处理上百万上下文的方法了🤡">
+<meta name="twitter:image" content="/post-images/scalingTo1m.png">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        Scaling Transformer to 1M tokens and beyond with RMT
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2023-07-07
+                        </span>
+                        <span>
+                            5 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="/post-images/scalingTo1m.png" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>当我还在用最大一次只能处理1024个上下文的BART模型做实验时，已经有能处理上百万上下文的方法了🤡</p>
+<!-- more -->
+<h2 id="heading">概述</h2>
+<p>提出了 Recurrent Memory Transformer 架构，作者并将其运用在BERT模型上，使BERT模型的有效上下文长度增加到了前所未有的200万，同时保持了较高的记忆检索精度。其方法允许存储和处理局部和全局信息，并使用递归使信息在输入序列的片段之间流动。</p>
+<h2 id="heading-1">方法</h2>
+<p>RMT（Recurrent Memory Transformer）的结构如下图所示，由于记忆机制允许存储和处理局部和全局信息，并通过递归在长序列的段之间传递信息。RMT的实现不需要改变 Transformer 模型，只需 <strong>对模型的输入和输出序列进行修改即可实现记忆和循环</strong> 。然后，模型被训练来控制记忆操作和序列表示处理。</p>
+<p>具体来说，RMT 将长序列分成很多个片段，把前一个片段通过Transformer后得到的embedding作为memory token，影响下一个片段的embedding。相当于只在每个片段长度内做<strong>self-attention</strong>，然后把当前片段的状态浓缩到几个memory token上去，再用这个memory token去和下一个片段的embedding做self-attention，这样一直递归下去。<br />
+<img src="https://voluntexi.github.io//post-images/1688739638706.png" alt="" /></p>
+<p><strong>公式表示如下：</strong></p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 109: …former层数，在向前传播后$̲\overline{H}^{m…" style="color:#cc0000">\\\overline{H}^N_τ 
+\\ [ \overline{H}^{mem}_τ\ ◦ \ H^N_τ ] :=\overline{H}^N_τ ,
+其中，N代表Transformer层数，在向前传播后$\overline{H}^{mem}_τ$包含了用于片段 $τ$ 更新的memory token，输入序列的片段被顺序地处理。为了进行循环，将memory token从当前段传递到下一个段的输入：
+\overline{H}^{mem}_{τ+1} :=\overline{H}^{mem}_τ\ ,\\</span><p>下图可以看到，计算量相比原始的Transformer大大降低，毕竟该架构只在每个片段内做<strong>self-attention</strong>，效率优势随着上下文的长度增加而更明显。</p>
+<p><img src="https://voluntexi.github.io//post-images/1688739666894.png" alt="" /></p>
+<h2 id="heading-2">实验结果</h2>
+<p>为了测试记忆能力，作者构建了需要记忆简单事实和基本推理的合成数据集。任务输入由一个或多个事实和一个问题组成，该问题只能通过使用所有这些事实来回答。为增加任务难度，还添加了与问题或答案无关的自然语言文本，该文本起到了加入噪声的作用。</p>
+<p>所以模型的任务是 <strong>将事实从无关的文本中分离出来，并用它们来回答问题</strong> 。该任务被公式化为 6 个分类，每个类别代表一个单独的答案选项。如下图所示，提出了综合任务和解决这些任务所需的 RMT 操作。<strong>在事实记忆任务中</strong>，事实陈述被放在序列的开头，<strong>在事实检测和记忆任务中</strong>，事实被随机放置在文本序列中，从而使检测更具挑战性。<strong>在推理任务中</strong>，提供答案所需的两个事实被随机放置在文本中。对于所有任务，问题都在序列的结尾。其中，‘mem’表示记忆符号，‘Q’表示问题，‘A’表示答案。</p>
+<p><img src="https://voluntexi.github.io//post-images/1688739770035.png" alt="" /></p>
+<h4 id="task1">Task1：事实记忆</h4>
+<p>第一个任务是测试 RMT 在较长时间内在<strong>记忆中写入和存储信息的能力</strong>（如上图Memorize部分）。在最简单的情况下，事实始终位于输入的开头，而问题始终位于结尾。问题和答案之间的无关文本的数量逐渐增加，因此整个输入不适合单个模型输入。</p>
+<p><img src="https://voluntexi.github.io//post-images/1688739737991.png" alt="" /></p>
+<h4 id="task2--">Task2：事实检测 &amp; 记忆</h4>
+<p>事实检测通过将事实移动到输入中的随机位置来增加任务难度（如上图 Detect &amp; memorize部分）。这要求模型首先将事实与不相关的文本区分开来，将其写入记忆，然后使用它来回答位于结尾的问题。</p>
+<h4 id="task3">Task3：推理任务</h4>
+<p>另一个与记忆有关的重要操作是利用记忆的事实和当前上下文进行推理。为了评估这个函数，使用了一个更复杂的任务（如图 3 的Reasoning部分），其中生成两个事实并在输入序列中随机定位。在序列结尾提出的问题以这样一种方式表述，即 <strong>任何事实都必须用于正确回答问题</strong></p>
+<p><img src="https://voluntexi.github.io//post-images/1688739784796.png" alt="" /></p>
+<hr>
+<h3 id="curriculum-learning">Curriculum Learning</h3>
+<p>最初 RMT 在任务的较短版本上进行训练，在训练收敛时，通过增加一个片段来增加任务长度。Curriculum Learning的过程将持续至达到所需的输入长度。</p>
+<p>在实验中从适合单个片段的序列开始，实际的段大小为 499，因为从模型输入中保留了 3 个 BERT 特殊 token 和 10 个记忆占位符，大小共为 512。</p>
+<h3 id="extrapolation-abilities">Extrapolation Abilities</h3>
+<p>作者在<strong>BERT-base-cased</strong>上进行实验，训练时使用不同的片段（每个片段 512个token），以评估该方法对序列长度的泛化能力。实验发现RMT能泛化到两倍于训练长度的序列。例如下图Detect &amp; Memorize这个task里，训练时候使用7个片段，评估时使用15个片段依然能取得100%的准确率。</p>
+<p><img src="https://voluntexi.github.io//post-images/1688739813122.png" alt="" /></p>
+<h3 id="attention-patterns-of-memory-operations">Attention Patterns of Memory Operations</h3>
+<p>通过对下图中特定片段上的 RMT 注意力分析，观察到 <strong>记忆操作对应着注意力中的特定模式</strong> 。此外，在处理极长的序列时，学习的记忆操作表现出了很强的泛化能力，即使执行成千上万次仍然有效。这些操作并没有明确地受到任务损失的影响。</p>
+<p><img src="https://voluntexi.github.io//post-images/1688739816646.png" alt="" /></p>
+<h2 id="heading-3">参考文献</h2>
+<p><a href="https://arxiv.org/pdf/2304.11062.pdf">Scaling Transformer to 1M tokens and beyond with RMT</a></p>
+<p><a href="https://www.shangyexinzhi.com/article/7825563.html">太酷啦，Transformer 的有效上下文长度可扩展至百万级</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/626763834">Scaling Transformer to 1M tokens and beyond with RMT 把上下文长度提升到Million级别 </a></p>
+
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/lora/">
+                    <h3 class="post-title">
+                        LoRA
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

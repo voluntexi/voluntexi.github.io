@@ -1,0 +1,363 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>CNN | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CNN | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="深度学习" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="卷积神经网络（Convolutional Neural Networks, CNN）是一类包含卷积计算且具有深度结构的前馈神经网络（Feedforward Neural Networks），是深度学习（deep learning）的代表算法之一">
+<link rel="canonical" href="https://voluntexi.github.io/post/cnn/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"CNN","url":"https://voluntexi.github.io/post/cnn/","description":"卷积神经网络（Convolutional Neural Networks, CNN）是一类包含卷积计算且具有深度结构的前馈神经网络（Feedforward Neural Networks），是深度学习（deep learning）的代表算法之一","image":"https://img0.baidu.com/it/u=480525687,3837767930\u0026fm=253\u0026fmt=auto\u0026app=120\u0026f=GIF?w=700\u0026h=350","datePublished":"2022-11-25T21:20:33+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/cnn/","name":"CNN","position":2}]}</script>
+<meta property="og:title" content="CNN">
+<meta property="og:description" content="卷积神经网络（Convolutional Neural Networks, CNN）是一类包含卷积计算且具有深度结构的前馈神经网络（Feedforward Neural Networks），是深度学习（deep learning）的代表算法之一">
+<meta property="og:url" content="https://voluntexi.github.io/post/cnn/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://img0.baidu.com/it/u=480525687,3837767930&amp;fm=253&amp;fmt=auto&amp;app=120&amp;f=GIF?w=700&amp;h=350">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/cnn/">
+<meta name="twitter:title" content="CNN">
+<meta name="twitter:description" content="卷积神经网络（Convolutional Neural Networks, CNN）是一类包含卷积计算且具有深度结构的前馈神经网络（Feedforward Neural Networks），是深度学习（deep learning）的代表算法之一">
+<meta name="twitter:image" content="https://img0.baidu.com/it/u=480525687,3837767930&amp;fm=253&amp;fmt=auto&amp;app=120&amp;f=GIF?w=700&amp;h=350">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        CNN
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-11-25
+                        </span>
+                        <span>
+                            12 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/shen-du-xue-xi/" class="post-tag">
+                            # 深度学习
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://img0.baidu.com/it/u=480525687,3837767930&amp;fm=253&amp;fmt=auto&amp;app=120&amp;f=GIF?w=700&amp;h=350" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>卷积神经网络（Convolutional Neural Networks, CNN）是一类包含卷积计算且具有深度结构的前馈神经网络（Feedforward Neural Networks），是深度学习（deep learning）的代表算法之一</p>
+<!-- more -->
+<p>LeNet-5是卷积神经网络的开山之作，也是一个较简单的卷积神经网络，出自论文：</p>
+<p><a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">《Gradient-based learning applied to document recognition》</a></p>
+<p>这篇文章中，我们在LeNet-5的基础上，<strong>探索CNN是什么，了解它们是如何工作的，</strong></p>
+<p><img src="https://voluntexi.github.io//post-images/1667395307116.png" alt="" /></p>
+<p>CNN是用来对图像分类的模型，CNN与普通的神经网络对比有如下优势：</p>
+<p><strong>优势1：能有效提取图像中关键的数值</strong></p>
+<p>用于计算机视觉问题的图像通常大小为 224x224 。如果构建一个神经网络来处理 224x224 彩色图像：包括图像中的 3 个颜色通道 （RGB），那么输入有 224 x 224 x 3 =<strong>150528</strong>个数值，如果神经网络中的隐藏层有 1024 个节点，因此我们必须训练 150528 x 1024 =<strong>仅第一层就有 150+ 百万个权重</strong>。</p>
+<p>同时我们也知道，并不是图像中每一个值都需要作为输入，图像中像素是否有用关键在于其在图像中所处的环境。并不需要要查看图像中的每一个像素点。</p>
+<p><strong>优势2：能解决图像位置的偏移的问题</strong></p>
+<p>如果你训练了一个神经网络来检测狗，然而预测的图像可能和预测图像有所偏移。那么普通神经网络就不会激活相同的神经元。</p>
+<p>而CNN能够准确的对图像进行预测，无论图像怎么偏移。</p>
+<h2 id="heading">数据集</h2>
+<p>在这篇文章中，我们将通过<strong>MNIST手写数字数据集</strong>来进行图像的分类。</p>
+<p><img src="https://victorzhou.com/static/16ddab2ee3bcd9e22d96f267e473a2f4/d369c/mnist-examples.png" alt="来自 MNIST 数据集的示例图像" /></p>
+<center>MNIST 手写数字数据集的示例图</center>
+<p>MNIST 数据集中的每个图像都是 28x28，MNIST将每个数字进行了居中排列。</p>
+<h2 id="heading-1">卷积层</h2>
+<p>卷积层：就是将图像矩阵和卷积核卷积的数学运算。</p>
+<p>下面是一个 3x3 卷积核示例：</p>
+<img src="https://victorzhou.com/687f9b9f24fc4f9a50b30e8a1f4d3686/vertical-sobel.svg" alt="img" style="zoom:67%;" />
+<p><strong>通过将卷积核与输入图像卷积来生成输出图像矩阵。</strong></p>
+<p>例子：将一个的4x4灰度图像和这个3x3卷积核进行卷积：</p>
+<img src="https://victorzhou.com/media/cnn-post/convolve-example-1.svg" alt="img" style="zoom:67%;" />
+<p>图像中的数字表示像素强度，其中 0 表示黑色，255 表示白色。我们将对输入图像和卷积核进行卷积，最后会生成一个 2x2 输出图像：</p>
+<p>首先，让我们在图像的左上角叠加我们的卷积核：</p>
+<img src="https://victorzhou.com/media/cnn-post/convolve-example-2.svg" alt="img" style="zoom: 67%;" />
+<p>接下来，我们在重叠的图像值和过滤器值之间执行逐元素乘法。以下是结果，从左上角开始，向右，然后向下：</p>
+<table>
+<thead>
+<tr>
+<th>图像值</th>
+<th>过滤器值</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>-1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>50</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>-2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>80</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>31</td>
+<td>2</td>
+<td>62</td>
+</tr>
+<tr>
+<td>33</td>
+<td>-1</td>
+<td>-33</td>
+</tr>
+<tr>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>将所有的结果相加：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>最后，我们将结果放置在输出图像的目标像素中。由于我们的卷积核叠加在输入图像的左上角，因此我们的目标像素是输出图像的左上角像素：</p>
+<img src="https://victorzhou.com/media/cnn-post/convolve-output-1.svg" alt="img" style="zoom:67%;" />
+<p>做同样的操作，直到输出矩阵被填满：</p>
+<img src="https://victorzhou.com/69b4c1dd078ee363317bb8fa323eaace/convolve-output.gif" alt="img" style="zoom:67%;" />
+<hr>
+<p>使用卷积核卷积图像有什么作用？我们可以从我们一直在使用的示例 3x3 过滤器开始，它通常被称为垂直Sobel 卷积核：</p>
+<img src="https://victorzhou.com/media/cnn-post/vertical-sobel.svg" alt="img" style="zoom:67%;" />
+<p>还有水平Sobel卷积核：</p>
+<img src="https://victorzhou.com/media/cnn-post/horizontal-sobel.svg" alt="img" style="zoom:67%;" />
+<ul>
+<li>垂直 Sobel 卷积核能检测图像垂直边缘。</li>
+<li>水平 Sobel 卷积核能检测水平边缘。</li>
+</ul>
+<p>也就是说：经过卷积核输出图像中的明亮像素（具有高值的像素）表示原始图像中存在很强的边缘。</p>
+<p><strong>Padding</strong></p>
+<p>很多时候，如果希望输出图像与输入图像的大小相同。那么可以在图像周围添加零，以便我们可以在更多位置覆盖卷积核。这样的操作就称为<strong>Padding</strong>。如下图，4x4图像通过padding一层，经过卷积层后，产生了相同大小的输出图像</p>
+<p><img src="https://victorzhou.com/media/cnn-post/padding.svg" alt="img" /></p>
+<p><strong>padding 存在的意义在于</strong></p>
+<ul>
+<li>为了不丢弃原图信息</li>
+<li>为了保持feature map 的大小与原图一致</li>
+<li>为了让更深层的layer的input依旧保持有足够大的信息量</li>
+<li>为了实现上述目的，且不做多余的事情，padding出来的pixel的值都是0，不存在噪音问题。</li>
+</ul>
+<blockquote>
+<p><strong>在LeNet-5论文中，作者将数字图像通过了一个带有 8 个卷积核的卷积层作为我们网络中的初始层。图像从 32x32 转换为了 28x28x8 的输出体积：</strong></p>
+</blockquote>
+<hr>
+<h2 id="heading-2">池化层</h2>
+<p>图像中的相邻像素往往具有相似的值，因此卷积层通常也会为输出中的相邻像素生成相似的值。因此，<strong>卷积层输出中包含的大部分信息都是多余的</strong>。</p>
+<p>池化层解决了这个问题，池化层通过对卷积后的图像进行下采样，是缩小图像的尺寸(长、宽、通道数)，从而减少计算量、内存使用量、参数个数，从而达到一定的尺度、空间不变性，和降低过拟合可能性的目的。</p>
+<p>池化层有最大池化，均值池化，全局平均池化，混合池化，随机池化等池话操作</p>
+<p>下图示例了一个4x4的图像进行最大池化缩小为2x2的图像：</p>
+<img src="https://victorzhou.com/ac441205fd06dc037b3db2dbf05660f7/pool.gif" alt="img" style="zoom:67%;" />
+<blockquote>
+<p><strong>在LeNet-5论文中，作者将卷积后的图像通过池化层，让图像从 28x28x8转换为了 14x14x6 的输出体积：</strong></p>
+</blockquote>
+<h2 id="heading-3">全连接层</h2>
+<p>在图像经过了多层卷积层和池话层后，将其展开为一个n元向量，作为输入传入全连接层，经过<strong>softmax</strong>，概率<strong>最高的节点所代表的数字</strong>就是CNN预测的数字。</p>
+<p><img src="https://victorzhou.com/media/cnn-post/cnn-dims-3.svg" alt="img" /></p>
+<hr>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><blockquote>
+<p>注意：LeNet-5 与现在通用的卷积神经网络在某些细节结构上还是有差异的， LeNet-5 采用的激活函数是 sigmoid，而目前图像一般用 tanh，relu，leakly relu 较多；多分类最后的输出层一般用 softmax，而 LeNet-5 采用的是欧式距离。</p>
+</blockquote>
+<h2 id="heading-4">反向传播</h2>
+<p><strong>损失函数</strong></p>
+<p>使用<strong>Softmax与交叉熵损失函数</strong>，作为损失函数。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中P(c)为当前实际数字的概率</p>
+<p><strong>求导过程</strong></p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;\end&#x27; at position 20: …uad i\neq c\\
+\̲e̲n̲d̲{cases}" style="color:#cc0000">0,\quad i\neq c\\
+\end{cases}</span><p>当<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext> </mtext><mi>k</mi><mo mathvariant="normal">≠</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">\ k  \neq c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span>时：</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 58: …^2}} \tag{2}
+当$̲\ k = c$时：
+\fr…" style="color:#cc0000">\\=\frac{-e^{t_c}e^{t_k}}{({\sum_je^{t_j})^2}} \tag{2}
+当$\ k = c$时：
+\frac{∂out_s(c)}{∂t_c}=\frac{e^{t_c}(∂\sum_je^{t_j}-e^{t_c})}{S^2} \tag 3</span><p>其中，S=\sum _{i}e^{t_i}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\frac{∂out_s(c)}{∂t}=\begin{cases}<br />
+\frac{-e^{t_c}e^{t_k}}{({\sum_je^{t_j})^2}}，\quad k\neq c\<br />
+\frac{e^{t_c}(∂\sum_je^{t_j}-e^{t_c})}{S^2}, \quad k=c<br />
+\end{cases}<br />
+\tag{4}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>t=w*input+b</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\frac{∂t}{∂w}=input \tag 5</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\frac{∂t}{∂b}=1 \tag 6</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\frac{∂t}{∂input}=w \tag 7</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable width="100%"><mtr><mtd width="50%"></mtd><mtd><mrow><mtext>联立①④⑤：</mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>o</mi><mi>u</mi><mi>t</mi></mrow></mfrac><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>o</mi><mi>u</mi><mi>t</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac><mtext>联立①④⑥：</mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>o</mi><mi>u</mi><mi>t</mi></mrow></mfrac><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>o</mi><mi>u</mi><mi>t</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mtext>联立①④⑦：</mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>o</mi><mi>u</mi><mi>t</mi></mrow></mfrac><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>o</mi><mi>u</mi><mi>t</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac><mo>∗</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi></mrow></mfrac><mtext>接下来对</mtext><mi>w</mi><mtext>，</mtext><mi>b</mi><mtext>，</mtext><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi><mtext>进行梯度下降更新数值：</mtext><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi><mo>=</mo><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi><mo>−</mo><mi>μ</mi><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi></mrow></mfrac><mspace linebreak="newline"></mspace><mi>b</mi><mo>=</mo><mi>b</mi><mo>−</mo><mi>μ</mi><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mspace linebreak="newline"></mspace><mo>&lt;</mo><mi>h</mi><mi>r</mi><mo>&gt;</mo></mrow></mtd><mtd width="50%"></mtd><mtd><mtext>(8)</mtext></mtd></mtr></mtable><annotation encoding="application/x-tex">联立①④⑤：
+\frac{∂L}{∂w}=\frac{∂L}{∂out}*\frac{∂out}{∂t}*\frac{∂t}{∂w}
+联立①④⑥：
+\frac{∂L}{∂b}=\frac{∂L}{∂out}*\frac{∂out}{∂t}*\frac{∂t}{∂b}
+联立①④⑦：
+\frac{∂L}{∂input}=\frac{∂L}{∂out}*\frac{∂out}{∂t}*\frac{∂t}{∂input} \tag 8
+接下来对w，b，input进行梯度下降更新数值：
+input=input-\mu\frac{∂L}{∂input}\\
+b= b-\mu\frac{∂L}{∂b}\\
+
+&lt;hr&gt;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord cjk_fallback">联立</span><span class="mord">①④⑤</span><span class="mord cjk_fallback">：</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord cjk_fallback">联立</span><span class="mord">①④⑥</span><span class="mord cjk_fallback">：</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">b</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">b</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord cjk_fallback">联立</span><span class="mord">①④⑦</span><span class="mord cjk_fallback">：</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">in</span><span class="mord mathnormal">p</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">in</span><span class="mord mathnormal">p</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord cjk_fallback">接下来对</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mord cjk_fallback">，</span><span class="mord mathnormal">b</span><span class="mord cjk_fallback">，</span><span class="mord mathnormal">in</span><span class="mord mathnormal">p</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span><span class="mord cjk_fallback">进行梯度下降更新数值：</span><span class="mord mathnormal">in</span><span class="mord mathnormal">p</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">in</span><span class="mord mathnormal">p</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord mathnormal">μ</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">in</span><span class="mord mathnormal">p</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord mathnormal">μ</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">b</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">h</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span></span><span class="tag"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord text"><span class="mord">(</span><span class="mord"><span class="mord">8</span></span><span class="mord">)</span></span></span></span></span></span><p>conv(i,j)=convolve(image,filter)<br />
+\=\sum_{x=0}^{height}\sum_{y=0}^{width}image(i+x,j+y)*filter(x,y)</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\frac{∂conv(i,j)}{∂filter(x,y)}=image(i+x,j+y) \tag 9</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\frac{∂L}{∂filter(x,y)}=\sum_i\sum_j\frac{∂L}{∂conv(i,j)}*\frac{∂conv(i,j)}{∂filter(x,y)}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\sum_{x=0}^{height}\sum_{y=0}^{width}filter(x,y)= \sum_{x=0}^{height}\sum_{y=0}^{width}(filter(x,y)-\mu\frac{∂L}{∂filter(x,y)})</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo>&lt;</mo><mi>h</mi><mi>r</mi><mo>&gt;</mo><mo>&gt;</mo><mo>&gt;</mo><mo>&gt;</mo></mrow><annotation encoding="application/x-tex">&lt;hr&gt;
+
+
+
+
+
+
+&gt;
+&gt;
+&gt;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">h</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;&gt;&gt;&gt;</span></span></span></span></span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/rnn/">
+                    <h3 class="post-title">
+                        RNN
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

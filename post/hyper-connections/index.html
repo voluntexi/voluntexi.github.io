@@ -1,0 +1,286 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>Hyper Connections | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Hyper Connections | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="大模型,NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="Hyper Connections 是对残差网络（Residual Connections） 的一种改进设计，其核心在于引入了可学习的深度连接与宽度连接。该方法在几乎不增加计算量和参数量的前提下，能够带来显著的性能提升，且具有极高的普适性——无论是密集连接（Dense）还是混合专家模型（MoE），无论是视觉任务还是文本模态，均能取得收益。特别是在大语言模型（LLMs）的预训练中，收敛速度最高可提升0.8倍[1]。">
+<link rel="canonical" href="https://voluntexi.github.io/post/hyper-connections/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Hyper Connections","url":"https://voluntexi.github.io/post/hyper-connections/","description":"Hyper Connections 是对残差网络（Residual Connections） 的一种改进设计，其核心在于引入了可学习的深度连接与宽度连接。该方法在几乎不增加计算量和参数量的前提下，能够带来显著的性能提升，且具有极高的普适性——无论是密集连接（Dense）还是混合专家模型（MoE），无论是视觉任务还是文本模态，均能取得收益。特别是在大语言模型（LLMs）的预训练中，收敛速度最高可提升0.8倍[1]。","image":"/post-images/hyper-connections.png","datePublished":"2026-03-19T20:40:25+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/hyper-connections/","name":"Hyper Connections","position":2}]}</script>
+<meta property="og:title" content="Hyper Connections">
+<meta property="og:description" content="Hyper Connections 是对残差网络（Residual Connections） 的一种改进设计，其核心在于引入了可学习的深度连接与宽度连接。该方法在几乎不增加计算量和参数量的前提下，能够带来显著的性能提升，且具有极高的普适性——无论是密集连接（Dense）还是混合专家模型（MoE），无论是视觉任务还是文本模态，均能取得收益。特别是在大语言模型（LLMs）的预训练中，收敛速度最高可提升0.8倍[1]。">
+<meta property="og:url" content="https://voluntexi.github.io/post/hyper-connections/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="/post-images/hyper-connections.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/hyper-connections/">
+<meta name="twitter:title" content="Hyper Connections">
+<meta name="twitter:description" content="Hyper Connections 是对残差网络（Residual Connections） 的一种改进设计，其核心在于引入了可学习的深度连接与宽度连接。该方法在几乎不增加计算量和参数量的前提下，能够带来显著的性能提升，且具有极高的普适性——无论是密集连接（Dense）还是混合专家模型（MoE），无论是视觉任务还是文本模态，均能取得收益。特别是在大语言模型（LLMs）的预训练中，收敛速度最高可提升0.8倍[1]。">
+<meta name="twitter:image" content="/post-images/hyper-connections.png">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        Hyper Connections
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2026-03-19
+                        </span>
+                        <span>
+                            12 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/da-mo-xing/" class="post-tag">
+                            # 大模型
+                        </a>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="/post-images/hyper-connections.png" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p><code>Hyper Connections</code> 是对<strong>残差网络（Residual Connections）</strong> 的一种改进设计，其核心在于引入了可学习的深度连接与宽度连接。该方法在几乎不增加计算量和参数量的前提下，能够带来显著的性能提升，且具有极高的普适性——无论是密集连接（Dense）还是混合专家模型（MoE），无论是视觉任务还是文本模态，均能取得收益。特别是在大语言模型（LLMs）的预训练中，收敛速度最高可提升<strong>0.8</strong>倍<sup>[1]</sup>。</p>
+<!-- more -->
+<h2 id="heading">概述</h2>
+<p><code>Hyper Connections</code> 旨在解决残差网络中<strong>前归一化（Pre-Norm）<strong>与</strong>后归一化（Post-Norm）</strong> 之间存在的跷跷板效应——即表示崩溃与梯度消失之间的矛盾。该方法允许网络动态调整不同深度特征的连接强度，甚至实现对网络层的重排列。</p>
+<p>残差网络主要有两种变体：</p>
+<p><strong>前归一化（Pre-Norm）</strong>：训练过程更稳定：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>随着迭代进行，当 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">x_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的幅值逐渐增大时，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">x_{t+1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span> 会与初始输入 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">x_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 高度相似，导致模型逐渐丧失学习复杂变换的能力，从而引发<strong>表示崩溃</strong>。然而，由于梯度不经过归一化层的缩放，反向传播路径更接近恒等映射，因此梯度回传较为顺畅，能有效缓解梯度消失问题。</p>
+<p><strong>后归一化（Post-Norm）</strong>：训练效果通常更好：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">F(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 的输出未经归一化直接加入，保留了不同层之间的幅值差异，因此模型能更充分地学习特征。但正因如此，梯度的幅值分布容易被改变，导致深层梯度呈指数级衰减，进而引发<strong>梯度消失</strong>问题。</p>
+<blockquote>
+<p>在 Transformer 中，式中的 Norm 主要指 Layer Normalization，但在其他模型中，它也可以是 Batch Normalization、Instance Normalization 等，相关结论本质上是通用的。</p>
+</blockquote>
+<p>两种方法各有优势，那怎么做才能将给自的优点结合起来呢？</p>
+<p>有的~~</p>
+<p><code>Hyper Connections</code> 的核心思想在于：通过动态调整不同层之间的连接权重，弥补残差连接在梯度消失与表示崩溃之间的跷跷板效应。实验表明，该方法不仅训练过程比前归一化更稳定，还能有效降低层间相似度，并扩大相似度的动态范围，从而模拟出后归一化的良好训练特性。</p>
+<p><img src="https://voluntexi.github.io//post-images/1773924088796.jpg" alt="" /></p>
+<h2 id="hyper-connections">Hyper Connections</h2>
+<p><code>Hyper Connections</code> 的结构如下图（b）所示。该方法引入了两种可学习的连接机制：<strong>深度连接（Depth-Connections）<strong>和</strong>宽度连接（Width-Connections）</strong>。</p>
+<p><img src="https://voluntexi.github.io//post-images/1773924102490.jpg" alt="" /></p>
+<ul>
+<li><strong>深度连接（Depth-Connections）</strong>：类似于残差连接，但通过为输入与输出之间的连接分配可学习的权重，允许网络灵活调整不同层之间的连接强度。</li>
+<li><strong>宽度连接（Width-Connections）</strong>：在每一层中实现Hidden Vector之间的信息交互，增强特征融合能力，从而提升模型的表示效果。</li>
+</ul>
+<p>首先，将输入扩展为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 份（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 称为<strong>膨胀率（Expansion Rate）</strong>）。此后，每一层的输入均为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个隐藏向量（如图 (b) 中的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">h_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">h_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>）。通过将深度连接与宽度连接统一为矩阵形式，<code>Hyper Connections</code> 不仅可以调整残差连接的强度，还能实现对网络层的重排列。</p>
+<p>此外，<code>Hyper Connetions</code>可以分为<strong>静态</strong>和<strong>动态</strong>两种类型：</p>
+<ul>
+<li><strong>Static Hyper Connections (SHC）</strong>：连接权重在训练完成后保持固定，不随输入变化。</li>
+<li><strong>Dynamic Hyper Connections (DHC）</strong>：连接权重根据输入动态变化，能够自适应不同的输入，通常效果更优</li>
+</ul>
+<h3 id="static-hyper-connectionsshc">Static Hyper-Connections(SHC)</h3>
+<p>首先，第0层的输入为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>h</mi><mn>0</mn></msup></mrow><annotation encoding="application/x-tex">h^0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span></span></span></span></span></span></span></span>，维度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span>，然后将其复制<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>次，得到初始矩阵:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>第<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span>层的输入是上一层的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">H^{k-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>，即:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>最终的输出表示为对最后一层的矩阵按行求和，最后进行一次前归一化，获得最终输出得到最后所需要的向量。</p>
+<p>为了简化后续分析中的符号表示，省略层索引，记矩阵为：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>上图的(b)为<code>Hyper Connections</code>的图结构，其实<code>Hyper Connections</code>可以用一个矩阵来表示，对于扩展率为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>的情况，<code>Hyper Connections</code>矩阵<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">H</mi><mi mathvariant="script">C</mi></mrow><annotation encoding="application/x-tex">\mathcal{HC}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.0097em;">H</span><span class="mord mathcal" style="margin-right:0.0583em;">C</span></span></span></span></span>如下：</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 278: …(n+1)}.
+考虑一层网络$̲\mathcal{T}$ ，它…" style="color:#cc0000">\begin{pmatrix}
+\mathbf{A}_m &amp; \mathbf{A}_r
+=
+0 &amp; \beta_1 &amp; \beta_2 &amp; \cdots &amp; \beta_n \\
+\alpha_{2,0} &amp; \alpha_{2,1} &amp; \alpha_{2,2} &amp; \cdots &amp; \alpha_{2,n} \\
+\alpha_{n,0} &amp; \alpha_{n,1} &amp; \alpha_{n,2} &amp; \cdots &amp; \alpha_{n,n}
+\in \mathbb{R}^{(n+1) \times (n+1)}.
+考虑一层网络$\mathcal{T}$ ，它可能是Transformer中的Attention层或者是FFN层，那么`Hyper Connections`的输出$\hat{H}$可以简单地表示为：
+\hat{H} = \mathcal{HC}(\mathcal{T}, \mathbf{H}) = \mathbf{B}^{\top} \mathcal{T} (\mathbf{H}^{\top} \mathbf{A}_m)^{\top} + \mathbf{A}_r^{\top} \mathbf{H}
+即对输入$\mathbf{H}$，按$\mathbf{A}_m$的权重进行加权和获得当前网络层$\mathcal{T}$的`输入`：
+\mathbf{h}_0^{\top} = \mathbf{A}_m^{\top} \mathbf{H}
+$\mathbf{A}_r$用于将$\mathbf{H}$映射为`hyper hidden matrix` $\mathbf{H}&#x27;$，即：
+\mathbf{H}&#x27; = \mathbf{A}_r^{\top} \mathbf{H}
+那么最终式子可以变为：
+\hat{H} = \mathbf{B}^\top (\mathcal{T} \mathbf{h}_0)^\top + \mathbf{H}&#x27;
+则`Depth-Connections`（上图(c)）可以被解耦为：
+DC = \begin{pmatrix} \mathbf{B} \\ \operatorname{diag}(\mathbf{A}_r) \end{pmatrix} = \begin{pmatrix} \beta_1 &amp; \beta_2 &amp; \cdots &amp; \beta_n \\ \alpha_{1,1} &amp; \alpha_{2,2} &amp; \cdots &amp; \alpha_{n,n} \end{pmatrix} \in \mathbb{R}^{2 \times n}
+其中$\mathbf{B}$和$\operatorname{diag}(\mathbf{A}_r)$分别表示当前网络$\mathcal{T}$ 的输出和输入权重。$\operatorname{diag}(\mathbf{A}_r)$表示将$\mathbf{A}_r$沿着对角线展开。
+同样的，`Width-Connections`（上图(d)）可以被定义为：
+\mathcal{WC} = (\mathbf{A}_m \quad \mathbf{A}_r) \in \mathbb{R}^{n \times (n+1)}.
+伪代码如下：</span><p>\mathcal{HC}(\mathbf{H}) =<br />
+\begin{pmatrix}<br />
+\mathbf{0}_{1 \times 1} &amp; \mathcal{B}(\mathbf{H}) \<br />
+\mathcal{A}_m(\mathbf{H}) &amp; \mathcal{A}_r(\mathbf{H})<br />
+\end{pmatrix}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\hat{H} = \mathcal{HC}(\mathbf{H})(\mathcal{T}, \mathbf{H})</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\overline{\mathbf{H}} = \operatorname{norm}(\mathbf{H})</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\mathcal{B}(\mathbf{H}) = s_\beta \circ \tanh(\overline{\mathbf{H}}\mathbf{W}_\beta)^\top + \mathbf{B} \in \mathbb{R}^{1 \times n}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\mathcal{A}<em>m(\mathbf{H}) = s</em>\alpha \circ \tanh(\overline{\mathbf{H}}\mathbf{W}_m) + \mathbf{A}_m \in \mathbb{R}^{n \times 1}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\mathcal{A}<em>r(\mathbf{H}) = s</em>\alpha \circ \tanh(\overline{\mathbf{H}}\mathbf{W}_r) + \mathbf{A}_r \in \mathbb{R}^{n \times n}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>代码为：</mtext></mrow><annotation encoding="application/x-tex">代码为：</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">代码为：</span></span></span></span></span><p>\mathcal{HC}<em>{\text{PreNorm}} = \begin{pmatrix} 0 &amp; 1 \ 1 &amp; 1 \end{pmatrix}, \quad \mathcal{HC}</em>{\text{PostNorm}} = \begin{pmatrix} 0 &amp; \frac{1}{\sqrt{\sigma_i^2 + \sigma_o^2 + 2\sigma_{io}}} \ 1 &amp; \frac{1}{\sqrt{\sigma_i^2 + \sigma_o^2 + \sigma_{io}}} \end{pmatrix}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>\mathcal{HC} =<br />
+\begin{pmatrix}<br />
+0 &amp; 1 &amp; 1 \<br />
+1 &amp; 1 &amp; 0 \<br />
+0 &amp; 0 &amp; 1<br />
+\end{pmatrix}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo stretchy="false">!</mo><mo stretchy="false">[</mo><mo stretchy="false">]</mo><mo stretchy="false">(</mo><mi>h</mi><mi>t</mi><mi>t</mi><mi>p</mi><mi>s</mi><mo>:</mo><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>v</mi><mi>o</mi><mi>l</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>x</mi><mi>i</mi><mi mathvariant="normal">.</mi><mi>g</mi><mi>i</mi><mi>t</mi><mi>h</mi><mi>u</mi><mi>b</mi><mi mathvariant="normal">.</mi><mi>i</mi><mi>o</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mo>−</mo><mi>i</mi><mi>m</mi><mi>a</mi><mi>g</mi><mi>e</mi><mi>s</mi><mi mathvariant="normal">/</mi><mn>1773924146439.</mn><mi>p</mi><mi>n</mi><mi>g</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">![](https://voluntexi.github.io//post-images/1773924146439.png)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mclose">!</span><span class="mopen">[</span><span class="mclose">]</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mord mathnormal">ttp</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">//</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">i</span><span class="mord">.</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">i</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mord mathnormal">u</span><span class="mord mathnormal">b</span><span class="mord">.</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord">//</span><span class="mord mathnormal">p</span><span class="mord mathnormal">os</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ima</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">es</span><span class="mord">/1773924146439.</span><span class="mord mathnormal">p</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mclose">)</span></span></span></span></span><p>HC_{\text{odd}} = \begin{pmatrix} 0 &amp; 1 &amp; 0 \ 1 &amp; 1 &amp; 1 \ 1 &amp; 1 &amp; 1 \end{pmatrix}</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>HC_{\text{even}} = \begin{pmatrix} 0 &amp; 0 &amp; 1 \ 0 &amp; 1 &amp; 0 \ 1 &amp; 0 &amp; 1 \end{pmatrix}.</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 52: …层的排列可以多种表现形式。
+#̲# 实验
+一方面，Hyper…" style="color:#cc0000"><span class="cjk_fallback">因此，通过学习不同形式的`Hyper Connections`矩阵，网络层的排列可以多种表现形式。
+## 实验
+一方面，Hyper Connections 显著提升了训练稳定性，使训练过程中的损失曲线更加平滑：
+![](https://voluntexi.github.io//post-images/1773924154647.png)
+另一方面，Hyper Connections 在最终效果上也表现优异：
+![](https://voluntexi.github.io//post-images/1773924159517.png)
+研究还对比了不同连接模式的特性：：
+- **Hyper Connections** 显示出一种大致**形连接模式**，即每层输出对邻近层的贡献较大，同时浅层对远层有长期贡献。这种模式融合了 Pre-Norm 和 Post-Norm 结构的特性。
+- **Post-Norm ** 的连接仅限于相邻层，权重随着深度迅速衰减。
+
+
+
+
+
+
+## 参考文章
+* [HYPER-CONNECTIONS](https://arxiv.org/pdf/2409.19606#page=4.75)
+* [LLM: Hyper-Connections, Normalized-GPT - 知乎](https://zhuanlan.zhihu.com/p/18338048075)
+* [都2025年了，我不允许你还在用残差连接！ - 知乎](https://zhuanlan.zhihu.com/p/20810468231)</span></span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/openclaw-bu-shu/">
+                    <h3 class="post-title">
+                        OpenClaw部署
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

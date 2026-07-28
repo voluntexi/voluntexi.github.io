@@ -1,0 +1,546 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>中文分词方法总结 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="中文分词方法总结 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="本文介绍的是基于字符串匹配的中文分词的方法。">
+<link rel="canonical" href="https://voluntexi.github.io/post/zi-fu-chuan-pi-pei/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"中文分词方法总结","url":"https://voluntexi.github.io/post/zi-fu-chuan-pi-pei/","description":"本文介绍的是基于字符串匹配的中文分词的方法。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg\u0026refer=http%3A%2F%2Fwww.sina.com\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1660031375\u0026t=70d0b9f6fcbc2196016de2665a02c1d2","datePublished":"2022-07-12T19:03:36+08:00","dateModified":"2026-05-22T18:33:21+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/zi-fu-chuan-pi-pei/","name":"中文分词方法总结","position":2}]}</script>
+<meta property="og:title" content="中文分词方法总结">
+<meta property="og:description" content="本文介绍的是基于字符串匹配的中文分词的方法。">
+<meta property="og:url" content="https://voluntexi.github.io/post/zi-fu-chuan-pi-pei/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/zi-fu-chuan-pi-pei/">
+<meta name="twitter:title" content="中文分词方法总结">
+<meta name="twitter:description" content="本文介绍的是基于字符串匹配的中文分词的方法。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        中文分词方法总结
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-07-12
+                        </span>
+                        <span>
+                            25 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>本文介绍的是基于字符串匹配的中文分词的方法。</p>
+<!-- more -->
+<p>通过按照一定策略将待分析的汉字串与一个“词典”中的词条进行匹配，若在词典中找到某个字符串，则匹配成功。</p>
+<h2 id="heading">字符串匹配算法：</h2>
+<p>在通过确定了词典后，目标句子可能含有很多词典中的词语。它们可能互相重叠，到底输出哪一个由规则决定。让我们来制定一些规则查词典。常用的规则有正向最长匹配、逆向最长匹配和双向最长匹配，它们都基于完全切分过程。</p>
+<h3 id="heading-1">完全切分：</h3>
+<p>完全切分的思想是通过在句子中寻找出现在词典的单词。通过遍历句子中的字，查询该序列是否在字典中即可。</p>
+<h4 id="heading-2">实现：</h4>
+<pre><code class="language-python">def fullSegment(text,dict):
+    res=[]
+    for i in range(len(text)):
+        for j in range(i+1,len(text)+1):
+            if(text[i:j] in dict):
+                res.append(text[i:j])
+    return res
+</code></pre>
+<p>结果如下：</p>
+<pre><code class="language-python">print(fullSegment(&quot;南京市长江大桥&quot;,['南京','南京市','长江','大桥','长江大桥']))
+
+['南京', '南京市', '长江', '长江大桥', '大桥']
+</code></pre>
+<h3 id="heading-3">正向最大匹配分词：</h3>
+<p>完全切分算法输出的并不是分词结果，为了输出真正的分词结果，需要完善规则，考虑到越长的单词表达的意义越丰富，于是我们定义单词越长优先级越高。具体说来，就是在以某个下标为起点递增查词的过程中，优先输出更长的单词，这种规则被称为最长匹配算法。该下标的扫描顺序如果从前往后,则为正向最大匹配。</p>
+<p>算法思想：</p>
+<ul>
+<li>
+<p>从左向右取待切分汉语句的m个字符作为匹配字段，m为大机器词典中最长词条个数。</p>
+</li>
+<li>
+<p>查找词典并进行匹配。若匹配成功，则将这个匹配字段作为一个词切分出来。</p>
+</li>
+<li>
+<p>若匹配不成功，则将这个匹配字段的最后一个字去掉，剩下的字符串作为新的匹配字段，进行再次匹配，重复以上过程，直到切分出所有词为止。</p>
+</li>
+</ul>
+<h4 id="heading-4">实现：</h4>
+<pre><code class="language-python">def forwardSegment(text,dict):
+    res = []
+    i=0
+    while i &lt; len(text):
+        long = text[i]
+        for j in range(i + 1, len(text) + 1):
+            long=text[i:j] if text[i:j] in dict and len(text[i:j])&gt;len(long) else long
+        res.append(long)
+        i+=len(long)
+    return res
+</code></pre>
+<p>结果如下：</p>
+<pre><code class="language-python">print(forwardSegment(&quot;南京市长江大桥&quot;,['南京','南京市','长江','大桥','长江大桥']))
+
+['南京市', '长江大桥']
+</code></pre>
+<h3 id="heading-5">逆向最大匹配分词：</h3>
+<p>逆向匹配思想和正向是相同的，不过扫描顺序变成了从后至前。</p>
+<h4 id="heading-6">实现：</h4>
+<pre><code class="language-python">def backSegment(text,dict):
+    res = []
+    i = len(text)-1
+    while i &gt;= 0:
+        long = text[i]
+        for j in range(0, i):
+            long = text[j:i+1] if text[j:i+1] in dict and len(text[j:i+1]) &gt; len(long) else long
+        res.insert(0,long)
+        i -= len(long)
+    return res
+</code></pre>
+<p>结果如下：</p>
+<pre><code class="language-python">print(backSegment(&quot;南京市长江大桥&quot;,['南京','南京市','长江','大桥','长江大桥']))
+
+['南京市', '长江大桥']
+</code></pre>
+<h3 id="heading-7">双向最大匹配分词：</h3>
+<p>有些句子用正向匹配能正确切分，而有些句子只能通过逆向匹配才能正确切分。<br />
+<img src="https://voluntexi.github.io//post-images/1657623958053.png" alt="" /></p>
+<p>那么，具体该怎么使用匹配算法呢？我们一般通过如下规则来进行确定：</p>
+<ul>
+<li>
+<p>同时执行正向和逆向最长匹配，若两者的词数不同，则返回词数更少的那一个。</p>
+</li>
+<li>
+<p>否则，返回两者中单字更少的那一个。当单字数也相同时，优先返回逆向最长匹配的结果。</p>
+</li>
+</ul>
+<h4 id="heading-8">实现：</h4>
+<pre><code class="language-python">def bidrectionalSegment(text,dict):
+    f=forwardSegment(text,dict)
+    b=backSegment(text,dict)
+    print(f)
+    print(b)
+    if(len(f)&lt;len(b)):
+        return f
+    elif(len(f)&gt;len(b)):
+        return b
+    else:
+        lenF=0
+        lenB=0
+        for i in b:
+            if len(i)==1:
+                lenB+=1
+        for j in f:
+            if len(j)==1:
+                lenF+=1
+        return f if lenF&lt;lenB else b
+</code></pre>
+<p>结果如下：</p>
+<pre><code class="language-python">print(bidrectionalSegment(&quot;研究生命起源&quot;,['研究','研究生','生命','起源']))
+
+['研究生', '命', '起源'] #forward
+['研究', '生命', '起源'] #back
+['研究', '生命', '起源'] #bidrectional
+</code></pre>
+<h2 id="heading-9">总结：</h2>
+<p><strong>字符串匹配方法</strong>算法<strong>简单，易于理解和实现，并且切分速度较快</strong>，成为分词方法中最流行的。因为字典匹配的方法不考虑具体的语言环境和定义，最大的缺点就是不能处理多词冲突和新词情况，<strong>严重依赖于词表，准确度较低</strong>。单纯采用字符串匹配的方法不能满足中文信息处理对分词结果准确度的要求。</p>
+<h2 id="heading-10">提高词典匹配速度：</h2>
+<p>匹配算法的瓶颈之一在于如何判断集合词典中是否含有字符串。如果用有序集合，复杂度是O(logn)( n是词典大小);如果用散列表，时间复杂度虽然下降了，但内存复杂度却上去了。我们需要寻找一种速度又快、内存又省的数据结构。</p>
+<h3 id="heading-11">字典树：</h3>
+<p>字典树（trie树）是一种特殊的前缀树结构。它是哈希树的一种变种，专门为字符串处理设计的数据结构。典型的应用是用于<strong>统计和排序大量的字符串</strong>（不限于字符串）因此经常被搜索引擎用于文字词频统计。优点：最大限度地减少无谓的字符串比较。Trie的核心思想是空间换时间，<strong>利用字符串的公共前缀来降低查询时间的开销</strong>以达到提高效率的目的</p>
+<p>如图为一颗字典树，红色表示结束字符串，表示一个字符串的终止。</p>
+<p>前缀树有三个基本性质：</p>
+<ul>
+<li>
+<p>根节点不包含字符，除根节点外每一个节点只包含一个字符。</p>
+</li>
+<li>
+<p>从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串。</p>
+</li>
+<li>
+<p>每个节点的所有子节点包含的字符都不相同。</p>
+</li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1657624001227.png" alt="" /></p>
+<p>当我们需要查找apple ，字典树的查找步骤：/-&gt;a-&gt;p-&gt;p-&gt;l-&gt;e,此时e为结尾，说明apple存在字典树中。</p>
+<p>当我们需要查找app，字典树的查找步骤：/-&gt;a-&gt;p-&gt;p，此时p不为字符串结尾，则app不存在字典树中。</p>
+<h4 id="heading-12">实现：</h4>
+<pre><code class="language-python">class  tree():
+    def __init__(self):
+        self.child={}
+        self.is_end=False
+class Trie():
+    def __init__(self):
+        self.root=tree()
+    def insert(self,word)-&gt;None:
+        node=self.root
+        for char in word:
+            if char not in node.child:
+                node.child[char]=tree()
+            node=node.child[char]
+        node.is_end=True
+    def search(self,word):
+        node=self.root
+        for char in word:
+            if char not in node.child:
+                return False
+            node=node.child[char]
+        return node.is_end
+trie=Trie()
+for word in ['apple','app','aww']:
+    trie.insert(word)
+print(trie.search(&quot;apple&quot;))
+print(trie.search(&quot;appl&quot;))
+</code></pre>
+<pre><code>True #trie.search(&quot;apple&quot;)
+False#trie.search(&quot;appl&quot;)
+</code></pre>
+<p>当我们需要实现<strong>中英转换</strong>的时候，就需要对字典树加上映射。需要知道自己对应的值。我们约定用值为None表示节点不对应词语，虽然这样就不能插入值为None的键了，但实现起来更简洁。</p>
+<pre><code class="language-python">class Node(object):
+    def __init__(self, value) -&gt; None:
+        self._children = {}
+        self._value = value
+
+    def _add_child(self, char, value, overwrite=False):
+        child = self._children.get(char)
+        if child is None:
+            child = Node(value)
+            self._children[char] = child
+        elif overwrite:
+            child._value = value
+        return child
+class Trie(Node):
+    def __init__(self) -&gt; None:
+        super().__init__(None)
+
+    def __contains__(self, key): #函数可以在类的实例化对象上进行 in 操作.
+        return self[key] is not None
+
+    def __getitem__(self, key):#按下标访问数列的任意一项
+        state = self
+        for char in key:
+            state = state._children.get(char)
+            if state is None:
+                return None
+        return state._value
+    def __setitem__(self, key, value):#以与键相关联的方式存储值
+        state = self
+        for i, char in enumerate(key):
+            if i &lt; len(key) - 1:
+                state = state._add_child(char, None, False)
+            else:
+                state = state._add_child(char, value, True)
+Trie=Trie()
+Trie[&quot;自然&quot;]=&quot;nature&quot;
+print(Trie[&quot;自然&quot;])
+</code></pre>
+<pre><code class="language-python">nature #output
+</code></pre>
+<h3 id="ac">AC自动机：</h3>
+<p><strong>学习AC自动机必须掌握Trie树和KMP算法</strong></p>
+<h4 id="ac-1">AC自动机概述：</h4>
+<p>AC自动机是最一种多模式匹配算法，它由贝尔实验室的两位研究人员Alfred V. Aho 和 Margaret J.Corasick 于1975年发明，几乎与KMP算法同时问世，至今仍然在模式匹配领域被广泛应用。<strong>例如：在一篇文章中，需要找到多个词汇所在的位置和出现频率。</strong></p>
+<hr/>
+<p>上节已经介绍了字典树，接下来介绍KMP算法，再进行融合介绍AC自动机。</p>
+<h4 id="kmp">KMP算法：</h4>
+<p>&ldquo;字符串A是否为字符串B的子串?如果是的话出现在B的哪些位置?&ldquo;该问题就是字符串匹配问题，字符串A称为<strong>模式串</strong>，字符串B称为<strong>主串</strong>。相对比较暴力方法（一个一个字符进行比较）的时间复杂度 <code>O(MN)</code>，KMP算法通过设定next数组而减少了匹配的趟数，能够将时间复杂度降至 <code>O(N+M)</code>节省了大量的时间。</p>
+<p>简单举一个例子：</p>
+<p>我们要在主串<strong>S：ababcabcacbab</strong>，中匹配模式串<strong>T：abcac</strong></p>
+<p>KMP的<strong>next</strong>数组我先直接写出来，具体怎么得到的，我们后面再讲：</p>
+<p><img src="https://img-blog.csdnimg.cn/20190424204336213.png" alt="在这里插入图片描述" /></p>
+<p>在第一次匹配中，从首部开始匹配：<strong>i</strong>从0开始，<strong>j</strong>从0开始。当<strong>i=2，j=2</strong>时匹配失败，接下来我们查看next数组，<strong>next[2]=0</strong>，因此我们将模式串的第一位移动到此时<strong>j</strong>的位置上来，也就是T：abcac向右移动j - next [j] = 2 位</p>
+<img src="https://img-blog.csdnimg.cn/20190424204819620.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l5enNpcg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" style="zoom:40%;" />
+<p>接下来是第二次匹配，<strong>i</strong>从2开始，<strong>j</strong>从0开始。当<strong>i=6，j=4</strong>时匹配失败，此时i不动，此时<strong>next[4]=1</strong>，因此我们将模式串的第二位移动到此时<strong>j</strong>的位置上来，也即是模式串T要相对于主串S向右移动j - next [j] = 3位，j回溯到1</p>
+<img src="https://img-blog.csdnimg.cn/2019042315275360.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l5enNpcg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" style="zoom:40%;" />
+<p>第三次匹配中，<strong>i</strong>从6开始，<strong>j</strong>从1开始。当<strong>i=10，j=5</strong>时匹配成功，返回i - j = 5，也即是在主串的第六位能够匹配成功。</p>
+<img src="https://img-blog.csdnimg.cn/20190423152939226.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l5enNpcg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" style="zoom:40%;" />
+<h5 id="kmp-1">KMP的代码实现：</h5>
+<p>通过上述例子，我们已经知道KMP主要是通过Next数组的值而进行字符串的前进，而减少匹配的趟数，可以根据此写出代码：</p>
+<pre><code class="language-python">def KMP(word,string,next):
+    i=0
+    j=0
+    while(i&lt;len(word) and j&lt;len(string)):
+        if(j==-1 or word[i]==string[j]):
+            j+=1
+            i+=1
+        else:
+            j=next[j]
+    if j==len(string):
+        return True
+    else:
+        return False
+</code></pre>
+<hr/>
+<p><strong>那么next数组该如何得出呢？</strong></p>
+<p>next数组是通过最长公共前后缀得出的。什么是最长公共前后缀呢？</p>
+<ul>
+<li>规则如下：</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mo>=</mo><mtext>“</mtext><msub><mi>p</mi><mn>0</mn></msub><msub><mi>p</mi><mn>1</mn></msub><msub><mi>p</mi><mn>2</mn></msub><mo>…</mo><msub><mi>p</mi><mrow><mi>j</mi><mo>−</mo><mn>1</mn></mrow></msub><msub><mi>p</mi><mi>j</mi></msub><mtext>”</mtext><mspace linebreak="newline"></mspace><mspace linebreak="newline"></mspace><mtext>则</mtext><mi>P</mi><mtext>串中有一个最大长度为</mtext><mi>k</mi><mo>+</mo><mn>1</mn><mtext>的公共前后缀。</mtext><mi>d</mi><mi>e</mi><mi>f</mi><mi>g</mi><mi>e</mi><mi>t</mi><mi>N</mi><mi>e</mi><mi>x</mi><mi>t</mi><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo><mo>:</mo><mi>c</mi><mo>=</mo><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mi>a</mi><mo>=</mo><mi>b</mi><mo stretchy="false">[</mo><mn>0</mn><mo>:</mo><mi>i</mi><mo stretchy="false">]</mo><mi>f</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>i</mi><mi>n</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>g</mi><mi>e</mi><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mi>l</mi><mi>e</mi><mi>n</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>:</mo><mi>r</mi><mi>e</mi><mi>s</mi><mo>=</mo><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>i</mi><mi>f</mi><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mo>&gt;</mo><mi>r</mi><mi>e</mi><mi>s</mi><mi>e</mi><mi>l</mi><mi>s</mi><mi>e</mi><mi>r</mi><mi>e</mi><mi>s</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>c</mi><mtext>当</mtext><msub><mi>p</mi><mi>k</mi></msub><mo>=</mo><msub><mi>p</mi><mi>j</mi></msub><mtext>时，</mtext><mi>n</mi><mi>e</mi><mi>x</mi><mi>t</mi><mo stretchy="false">[</mo><mi>j</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi>n</mi><mi>e</mi><mi>x</mi><mi>t</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>+</mo><mn>1</mn><mo>=</mo><mi>k</mi><mo>+</mo><mn>1</mn><mtext>，代表字符</mtext><mi>E</mi><mtext>前的模式串中，</mtext><mspace linebreak="newline"></mspace><mtext>有长度</mtext><mi>k</mi><mo>+</mo><mn>1</mn><mtext>的最大公共前后缀。</mtext><mo stretchy="false">!</mo><mo stretchy="false">[</mo><mtext>在这里插入图片描述</mtext><mo stretchy="false">]</mo><mo stretchy="false">(</mo><mi>h</mi><mi>t</mi><mi>t</mi><mi>p</mi><mi>s</mi><mo>:</mo><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>i</mi><mi>m</mi><mi>g</mi><mo>−</mo><mi>b</mi><mi>l</mi><mi>o</mi><mi>g</mi><mi mathvariant="normal">.</mi><mi>c</mi><mi>s</mi><mi>d</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>g</mi><mi mathvariant="normal">.</mi><mi>c</mi><mi>n</mi><mi mathvariant="normal">/</mi><mn>20190424214221535.</mn><mi>p</mi><mi>n</mi><mi>g</mi><mo stretchy="false">?</mo><mi>x</mi><mo>−</mo><mi>o</mi><mi>s</mi><mi>s</mi><mo>−</mo><mi>p</mi><mi>r</mi><mi>o</mi><mi>c</mi><mi>e</mi><mi>s</mi><mi>s</mi><mo>=</mo><mi>i</mi><mi>m</mi><mi>a</mi><mi>g</mi><mi>e</mi><mi mathvariant="normal">/</mi><mi>w</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>r</mi><mi>k</mi><mo separator="true">,</mo><mi>t</mi><mi>y</mi><mi>p</mi><msub><mi>e</mi><mi>Z</mi></msub><mi>m</mi><mi>F</mi><mi>u</mi><mi>Z</mi><mn>3</mn><mi>p</mi><mi>o</mi><mi>Z</mi><mi>W</mi><mn>5</mn><mi>n</mi><mi>a</mi><mi>G</mi><mi>V</mi><mi>p</mi><mi>d</mi><mi>G</mi><mi>k</mi><mo separator="true">,</mo><mi>s</mi><mi>h</mi><mi>a</mi><mi>d</mi><mi>o</mi><msub><mi>w</mi><mn>1</mn></msub><mn>0</mn><mo separator="true">,</mo><mi>t</mi><mi>e</mi><mi>x</mi><msub><mi>t</mi><mi>a</mi></msub><mi>H</mi><mi>R</mi><mn>0</mn><mi>c</mi><mi>H</mi><mi>M</mi><mn>6</mn><mi>L</mi><mi>y</mi><mn>9</mn><mi>i</mi><mi>b</mi><mi>G</mi><mn>9</mn><mi>n</mi><mi>L</mi><mi>m</mi><mi>N</mi><mi>z</mi><mi>Z</mi><mi>G</mi><mn>4</mn><mi>u</mi><mi>b</mi><mi>m</mi><mi>V</mi><mn>0</mn><mi>L</mi><mn>3</mn><mi>l</mi><mn>5</mn><mi>e</mi><mi>n</mi><mi>N</mi><mi>p</mi><mi>c</mi><mi>g</mi><mo>=</mo><mo>=</mo><mo separator="true">,</mo><mi>s</mi><mi>i</mi><mi>z</mi><msub><mi>e</mi><mn>1</mn></msub><mn>6</mn><mo separator="true">,</mo><mi>c</mi><mi>o</mi><mi>l</mi><mi>o</mi><msub><mi>r</mi><mi>F</mi></msub><mi>F</mi><mi>F</mi><mi>F</mi><mi>F</mi><mi>F</mi><mo separator="true">,</mo><msub><mi>t</mi><mn>7</mn></msub><mn>0</mn><mo stretchy="false">)</mo><mtext>当</mtext><msub><mi>p</mi><mi>k</mi></msub><mo stretchy="false">!</mo><mo>=</mo><msub><mi>p</mi><mi>j</mi></msub><mtext>时，说明</mtext><msub><mi>p</mi><mn>0</mn></msub><msub><mi>p</mi><mn>1</mn></msub><mo>…</mo><msub><mi>p</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><msub><mi>p</mi><mi>k</mi></msub><mo stretchy="false">!</mo><mo>=</mo><msub><mi>p</mi><mrow><mi>j</mi><mo>−</mo><mi>k</mi></mrow></msub><msub><mi>p</mi><mrow><mi>j</mi><mo>−</mo><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>…</mo><msub><mi>p</mi><mrow><mi>j</mi><mo>−</mo><mn>1</mn></mrow></msub><msub><mi>p</mi><mi>j</mi></msub><mtext>，</mtext><mspace linebreak="newline"></mspace><mtext>这时</mtext><mi>A</mi><mi>B</mi><mi>C</mi><mtext>与</mtext><mi>A</mi><mi>B</mi><mi>D</mi><mtext>不相同，也就是字符</mtext><mi>E</mi><mtext>前的模式串中没有长度为</mtext><mi>k</mi><mo>+</mo><mn>1</mn><mtext>的最大公共前后缀，</mtext><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">P=“p_0p_1p_2 …p_{j-1}p_j”\\
+\\则P串中有一个最大长度为k+1的公共前后缀。
+
+
+
+
+
+
+
+
+
+
+
+
+def getNext(b):
+     c=[-1,0]
+         a=b[0:i]
+         for time in range(1,len(a)):
+                 res=time if time&gt;res else res
+     return c
+
+
+
+
+当p_k=p_j时，next[j + 1] = next[j] + 1 = k + 1，代表字符E前的模式串中，\\有长度k+1 的最大公共前后缀。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190424214221535.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l5enNpcg==,size_16,color_FFFFFF,t_70)
+当p_k ! = p_j时，说明p_0p_1…p_{k-1}p_k != p_{j-k}p_{j-k+1}…p_{j-1}p_j，\\这时ABC与ABD不相同，也就是字符E前的模式串中没有长度为k+1的最大公共前后缀，\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord">“</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord">”</span></span><span class="mspace newline"></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">则</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord cjk_fallback">串中有一个最大长度为</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord cjk_fallback">的公共前后缀。</span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.109em;">tN</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">]</span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">b</span><span class="mopen">[</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord mathnormal" style="margin-right:0.0278em;">or</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mord mathnormal">in</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">an</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">e</span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">es</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">ese</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal" style="margin-right:0.0278em;">ser</span><span class="mord mathnormal" style="margin-right:0.0278em;">esr</span><span class="mord mathnormal">e</span><span class="mord mathnormal">t</span><span class="mord mathnormal">u</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">n</span><span class="mord mathnormal">c</span><span class="mord cjk_fallback">当</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">时，</span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">1</span><span class="mord cjk_fallback">，代表字符</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord cjk_fallback">前的模式串中，</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">有长度</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord cjk_fallback">的最大公共前后缀。</span><span class="mclose">!</span><span class="mopen">[</span><span class="mord cjk_fallback">在这里插入图片描述</span><span class="mclose">]</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mord mathnormal">ttp</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">//</span><span class="mord mathnormal">im</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord">.</span><span class="mord mathnormal">cs</span><span class="mord mathnormal">d</span><span class="mord mathnormal">nim</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord">.</span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord">/20190424214221535.</span><span class="mord mathnormal">p</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mclose">?</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">oss</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">ocess</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ima</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">e</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal" style="margin-right:0.0278em;">er</span><span class="mord mathnormal">ma</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord mathnormal">p</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">Z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal">m</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal">u</span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span><span class="mord">3</span><span class="mord mathnormal">p</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord">5</span><span class="mord mathnormal">na</span><span class="mord mathnormal">G</span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord mathnormal">G</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">ha</span><span class="mord mathnormal">d</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.0813em;">cH</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord">6</span><span class="mord mathnormal">L</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord">9</span><span class="mord mathnormal">ib</span><span class="mord mathnormal">G</span><span class="mord">9</span><span class="mord mathnormal">n</span><span class="mord mathnormal">L</span><span class="mord mathnormal">m</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span><span class="mord mathnormal">G</span><span class="mord">4</span><span class="mord mathnormal">u</span><span class="mord mathnormal" style="margin-right:0.2222em;">bmV</span><span class="mord">0</span><span class="mord mathnormal">L</span><span class="mord">3</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord">5</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">p</span><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">==</span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">6</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">co</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">F</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">0</span><span class="mclose">)</span><span class="mord cjk_fallback">当</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">!</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">时，说明</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">!</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">，</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">这时</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord cjk_fallback">与</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord cjk_fallback">不相同，也就是字符</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord cjk_fallback">前的模式串中没有长度为</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">1</span><span class="mord cjk_fallback">的最大公共前后缀，</span></span><span class="mspace newline"></span></span></span></span><p><img src="https://img-blog.csdnimg.cn/20190424214743932.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l5enNpcg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" /></p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 847: … self.tail=0   #̲尾标志
+        se…" style="color:#cc0000"><span class="cjk_fallback">也是D的话，那么最大公共前后缀长度就为k’+1。\\
+\\从而next[j+1] = k’ + 1 = next[k’] + 1。否则前缀没有D，next[j+1] = 0。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190424221058306.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l5enNpcg==,size_16,color_FFFFFF,t_70)
+在p_k != p_j时，k = next[k]，用p_{next[k]}去跟p_j继续匹配。\\
+的已匹配串，说明p_k字符前有一段长度为next[k]的最大公共前后缀（蓝色的那段）。\\
+那么我们只能找更短的最大公共前后缀，此时因为p_k和p_{next[k]}前面的蓝色串已完全匹配，\\
+p_{next[next[k]…]}去跟p_j继续匹配,直到找到长度更短公共前后缀。
+综上，优化后的代码如下：时间复杂度降为`O(N)`
+```python
+    j=0
+    next=[-1 for i in range(len(b))]
+        if(k==-1 or b[j]==b[k]):
+            j+=1
+        else:
+    return next
+
+
+
+
+![](https://voluntexi.github.io//post-images/1657624055865.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class node:
+        self.char=char
+        self.tail=0   #尾标志
+        self.childValue=[] #子结点的值
+    def __init__(self):
+        self.count=0
+        self.count+=1
+        for i in strKey:
+                child=node(i)
+                p.childValue.append(i)
+            else:
+        p.tail=self.count
+    def acAutomation(self):
+        while len(p):  #BFS
+            p.remove(temp)
+                if temp==self.root:  #若根的子结点fail指向自己
+                else:
+                    while q:
+                            i.fail=q.child[q.childValue.index(i.char)]
+                        q=q.fail #否则继续循环
+                        i.fail=self.root
+    #模式匹配
+        p=self.root
+        for i in strMode:
+                p=p.fail #若字符不在子节点中且不为根节点，循环
+                p=p.child[p.childValue.index(i)]
+                p=self.root
+            while temp is not  self.root: #若此结点不为根节点且fail存在则匹配成功
+                    if temp.tail not in cnt:
+                        cnt[temp.tail]=1
+                        cnt[temp.tail]+=1
+        return cnt
+dic=[&#x27;南京&#x27;,&#x27;南京市&#x27;,&#x27;长江&#x27;,&#x27;大桥&#x27;,&#x27;长江大桥&#x27;]
+    ac.Insert(i)
+print(ac.runkmp(&quot;南京市长江大桥&quot;))
+
+{1: 1, 2: 1, 3: 1, 5: 1, 4: 1}
+#南京1次，南京市1次，长江1次，长江大桥1次，大桥1次</span></span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/zhong-wen-fen-ci-fang-fa-zong-jie/">
+                    <h3 class="post-title">
+                        中文分词方法总结
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

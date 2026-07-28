@@ -1,0 +1,524 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>朴素贝叶斯在sklearn中的实现 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="朴素贝叶斯在sklearn中的实现 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="朴素贝叶斯方法是基于贝叶斯定理的一组有监督学习算法，给定一个类别y和一个从x1x_1x1​到xnx_nxn​的相关的特征向量， 贝叶斯定理公式表示如下:">
+<link rel="canonical" href="https://voluntexi.github.io/post/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"朴素贝叶斯在sklearn中的实现","url":"https://voluntexi.github.io/post/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/","description":"朴素贝叶斯方法是基于贝叶斯定理的一组有监督学习算法，给定一个类别y和一个从x1x_1x1​到xnx_nxn​的相关的特征向量， 贝叶斯定理公式表示如下:","image":"https://img2.baidu.com/it/u=2188007372,3519858780\u0026fm=253\u0026fmt=auto\u0026app=138\u0026f=JPEG?w=500\u0026h=152","datePublished":"2022-06-25T18:50:48+08:00","dateModified":"2026-05-22T18:33:21+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/","name":"朴素贝叶斯在sklearn中的实现","position":2}]}</script>
+<meta property="og:title" content="朴素贝叶斯在sklearn中的实现">
+<meta property="og:description" content="朴素贝叶斯方法是基于贝叶斯定理的一组有监督学习算法，给定一个类别y和一个从x1x_1x1​到xnx_nxn​的相关的特征向量， 贝叶斯定理公式表示如下:">
+<meta property="og:url" content="https://voluntexi.github.io/post/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://img2.baidu.com/it/u=2188007372,3519858780&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=152">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/">
+<meta name="twitter:title" content="朴素贝叶斯在sklearn中的实现">
+<meta name="twitter:description" content="朴素贝叶斯方法是基于贝叶斯定理的一组有监督学习算法，给定一个类别y和一个从x1x_1x1​到xnx_nxn​的相关的特征向量， 贝叶斯定理公式表示如下:">
+<meta name="twitter:image" content="https://img2.baidu.com/it/u=2188007372,3519858780&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=152">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        朴素贝叶斯在sklearn中的实现
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-06-25
+                        </span>
+                        <span>
+                            20 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://img2.baidu.com/it/u=2188007372,3519858780&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=152" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>朴素贝叶斯方法是基于贝叶斯定理的一组有监督学习算法，给定一个类别y和一个从<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>到<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">x_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>的相关的特征向量， 贝叶斯定理公式表示如下:</p>
+<!-- more -->
+<p><img src="https://voluntexi.github.io//post-images/1757830344612.jpg" alt="" /></p>
+<p>假设每个特征之间都相互独立：<br />
+<img src="https://voluntexi.github.io//post-images/1757830349668.jpg" alt="" /></p>
+<p>于是公式可以简化为<br />
+<img src="https://voluntexi.github.io//post-images/1757830361006.jpg" alt="" /></p>
+<p>由于在给定的输入中是一个常量，我们使用下面的分类规则:</p>
+<p><img src="https://voluntexi.github.io//post-images/1757830377178.jpg" alt="" /></p>
+<p>可以使用最大后验概率来估计 P(y)和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mi mathvariant="normal">/</mi><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(x_i /y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> ; 前者是训练集中类别 y的相对频率。</p>
+<p><strong>虽然朴素贝叶斯分类的效果很好，但却不是好的估计器，所以不能太过于重视从 <code>predict_proba</code> 输出的概率。</strong></p>
+<h2 id="heading">朴素贝叶斯的分类</h2>
+<p>在sklearn中，一共有3个朴素贝叶斯的分类算法，分别是GaussianNB,MultinomialNB和BernoulliNB</p>
+<h3 id="gaussiannb">GAUSSIANNB（高斯贝叶斯）</h3>
+<p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB"><code>GaussianNB</code></a> 实现了运用于分类的高斯朴素贝叶斯算法。特征的可能性(即概率)服从正态分布:</p>
+<p><img src="https://voluntexi.github.io//post-images/1757830425691.jpg" alt="" /></p>
+<p>其中，σ_y参数和μ_y 使用最大似然法估计。</p>
+<h4 id="sklearngaussiannb">通过鸢尾花数据集作为例子，使用sklearn实现GAUSSIANNB</h4>
+<p><a href="https://pan.baidu.com/s/1pNmPMds_4j253lQhPbcD3Q">鸢尾花数据集</a><br />
+提取码：1234</p>
+<h5 id="heading-1">首先对数据集进行提取，输出前几行进行查看：</h5>
+<pre><code class="language-python">column_names=['SepalLength','SepalWidth','PetalLength','PetalWidth','Species']
+data=pandas.read_csv('./iris_training.csv',header=0,names=column_names)
+print(data.head(3))
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>SepalLength</th>
+<th>SepalWidth</th>
+<th>PetalLength</th>
+<th>PetalWidth</th>
+<th>Species</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.4</td>
+<td>2.8</td>
+<td>5.6</td>
+<td>2.2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>5.0</td>
+<td>2.3</td>
+<td>3.3</td>
+<td>1.0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4.9</td>
+<td>2.5</td>
+<td>4.5</td>
+<td>1.7</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>鸢尾花数据集的标签一共是3种，代表三种鸢尾花</p>
+<p>测试集给出一朵花的4个特征，判断是属于哪类鸢尾花</p>
+<h5 id="25">接下来切分数据集，前25行为训练数据，其余为测试数据</h5>
+<pre><code class="language-python">npData=np.array(data)
+train_data=npData[:25,0:4]
+train_label=npData[:25,4]
+predict_data=npData[25:,0:4]
+predict_label=npData[25:,4]
+Xtrain=train_data
+Ytrain=train_label
+Xtest=predict_data
+Ytest=predict_label
+</code></pre>
+<h5 id="heading-2">接下来调用相关函数进行计算</h5>
+<pre><code class="language-python">clf=GaussianNB()
+clf.fit(Xtrain,Ytrain)
+predict = clf.predict(Xtest)
+print(predict)
+prob = clf.predict_proba(Xtest)
+print(prob)
+print(clf.score(Xtest,Ytest))
+</code></pre>
+<p>其中：</p>
+<p>clf.predict() 输出为每一组数据进行分类的类别</p>
+<pre><code class="language-python">[0. 1. 2. 1. 2. 1. 1. 1. 2. 2. 2. 2. 2. 0. 0. 2. 2. 2. 0. 0. 1. 0. 2. 0.
+ 1. 0. 1. 1. 0. 1. 2. 2. 2. 2. 1. 1. 2. 2. 2. 1. 2. 0. 2. 2. 0. 0. 1. 0.
+ 2. 2. 0. 1. 1. 1. 2. 0. 1. 1. 1. 2. 0. 1. 1. 1. 0. 2. 1. 0. 0. 2. 0. 0.
+ 3. 2. 0. 0. 1. 0. 1. 0. 0. 0. 0. 1. 0. 2. 1. 0. 2. 0. 1. 1. 0. 0. 1.]
+</code></pre>
+<p>clf.predict_proba() 输出为预测的准确率</p>
+<pre><code class="language-python">0.968421052631579
+</code></pre>
+<p>clf.score(Xtest,Ytest)输出为每组数据在各类别的概率</p>
+<pre><code class="language-python">[[1.00000000e+000 1.03276921e-014 1.04755718e-021]
+ [1.52220777e-067 9.99638109e-001 3.61891415e-004]
+ [1.52662245e-147 7.71337608e-002 9.22866239e-001]
+ [3.46657230e-100 9.79212770e-001 2.07872298e-002]
+ [1.65108983e-138 1.49010121e-001 8.50989879e-001]
+ [2.18363297e-090 9.96165314e-001 3.83468595e-003]
+ [6.60011077e-030 9.99998455e-001 1.54475084e-006]
+ [3.03504780e-101 9.22883269e-001 7.71167310e-002]
+ [6.52533913e-193 7.26844383e-005 9.99927316e-001]
+ [2.26774333e-131 2.05158029e-001 7.94841971e-001]
+ [9.67885119e-220 6.61707470e-007 9.99999338e-001]
+ [3.79233963e-160 2.17314809e-003 9.97826852e-001]
+...]
+</code></pre>
+<h3 id="multinomialnb">MULTINOMIALNB(多项分布朴素贝叶斯)</h3>
+<p>它的假设特征是由一个简单多项式分布生成。多项分布可以描述各种类型样本出行次数的频率，因此多项式朴素贝叶斯非常适合用于描述出现次数或者出现次数比例的特征。<br />
+该模型常用于文本分类，特征表示的是次数，例如某个词语的出现次数</p>
+<p>分布参数由每类 y的 <span class="katex-error" title="ParseError: KaTeX parse error: Double subscript at position 9: θ_y=(θ_y_̲1,...,θ_yn )" style="color:#cc0000">θ_y=(θ_y_1,...,θ_yn )</span> 向量决定式中n是特征的数量(对于文本分类，是词汇量的大小) <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>y</mi></msub><mi>i</mi></mrow><annotation encoding="application/x-tex">θ_yi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal">i</span></span></span></span>是样本中属于类 y 中特征 i 概率 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(x_i|y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> 。</p>
+<p>参数<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>y</mi></msub></mrow><annotation encoding="application/x-tex">θ_y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 使用平滑过的最大似然估计法来估计，即相对频率计数:<br />
+<img src="https://voluntexi.github.io//post-images/1757830518811.jpg" alt="" /></p>
+<p>式中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>y</mi></msub><mi>i</mi></mrow><annotation encoding="application/x-tex">N_yi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal">i</span></span></span></span>是 训练集 T 中特征 i 在类 y 中出现的次数，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>y</mi></msub></mrow><annotation encoding="application/x-tex">N_y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 是类 y 中出现所有特征的计数总和。</p>
+<p>先验平滑因子α≥0 为在学习样本中没有出现的特征而设计，以防在将来的计算中出现0概率输出。 把 α=1被称为拉普拉斯平滑，而 α&lt; 1 被称为Lidstone平滑。</p>
+<h4 id="sklearnmultinomialnb">通过新闻分类数据集作为例子，使用sklearn实现MULTINOMIALNB</h4>
+<p><a href="https://pan.baidu.com/s/1580VyM0LqxsAjxYsXlhLuA">新闻分类数据集</a><br />
+提取码：sky5</p>
+<p>所用新闻数据集包含 train 训练集, test 测试集 数据两个文件夹，两个文件夹下各包含 四个子文件夹，代表1，2，3，4 四类新闻的文件，每条新闻的txt 文件存放在此四类文件夹中。</p>
+<h5 id="heading-3">首先对数据集进行提取</h5>
+<pre><code class="language-python">trainData1=&quot;./text/train/1&quot;
+trainData2=&quot;./text/train/2&quot;
+trainData3=&quot;./text/train/3&quot;
+trainData4=&quot;./text/train/4&quot;
+newsData1='./text/test/1'
+newsData2='./text/test/2'
+newsData3='./text/test/3'
+newsData4='./text/test/4'
+def preData(trainData,type):
+    files=os.listdir(trainData)
+    file_news=[]
+    for file in files:
+        path=trainData+'/'+file
+        with open(path,'r') as f:
+            news=f.readlines()
+            file_news.append(news[0].strip())
+    df=pandas.DataFrame({'news':file_news,'Newstype':[type for i in range(len(file_news))]})
+    return df
+trainType1=preData(trainData1,1)
+trainType2=preData(trainData2,2)
+trainType3=preData(trainData3,3)
+trainType4=preData(trainData4,4)
+trainData=pandas.concat([trainType1,trainType2,trainType3,trainType4])
+train_size=len(trainData)
+test_data=pandas.concat([preData(newsData1,1),preData(newsData2,2),preData(newsData3,3),preData(newsData4,4)])
+
+</code></pre>
+<p>接下来对训练数据和测试数据进行去重，重置索引</p>
+<pre><code class="language-python">test_data=test_data.drop_duplicates()
+testData=test_data.reset_index(drop=True)
+train_data=train_data.drop_duplicates()
+trainData=train_data.reset_index(drop=True)
+</code></pre>
+<p>查看数据</p>
+<p><img src="https://voluntexi.github.io//post-images/1656154516853.png" alt="" /></p>
+<h5 id="jiebatf-idf">接下来对数据进行jieba分词，提取tf-idf值，并转为向量</h5>
+<pre><code class="language-python">with open('./stopword.txt','r') as stop:
+    stopwords=stop.readlines()
+stopwords=[i.strip() for i in stopwords]
+def cutword(word):
+    res=[]
+    jie=jieba.lcut(word)
+    for i in jie:
+        if(i not in stopwords) and (i!=''):
+            res.append(i.strip())
+    return res
+testData.news=testData.news.apply(cutword)
+testData.news=testData.news.apply(lambda x: ' '.join([i for i in x if i !='']))
+trainData.news=trainData.news.apply(cutword)
+trainData.news=trainData.news.apply(lambda x: ' '.join([i for i in x if i !='']))
+#apply() 函数可以作用于整个 DataFrame，功能也是自动遍历整个DataFrame,
+# 对每一个元素运行指定的函数。
+tf_idf=TfidfVectorizer()
+train_tf_idfMaritx=tf_idf.fit_transform(trainData.news)
+test_tf_idfMaritx=tf_idf.transform(testData.news)
+train_tf_idfarray=train_tf_idfMaritx.toarray()
+test_tf_idfarray=test_tf_idfMaritx.toarray()
+trainData=np.array(trainData)
+testData=np.array(testData)
+</code></pre>
+<p>分词及TF-IDF如下<br />
+<img src="https://voluntexi.github.io//post-images/1656154531311.png" alt="" /></p>
+<p><img src="https://voluntexi.github.io//post-images/1656154534541.png" alt="" /></p>
+<h5 id="multinomialnb-1">切分数据，进行MULTINOMIALNB</h5>
+<pre><code class="language-python">x_train=train_tf_idfarray
+y_train=trainData[:,1]
+x_test=test_tf_idfarray
+y_test=testData[:,1]
+MNB=MultinomialNB(alpha=0.1)
+MNB.fit(x_train,y_train.astype('int'))
+MNB.predict(x_test)
+prob = MNB.predict_proba(x_test)
+print(prob)
+predict = MNB.predict(x_test)
+</code></pre>
+<pre><code class="language-python">模型预测正确率为：0.898989898989899
+</code></pre>
+<h5 id="heading-4">评估预测效果</h5>
+<pre><code class="language-python">mat = confusion_matrix(y_test.astype('int'),predict) #混淆矩阵
+df = pd.DataFrame(mat,columns=[1,2,3,4],index=[1,2,3,4])
+report_MNB = classification_report(y_test.astype('int'),predict)
+print(report_MNB)
+</code></pre>
+<p>混淆矩阵：</p>
+<pre><code class="language-python">[[ 35   1   2   0]
+ [  4 105   3   1]
+ [  0   2  29   0]
+ [  0   4   3   9]]
+</code></pre>
+<pre><code class="language-python">              precision    recall  f1-score   support
+
+           1       0.90      0.92      0.91        38
+           2       0.94      0.93      0.93        113
+           3       0.78      0.94      0.85        31
+           4       0.90      0.56      0.69        16
+
+    accuracy                           0.90       198
+   macro avg       0.88      0.84      0.85       198
+weighted avg       0.90      0.90      0.90       198
+</code></pre>
+<p>模型对 1、2、3 类的 预测效果较好而对第四类预测效果不佳，是因为训练数据集中第四类数据太少。</p>
+<p>因此，在使用MULTINOMIALNB时候要注意让各类别文本数量接近</p>
+<h3 id="bernoullinb">BERNOULLINB（伯努利贝叶斯）</h3>
+<p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.BernoulliNB.html#sklearn.naive_bayes.BernoulliNB"><code>BernoulliNB</code></a> 实现了用于多重伯努利分布数据的朴素贝叶斯训练和分类算法，即有多个特征，但每个特征 都假设是一个二元 (Bernoulli, boolean) 变量。 因此，这类算法要求样本以二元值特征向量表示；如果样本含有其他类型的数据， 一个 <code>BernoulliNB</code> 实例会将其二值化(取决于 <code>binarize</code> 参数)。</p>
+<p>伯努利朴素贝叶斯的决策规则基于:</p>
+<p><img src="https://voluntexi.github.io//post-images/1757830552075.jpg" alt="" /></p>
+<p>与多项分布朴素贝叶斯的规则不同 伯努利朴素贝叶斯明确地惩罚类 y 中没有出现作为预测因子的特征 i ，而多项分布分布朴素贝叶斯只是简单地忽略没出现的特征。</p>
+<h4 id="sklearnbernoullinb">通过识别手写数字数据集作为例子，使用sklearn实现BERNOULLINB</h4>
+<p><a href="http://yann.lecun.com/exdb/mnist/">MNIST数据集</a></p>
+<p>它包含了四个部分:</p>
+<ul>
+<li>Training set images: train-images-idx3-ubyte.gz (9.9 MB, 解压后 47 MB, 包含 60,000 个样本)</li>
+<li>Training set labels: train-labels-idx1-ubyte.gz (29 KB, 解压后 60 KB, 包含 60,000 个标签)</li>
+<li>Test set images: t10k-images-idx3-ubyte.gz (1.6 MB, 解压后 7.8 MB, 包含 10,000 个样本)</li>
+<li>Test set labels: t10k-labels-idx1-ubyte.gz (5KB, 解压后 10 KB, 包含 10,000 个标签)</li>
+</ul>
+<h5 id="heading-5">数据的读取与存储</h5>
+<p>将下载好的数据解压带代码目录下即可。<br />
+数据文件时二进制格式的，所以要按字节读取。</p>
+<pre><code class="language-python">import struct
+from PIL import Image
+from array import array as pyarray
+from numpy import array, int8, uint8, zeros
+trainImagePath='./手写数字数据集/train-images.idx3-ubyte'
+testImagePath='./手写数字数据集/t10k-images.idx3-ubyte'
+trainLabelPath='./手写数字数据集/train-labels.idx1-ubyte'
+testLabelPath='./手写数字数据集/t10k-labels.idx1-ubyte'
+def readData(imagePath,labelPath):
+    digits = np.arange(10)
+    data = open(labelPath, 'rb')
+    magic_nr, size = struct.unpack(&quot;&gt;II&quot;, data.read(8))
+    label=pyarray('b',data.read())
+    data.close()
+    data2 = open(imagePath, 'rb')
+    magic_nr, size, rows, cols = struct.unpack(&quot;&gt;IIII&quot;, data2.read(16))
+    img = pyarray(&quot;B&quot;, data2.read())
+    data2.close()
+    ind = [k for k in range(size) if label[k] in digits]
+    N = len(ind)
+    images = zeros((N, rows * cols), dtype=uint8)
+    labels = zeros((N, 1), dtype=int8)
+    for i in range(len(ind)):
+        images[i] = array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((1, rows * cols))
+        labels[i] = label[ind[i]]
+    return images,labels
+</code></pre>
+<p>读取后的image和label数据都为二维数组，image里每个元素为784维的向量，对应为28*28的图形</p>
+<p><img src="https://voluntexi.github.io//post-images/1656239899379.png" alt="" /></p>
+<h5 id="heading-6">将数据通过图片表示</h5>
+<p>接下来将784维的向量转化为28*28的二维数组，再将二维数组通过灰度图表示出来</p>
+<p>下面将前五个元素进行灰度图的转化</p>
+<pre><code class="language-python">def showImage(image,label):
+    for i in range(5):
+        a = np.array(image[i])
+        a=a.reshape((28,28))
+        im = Image.fromarray(a)
+        im = im.convert('L')  # 这样才能转为灰度图，如果是彩色图则改L为‘RGB’
+        im.save('finger{}.png'.format(label[i]))
+</code></pre>
+<p>结果如下：</p>
+<p><img src="https://voluntexi.github.io//post-images/1656239934281.png" alt="" /></p>
+<h5 id="bernoullinb-1">接下来调用BernoulliNB进行预测</h5>
+<pre><code class="language-python">trainImage,trainLabel=readData(trainImagePath,trainLabelPath)
+trainLabel=np.array(trainLabel).reshape(-1)#将二维数组转为一维
+testImage,testLabel=readData(testImagePath,testLabelPath)
+# showImage(trainImage,trainLabel)
+bnb=BernoulliNB()
+bnb.fit(trainImage,trainLabel)
+predict=bnb.predict(testImage)
+print(&quot;accuracy_score: %.4lf&quot; % accuracy_score(predict,testLabel))
+print(&quot;Classification report for classifier %s:\n%s\n&quot; % (bnb, classification_report(testLabel, predict)))
+</code></pre>
+<pre><code class="language-python">Classification report for classifier BernoulliNB():
+              precision    recall  f1-score   support
+
+           0       0.91      0.91      0.91       980
+           1       0.90      0.96      0.93      1135
+           2       0.89      0.83      0.86      1032
+           3       0.76      0.84      0.80      1010
+           4       0.83      0.81      0.82       982
+           5       0.82      0.70      0.76       892
+           6       0.89      0.89      0.89       958
+           7       0.93      0.85      0.89      1028
+           8       0.75      0.78      0.77       974
+           9       0.75      0.84      0.79      1009
+
+    accuracy                           0.84     10000
+   macro avg       0.84      0.84      0.84     10000
+weighted avg       0.84      0.84      0.84     10000
+</code></pre>
+<pre><code class="language-python">accuracy_score: 0.8413
+</code></pre>
+<h2 id="heading-7">总结</h2>
+<p>朴素贝叶斯推断的优点：</p>
+<ul>
+<li>生成式模型，通过计算概率来进行分类，可以用来处理多分类问题</li>
+<li>对小规模的数据表现很好，算法简单，适合增量式训练</li>
+</ul>
+<p>朴素贝叶斯推断的缺点：</p>
+<ul>
+<li>对输入数据的表达形式很敏感</li>
+<li>由于朴素贝叶斯的“朴素”特点，所以会带来精确率上的损失</li>
+<li>需要计算先验概率，分类决策存在错误率</li>
+<li>并不是好的估计器</li>
+</ul>
+<p>三种朴素贝叶斯的适用场景：</p>
+<ul>
+<li>GAUSSIANNB是一种特殊类型的NB算法,它特别用于当特征具有连续值时，同时假定所有特征符合高斯分布，比如通过升高和体重预测性别中，由于升高和体重特征值都是连续的数值。</li>
+<li>MULTINOMIALNB多用于离散特征分类，例如文本分类单词统计，以出现的次数作为特征值。</li>
+<li>BERNOULLINB与多项式贝叶斯模型一样，伯努利朴素贝叶斯适用于离散特征情况，只是伯努利模型中每个特征的取值必须为0或1。例如在文档中特征是单词是否出现</li>
+</ul>
+<h2 id="heading-8">参考</h2>
+<ul>
+<li><a href="https://blog.csdn.net/weixin_44264662/article/details/90700399">《机器学习实战》学习笔记（五） ： sklearn中关于朴素贝叶斯的用法</a></li>
+<li><a href="https://www.sklearncn.cn/10/">朴素贝叶斯</a></li>
+<li><a href="https://blog.csdn.net/weixin_47176703/article/details/124304692">python-新闻文本分类详细案例</a></li>
+<li><a href="https://blog.csdn.net/haohuang_ch/article/details/81297410">sklearn之分类算法与手写数字识别</a></li>
+</ul>
+
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/b-zhan-shi-pin-he-yong-hu-ping-lun-pa-chong/">
+                    <h3 class="post-title">
+                        B站视频和用户评论爬虫
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

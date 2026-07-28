@@ -1,0 +1,239 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>中文分词方法总结 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="中文分词方法总结 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="本文介绍的是基于统计的中文分词的方法。">
+<link rel="canonical" href="https://voluntexi.github.io/post/zhong-wen-fen-ci-fang-fa-zong-jie/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"中文分词方法总结","url":"https://voluntexi.github.io/post/zhong-wen-fen-ci-fang-fa-zong-jie/","description":"本文介绍的是基于统计的中文分词的方法。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg\u0026refer=http%3A%2F%2Fwww.sina.com\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1660031375\u0026t=70d0b9f6fcbc2196016de2665a02c1d2","datePublished":"2022-07-10T15:43:23+08:00","dateModified":"2026-05-22T18:33:21+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/zhong-wen-fen-ci-fang-fa-zong-jie/","name":"中文分词方法总结","position":2}]}</script>
+<meta property="og:title" content="中文分词方法总结">
+<meta property="og:description" content="本文介绍的是基于统计的中文分词的方法。">
+<meta property="og:url" content="https://voluntexi.github.io/post/zhong-wen-fen-ci-fang-fa-zong-jie/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/zhong-wen-fen-ci-fang-fa-zong-jie/">
+<meta name="twitter:title" content="中文分词方法总结">
+<meta name="twitter:description" content="本文介绍的是基于统计的中文分词的方法。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        中文分词方法总结
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-07-10
+                        </span>
+                        <span>
+                            6 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fww1.sinaimg.cn%2Flarge%2F6cbb8645jw1eqkariq2ijj20se0sik3a.jpg&amp;refer=http%3A%2F%2Fwww.sina.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1660031375&amp;t=70d0b9f6fcbc2196016de2665a02c1d2" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>本文介绍的是基于统计的中文分词的方法。</p>
+<!--more-->
+<h2 id="heading">语言模型：</h2>
+<p>语言模型(Language Model，LM)指的就是对语言珍象的数学抽象。确切来讲，给定一个句子w，语言模型就是计算句子的出现概率p(w)的模型我们无法枚举全人类在过去、现在和将来生成的所有句子，只能采样一个小型的样本空间，程为语料库。于是，这个概率分布就统计自某个人工标注而成的语料库。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>句子</mtext><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>w</mi><mn>2</mn></msub><msub><mi>w</mi><mn>3</mn></msub><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><msub><mi>w</mi><mi>k</mi></msub><mi>E</mi><mi>x</mi><mi>a</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mo>:</mo><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">句子=w_1w_2w_3...w_k
+
+
+Example:\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">句子</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">...</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">x</span><span class="mord mathnormal">am</span><span class="mord mathnormal" style="margin-right:0.0197em;">pl</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span><span class="mspace newline"></span></span></span></span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><h3 id="heading-1">马尔可夫链与二元语法</h3>
+<p>在语言模型的基础上假设该词出现的概率被前一个词所决定</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>因此语言模型公式可简化为：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><hr/>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mtext>商品</mtext><mo separator="true">,</mo><mtext>和</mtext><mo separator="true">,</mo><mtext>服务</mtext><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><mtext>商品</mtext><mi mathvariant="normal">∣</mi><msub><mi>w</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>∗</mo><mi>p</mi><mo stretchy="false">(</mo><mtext>和</mtext><mi mathvariant="normal">∣</mi><mtext>商品</mtext><mo stretchy="false">)</mo><mo>∗</mo><mi>p</mi><mo stretchy="false">(</mo><mtext>服务</mtext><mi mathvariant="normal">∣</mi><mtext>和</mtext><mo stretchy="false">)</mo><mo>∗</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>w</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mi mathvariant="normal">∣</mi><mtext>商品</mtext><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mn>6</mn></mrow><annotation encoding="application/x-tex">p(商品,和,服务)=p(商品|w_0)*p(和|商品)*p(服务|和)*p(w_{k+1}|商品)\\
+=1/6</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord cjk_fallback">商品</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">和</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">服务</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord cjk_fallback">商品</span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord cjk_fallback">和</span><span class="mord">∣</span><span class="mord cjk_fallback">商品</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord cjk_fallback">服务</span><span class="mord">∣</span><span class="mord cjk_fallback">和</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord cjk_fallback">商品</span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/6</span></span></span></span></span><p>p(w_t|w_{t-1})=a*p_{ML}(w_t|w_{t-1})+(1-a)p(w_t)</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo>&lt;</mo><mi>h</mi><mi>r</mi><mi mathvariant="normal">/</mi><mo>&gt;</mo></mrow><annotation encoding="application/x-tex">&lt;hr/&gt;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord">/</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span></span></span></span></span><p>Example:\a=0.5\p(和)=0.5\<br />
+p(和| 商品)=0.5<em>1/2+0.5</em>0.5\=1/2</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 1: #̲## 实例：通过二元语法模型来…" style="color:#cc0000">### 实例：通过二元语法模型来分词
+#### 导入语料库：
+Corpus：
+* 商品，和服，物品
+
+![](https://voluntexi.github.io//post-images/1657439171176.png)
+中文分词常用的经验公式：
+p(w_t|w_{t-1})=a*[(b*\frac{c(w_{t-1}w_t)}{c(w_t)}+1-b]+(1-a)\frac{c(w_t)+1)}{N}</span><p>由于多个0~1之间的数连续相乘会使值接近或者等于0，因此需要对概率进行取负对数</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>结果如下：<img src="https://voluntexi.github.io//post-images/1657439145839.png" alt="" /></p>
+<h4 id="heading-2">寻找最短距离</h4>
+<p>常见的最短距离算法有DS中的Dijkstra，Floyd算法，在NLP中：由马尔科夫链构成的网状图的最短距离算法使用<strong>维特比算法</strong>。</p>
+<p>接下来介绍维特比算法（转于<a href="https://www.zhihu.com/question/20136144/answer/763021768">知乎:如何通俗地讲解 viterbi 算法</a>)</p>
+<h5 id="heading-3">什么是维特比算法</h5>
+<p>维特比（Viterbi）算法属于一种动态规划算法，目标在于寻找最优路径。</p>
+<h5 id="heading-4">维特比算法图解</h5>
+<p>从S和E之间找一条最短的路径</p>
+<p><img src="https://picx.zhimg.com/80/v2-8a0e2bc64b7305a04c3aef847fa62bdb_720w.jpg?source=1940ef5c" alt="img" /></p>
+<p>为了找出S到E之间的最短路径，我们先从S开始从左到右一列一列地来看。</p>
+<p>首先起点是S，从S到<a href="https://www.zhihu.com/search?q=A%E5%88%97&amp;search_source=Entity&amp;hybrid_search_source=Entity&amp;hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A763021768%7D">A列</a>的路径有三种可能：S-A1、S-A2、S-A3，如下图：</p>
+<p><img src="https://pic4.zhimg.com/50/v2-facc41878c863acf63d9137df13ef422_720w.jpg?source=1940ef5c" alt="img" /></p>
+<p>​    我们不能武断地说S-A1、S-A2、S-A3中的哪一段必定是<a href="https://www.zhihu.com/search?q=%E5%85%A8%E5%B1%80%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84&amp;search_source=Entity&amp;hybrid_search_source=Entity&amp;hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A763021768%7D">全局最短路径</a>中的一部分，目前为止任何一段都有可能是全局最短路径的备选项。</p>
+<p>我们继续往右看，到了<a href="https://www.zhihu.com/search?q=B%E5%88%97&amp;search_source=Entity&amp;hybrid_search_source=Entity&amp;hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A763021768%7D">B列</a>。按B列的B1、B2、B3逐个分析。</p>
+<p><img src="https://pic1.zhimg.com/80/v2-ab128a2158510b6885daba65c7de50e0_720w.jpg?source=1940ef5c" alt="img" /></p>
+<p>以上这三条路径，各节点距离加起来对比一下，我们就可以知道其中哪一条是最短的。假设S-A3-B1是最短的,那么其余两条就可以删掉了，用相同方法依次比较B2和B3，得出到B1，B2，B3的最短路径</p>
+<p><img src="https://pic1.zhimg.com/80/v2-95d27b7061e1345c2942fd5d33b20a81_720w.jpg?source=1940ef5c" alt="img" /></p>
+<p>接下来到C列了，类似上面说的B列，我们仍然从C1、C2、C3一个个节点分析。方法和B相同，</p>
+<p>假设结果如下。</p>
+<p><img src="https://pic4.zhimg.com/80/v2-925cc071b0f7625a2ba9f523835cb05e_720w.jpg?source=1940ef5c" alt="img" /></p>
+<p>接下来只需要计算C1，C2，C3到E的路径谁最小就行了</p>
+<p><img src="https://pic1.zhimg.com/80/v2-accc8823ff890dd98620f6617e0cfe28_720w.jpg?source=1940ef5c" alt="img" /></p>
+<p>在效率方面相对于粗暴地遍历所有路径，viterbi 维特比算法到达每一列的时候都会删除不符合最短路径要求的路径，大大降低时间复杂度。</p>
+<h4 id="heading-5">计算结果</h4>
+<p>经过维特比算法后，输出为</p>
+<pre><code>['','商品','和','服务'，'']
+</code></pre>
+<h2 id="heading-6">总结：</h2>
+<p>基于<strong>统计的方法</strong>能够<strong>较好的切分歧义和识别新词</strong>，目前受到了研究者越来越多的重视。不受待处理文本的领域限制，不需要特定的词典，能够有效的自动排出歧义，较好的识别未登录词。<strong>缺点是需要大量的训练文本用于建立统计模型的参数，方法的计算量较大，对于常用词的识别精度差</strong>，且分词精度和训练文本的选择有关，会存在一些共现频度高但是并不是词的常用字组。</p>
+
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/wei-bo-re-dian-pa-chong/">
+                    <h3 class="post-title">
+                        微博榜单爬虫
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

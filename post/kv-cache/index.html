@@ -1,0 +1,297 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>KV Cache | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="KV Cache | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。">
+<link rel="canonical" href="https://voluntexi.github.io/post/kv-cache/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"KV Cache","url":"https://voluntexi.github.io/post/kv-cache/","description":"KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。","image":"/post-images/kv-cache.jpg","datePublished":"2025-03-11T14:01:00+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/kv-cache/","name":"KV Cache","position":2}]}</script>
+<meta property="og:title" content="KV Cache">
+<meta property="og:description" content="KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。">
+<meta property="og:url" content="https://voluntexi.github.io/post/kv-cache/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="/post-images/kv-cache.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/kv-cache/">
+<meta name="twitter:title" content="KV Cache">
+<meta name="twitter:description" content="KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。">
+<meta name="twitter:image" content="/post-images/kv-cache.jpg">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        KV Cache
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2025-03-11
+                        </span>
+                        <span>
+                            10 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="/post-images/kv-cache.jpg" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>KV Cache是一种针对Transformer-Decoder部分的注意力层的优化技术，其原理是通过缓存之前生成的KV值，提高模型的推理性能。</p>
+<!-- more -->
+<h2 id="-kv-cache">什么是 KV Cache</h2>
+<p>对于包含有Transformer-Decoder部分的模型（可以是Decoder-Encoder，Only Decoder），模型的推理过程如下：</p>
+<p>给定一个输入文本，模型会根据输入的文本，开始一个<code>token</code>一个 <code>token </code>的输出回答，每一个 token 的输出都依赖于之前的输出，直到输出终止 <code>token</code>。</p>
+<p>如下图例子所示：</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:700/0*sexO6adGhaKr7aH0.gif" alt="img" /></p>
+<p>上述过程的模型，我们也称之为<code>自回归模型</code></p>
+<p>在自回归模型中，因为模型一次只能生成一个token，而且每次新的预测都依赖于之前的上下文。这意味着，要预测第1000个token，你需要用到<strong>前999个token</strong>的信息。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>这通常涉及到对这些token的表示进行一系列矩阵乘法运算，Transformer原始的计算过程是在每一次计算token的时候，都得计算重新之前token的注意力信息。如下图所示：</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:700/1*8xqD4AYTwn6mQXNw0uhDCg.gif" alt="img" /></p>
+<p>KV cache就是在这里发挥作用，通过存储之前<strong>K , V的计算结果</strong>，并在接下来的token生成时复用这些结果，从而避免重复计算，提高推理效率。如下图第二部分所示：</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:700/1*uyuyOW1VBqmF5Gtv225XHQ.gif" alt="img" /></p>
+<blockquote>
+<p>需要注意的是，KV cache只在多个token生成步骤中发生，并且<strong>仅在decoder部分进行</strong>。像BERT这样的encoder only模型，并不是生成式模型，因此不涉及KV cache。</p>
+</blockquote>
+<p>当然，我们也可以用代码测试一下，使用了KV Cache后模型推理速度提升了多少</p>
+<pre><code class="language-python">import numpy as np
+import time
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+device = &quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;
+tokenizer = AutoTokenizer.from_pretrained(&quot;sshleifer/tiny-gpt2&quot;)
+model = AutoModelForCausalLM.from_pretrained(&quot;sshleifer/tiny-gpt2&quot;).to(device)
+
+for use_cache in (True, False):
+  times = []
+  for _ in range(10):  # measuring 10 generations
+    start = time.time()
+    model.generate(**tokenizer(&quot;What is KV caching?&quot;, return_tensors=&quot;pt&quot;).to(device), use_cache=use_cache, max_new_tokens=1000)
+    times.append(time.time() - start)
+  print(f&quot;{'with' if use_cache else 'without'} KV caching: {round(np.mean(times), 3)} +- {round(np.std(times), 3)} seconds&quot;)
+</code></pre>
+<p>测试结果如下：</p>
+<pre><code class="language-tex">with KV caching: 2.088 +- 0.715 seconds
+</code></pre>
+<pre><code>without KV caching: 18.835 +- 12.523 seconds
+</code></pre>
+<p>快了大约 9.02 倍！</p>
+<h2 id="qcache">为什么Q不用Cache</h2>
+<p>正常情况下，Transformer结构的Attention的计算公式步骤如下：</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 10: Q_1K_1^T &amp;̲-\infty \\
+
+V…" style="color:#cc0000">Q_1K_1^T &amp;-\infty \\
+
+V_1 \\
+
+\\
+=
+softmaxed(Q_1K_1^T) &amp;softmaxed(-\infty) \\
+
+V_1 \\
+
+\\
+=
+softmaxed(Q_1K_1^T)\times V_1+ 0\times V_2  \\
+\end{array}\right]</span><p>其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">∞</span></span></span></span>表示加上了<code>masked</code>的注意力,<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>o</mi><mi>f</mi><mi>t</mi><mi>m</mi><mi>a</mi><mi>x</mi><mi>e</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">softmaxed</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">so</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord mathnormal">t</span><span class="mord mathnormal">ma</span><span class="mord mathnormal">x</span><span class="mord mathnormal">e</span><span class="mord mathnormal">d</span></span></span></span>表示进行了softmax计算，那么最后的结果如下：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">Attention_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal">tt</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>表示Attention的第一行，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">Attention_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal">tt</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>表示Attention的第二行。</p>
+<p>因此，在Attention的每一步中，其实只需要根据<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">Q_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>计算 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">Attention_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal">tt</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 就可以，之前已经计算的Attention完全不需要重新计算。但是 K 和 V 是全程参与计算的，所以这里我们需要把每一步的 K,V 缓存起来。而Q只与当前一步计算有关，所以不需要也不用去缓存Q</p>
+<h2 id="kv-cache">KV Cache存在的问题</h2>
+<p>由于KV Cache思想是以空间换时间，那么显而易见的是KV Cache所带来模型占用显存的增加。</p>
+<p>假设输入序列的长度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span> ，输出序列的长度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> ，transformer层数为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi></mrow><annotation encoding="application/x-tex">l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span></span></span></span>，隐藏层维度$ h<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>，</mtext><mi>K</mi><mi>V</mi><mi>C</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>e</mi><mtext>存储</mtext><mi>k</mi><mi>v</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>e</mi><mi>q</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>e</mi><mi>n</mi><mtext>个</mtext><mi>K</mi><mi>V</mi><mi>v</mi><mi>a</mi><mi>l</mi><mi>u</mi><mi>e</mi><mtext>，形状为</mtext></mrow><annotation encoding="application/x-tex">，KV Cache 存储 kv\_seq\_len个 KV value，形状为</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord cjk_fallback">，</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord cjk_fallback">存储</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord" style="margin-right:0.0278em;">_</span><span class="mord mathnormal">se</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord" style="margin-right:0.0278em;">_</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord cjk_fallback">个</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">u</span><span class="mord mathnormal">e</span><span class="mord cjk_fallback">，形状为</span></span></span></span> [b, head_num, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mi>v</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>e</mi><mi>q</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>e</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">kv\_seq\_len</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord" style="margin-right:0.0278em;">_</span><span class="mord mathnormal">se</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord" style="margin-right:0.0278em;">_</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span></span></span></span>, head_dim]<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 20: …值kv\_seq\_len为 $̲s+n" style="color:#cc0000"><span class="cjk_fallback">，， 峰值kv\_seq\_len为 $s+n</span></span>,，以<code>float16</code>来保存KV cache，那么<strong>KV cache的峰值显存占用大小为</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mi>n</mi><mo stretchy="false">)</mo><mi>h</mi><mo>∗</mo><mi>l</mi><mo>∗</mo><mn>2</mn><mo>∗</mo><mn>2</mn><mo>=</mo><mn>4</mn><mi>b</mi><mi>l</mi><mi>h</mi><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">b(s+n)h∗l∗2∗2=4blh(s+n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">b</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4</span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">h</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 。这里第一个 2 表示 K/V cache，第二个2表示float16占 2 个 bytes。</p>
+<p>以GPT3-175B为例，对比KV cache与模型参数占用显存的大小。模型配置如下：</p>
+<table>
+<thead>
+<tr>
+<th>模型名</th>
+<th>参数量</th>
+<th>层数</th>
+<th>隐藏层维度</th>
+<th>注意力头数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-3</td>
+<td>175B</td>
+<td>96</td>
+<td>12288</td>
+<td>96</td>
+</tr>
+</tbody>
+</table>
+<p>GPT3 模型占用显存大小为350GB。假设批次大小<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">b=64</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">64</span></span></span></span> ，输入序列长度<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 7: s=512 $̲，输出序列长度" style="color:#cc0000">s=512 $，输出序列长度</span>n=32 <span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 20: … cache 峰值占用显存为 $̲4blh(s+n) = 164…" style="color:#cc0000"><span class="cjk_fallback">，则KV cache 峰值占用显存为 $4blh(s+n) = 164,282,499,072 bytes ≈ 164 GB</span></span>，大约是模型参数显存的0.5倍。</p>
+<h2 id="kv-cache-">优化KV Cache 的几种方法</h2>
+<h3 id="mha">MHA</h3>
+<p>MHA（<strong>M</strong>ulti-<strong>H</strong>ead <strong>A</strong>ttention）也就是Transformer原始的多头注意力机制，其思想是将多个独立的注意力机制进行拼接，假设输入的行向量为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[x_1,x_2,...,x_n]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">...</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span>，其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">x_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>有<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span>维。那么MHA的表现形式如下：</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 52: …\leq n}^s)
+其中，$̲O_n$ 表示$x_n$多头注…" style="color:#cc0000">o_s=Attention(Q_n^s,K_{\leq n}^s,V_{\leq n}^s)
+其中，$O_n$ 表示$x_n$多头注意力后的结果，分为了$h$个注意力头，每个头独立计算然后进行拼接，$s\in h$，这里省略了Attention矩阵的缩放因子，实践上，每个头里的$Q、K、V$维度一般为$d/h$，LLAMA2-7b有$d=4096$，$h=32$，每个头里$Q、K、V$的维度为128，LLAMA2-70b则是$d=8192$，$h=64$，每个头里$Q、K、V$的维度为128。
+### MQA
+MQA，即“**M**ulti-**Q**uery **A**ttention”，是减少KV Cache的一次非常朴素的尝试，首次提出自[《Fast Transformer Decoding: One Write-Head is All You Need》](https://arxiv.org/pdf/1911.02150)，这已经是2019年的论文了，这也意味着早在LLM火热之前，减少KV Cache就已经是研究人员非常关注的一个课题了。
+MQA的思路很简单，直接让所有Attention Head共享同一个K、V。
+O_n=[o_1,o_2,...,o_h] \\</span><p>使用 MQA 的模型包括 <a href="https://arxiv.org/pdf/2204.02311">PaLM</a>、<a href="https://arxiv.org/abs/2312.11805">Gemini</a> 等。很明显，MQA 直接将 KV Cache 减少到了原来的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">1/h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal">h</span></span></span></span>。</p>
+<p>效果方面，目前看来大部分任务的损失都比较有限。</p>
+<h3 id="gqa">GQA</h3>
+<p>有人担心 MQA 对 KV Cache 的压缩太严重，以至于会影响模型的学习效率以及最终效果。为此，一个 MHA 与 MQA 之间的过渡版本 GQA（<strong>G</strong>rouped-<strong>Q</strong>uery <strong>A</strong>ttention）应运而生，出自 2023 年 Google 的论文 <a href="https://arxiv.org/abs/2305.13245">GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints</a>。<br />
+<img src="https://voluntexi.github.io//post-images/1741673000135.png" alt="" /><br />
+GQA的思想也很朴素，它就是将所有Head分为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span>个组（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span>可以整除<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span>），每组共享同一对K、V用数学公式表示为</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 69: …sg/h⌉})
+其中这里的是$̲⌈⋅⌉$是向上取整符号。GQA…" style="color:#cc0000">o_s=Attention(Q_n^s,K_{\leq n}^{⌈sg/h⌉},V_{\leq n}^{⌈sg/h⌉})
+其中这里的是$⌈⋅⌉$是向上取整符号。GQA 提供了 MHA 到 MQA 的自然过渡。当$g=h$时就是MHA，$g=1$时就是MQA，当$1&lt;g&lt;h$时，它只将KV Cache压缩到$g/h$，压缩率不如MQA，但同时也提供了更大的自由度，效果上更有保证。GQA最知名的使用者，大概是Meta开源的[LLAMA2-70B](https://llama.meta.com/llama2/)，以及[LLAMA3](https://llama.meta.com/llama3/)全系列，此外使用GQA的模型还有[TigerBot](https://arxiv.org/abs/2312.08688)、[DeepSeek-V1](https://arxiv.org/abs/2401.02954)、[Yi](https://arxiv.org/abs/2403.04652)、[ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)、[ChatGLM3](https://github.com/THUDM/ChatGLM3)等，相比使用MQA的模型更多
+### MLA
+随着今年DeepSeek的爆火，DeepSeek所提出的MLA，也正是该模型`便宜`的关键技术之一。
+MLA（**M**ulti-head **L**atent **A**ttention）是对GQA的改进。其核心是对键（Keys）和值（Values）进行低秩联合压缩，生成压缩的潜在向量，以降低推理阶段的KV缓存。并结合了RoPE，提升了模型的外推能力，进一步提升了模型的效果。
+- MLA 通过低秩压缩显著降低了 KV 缓存的大小，在 DeepSeek-V2 中，KV 缓存减少了 93.3%，推理吞吐量提升了 576%。
+
+
+
+* [缓存与效果的极限拉扯：从MHA、MQA、GQA到MLA - 科学空间|Scientific Spaces](https://kexue.fm/archives/10091)</span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/zheng-que-shi-yong-order-by-limit/">
+                    <h3 class="post-title">
+                        正确使用 ORDER BY &#43; LIMIT
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

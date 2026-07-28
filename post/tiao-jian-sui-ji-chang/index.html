@@ -1,0 +1,309 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>条件随机场 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="条件随机场 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="机器学习" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="条件随机场（conditional random field）是一个比感知机更加强大的模型。">
+<link rel="canonical" href="https://voluntexi.github.io/post/tiao-jian-sui-ji-chang/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"条件随机场","url":"https://voluntexi.github.io/post/tiao-jian-sui-ji-chang/","description":"条件随机场（conditional random field）是一个比感知机更加强大的模型。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_bt%2F0%2F14483805786%2F641\u0026refer=http%3A%2F%2Finews.gtimg.com\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1662021993\u0026t=731d8dbf582e659a0456cdc535ae9aa4","datePublished":"2022-08-02T16:27:04+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/tiao-jian-sui-ji-chang/","name":"条件随机场","position":2}]}</script>
+<meta property="og:title" content="条件随机场">
+<meta property="og:description" content="条件随机场（conditional random field）是一个比感知机更加强大的模型。">
+<meta property="og:url" content="https://voluntexi.github.io/post/tiao-jian-sui-ji-chang/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_bt%2F0%2F14483805786%2F641&amp;refer=http%3A%2F%2Finews.gtimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1662021993&amp;t=731d8dbf582e659a0456cdc535ae9aa4">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/tiao-jian-sui-ji-chang/">
+<meta name="twitter:title" content="条件随机场">
+<meta name="twitter:description" content="条件随机场（conditional random field）是一个比感知机更加强大的模型。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_bt%2F0%2F14483805786%2F641&amp;refer=http%3A%2F%2Finews.gtimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1662021993&amp;t=731d8dbf582e659a0456cdc535ae9aa4">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        条件随机场
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-08-02
+                        </span>
+                        <span>
+                            12 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/ji-qi-xue-xi/" class="post-tag">
+                            # 机器学习
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_bt%2F0%2F14483805786%2F641&amp;refer=http%3A%2F%2Finews.gtimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1662021993&amp;t=731d8dbf582e659a0456cdc535ae9aa4" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>条件随机场（conditional random field）是一个比感知机更加强大的模型。</p>
+<!--more-->
+<h2 id="heading">背景知识</h2>
+<h3 id="heading-1">机器学习模型谱系图</h3>
+<p><img src="https://voluntexi.github.io//post-images/1659428932919.png" alt="" /></p>
+<p><strong>Sklearn对应机器学习算法决策树</strong><br />
+<img src="http://mms1.baidu.com/it/u=3838431236,1180467303&amp;fm=253&amp;app=138&amp;f=PNG&amp;fmt=auto&amp;q=75?w=802&amp;h=500" alt="img" /><br />
+使用模板：<br />
+<img src="http://dingyue.ws.126.net/2022/0414/fa3a4b4ag00rac2fg00nzd200u000hpg00it00b3.gif" alt="img" /></p>
+<h4 id="heading-2">生成式模型</h4>
+<p>模拟数据的生成过程，且随机变量x，y存在因果先后关系：现有y再有x。这种关系通过联合分布模拟：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>具体流程：</p>
+<ul>
+<li>根据p(y)采样y</li>
+<li>根据p(x|y)采用x</li>
+<li>生成样本概率p(x,y)</li>
+<li>通过遍历y的所有取值，获得最大的P(x,y)作为预测结果</li>
+</ul>
+<p>通过p(x,y)，可以求得p(x)。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>但是，p(x)很难准确估计。因为特征之间并不是相互独立的，存在一定的依赖关系。</p>
+<p><strong>eg：</strong> 中文分词的一元语法：字符“榴”的后一个字符可以确定是“莲”，但是生成式模型直接认为这两个字符相互独立，忽略的这种依赖关系，导致不合符实际。</p>
+<h4 id="heading-3">判别式模型</h4>
+<p>对生成式模型的改进。跳过了p(x)，直接对p(y|x)建模。这样不需要考虑x内的各种依赖关系。</p>
+<p>在生成式和判别式中，模型都是多维度随机变量分布。这些随机变量可能相互独立，也可能相互依赖，可以通过<strong>概率图模型</strong>来进行分析多维随机变量分布。</p>
+<h3 id="heading-4">有向和无向概率图模型</h3>
+<h4 id="heading-5">概率图模型</h4>
+<p>通过图来表示p(x,y)，利用结点来表示随机变量，用边来表示有关联的随机变量。</p>
+<h5 id="heading-6">有向图模型</h5>
+<p>将事情通过前后因果顺序进行连接为有向图。</p>
+<p><img src="https://voluntexi.github.io//post-images/1659429753293.png" alt="" /></p>
+<p>“发生地震”和“卡车撞墙”会导致“房子摇晃”，同时“发生地震”也会导致“卡车撞墙”，于是将&quot;卡车撞墙&quot;和&quot;发生地震&quot;指向&quot;房子摇晃&quot;，&ldquo;发生地震&quot;指向&quot;卡车撞墙&rdquo;。</p>
+<p>于是多维随机变量的分布可以分解为：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>马尔科夫链就是有向图中的一个例子。</p>
+<h5 id="heading-7">无向图模型：</h5>
+<p>不需要探究事情的前因后果。仅仅指向有关联的结点。</p>
+<p><img src="https://voluntexi.github.io//post-images/1659429826568.png" alt="" /></p>
+<p>无向图将概率分解为所有最大团上的某函数的乘积。</p>
+<p><strong>团：</strong> 无向图的完全子图。</p>
+<p><strong>极大团</strong>：如果一个团不被其他任一团所包含，即它不是其他任一团的真子集，则称该团为图G的极大团</p>
+<p><strong>最大团</strong>：最大团就是就是结点数最多的极大团。</p>
+<p><img src="https://voluntexi.github.io//post-images/1659430429707.jpg" alt="" /></p>
+<p>在上图中，</p>
+<p>团有很多：{0，5}，{0，1}，{0，4，5}，{1，2，4}&hellip;</p>
+<p>极大团：{0,4,5},{1,2,4},{0,1,4},{4,3}</p>
+<p>最大团：{0,4,5},{1,2,4},{0,1,4}</p>
+<p>无向图模型定义了一些虚拟的<strong>因子节点</strong>，每个因子节点只连接部分节点，组成更小的最大团</p>
+<p><img src="https://voluntexi.github.io//post-images/1659429838410.png" alt="" /></p>
+<p>这样，该图的最大团由一个变为了4个，每个最大团变量节点变为了两个。于是，将多为随机变量的联合分布分解为了各个最大团中的因子的乘积。并且该分布为判别式模型最需要的条件概率分布。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mspace linebreak="newline"></mspace><mi>a</mi><mtext>是因子节点，</mtext><msub><mi>C</mi><mi>a</mi></msub><mtext>是因子节点对应的函数，</mtext><msub><mi>x</mi><mi>a</mi></msub><mo separator="true">,</mo><msub><mi>y</mi><mi>a</mi></msub><mtext>是因子节点所有连接的变量节点</mtext><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">\\a是因子节点，C_a是因子节点对应的函数，x_a,y_a是因子节点所有连接的变量节点\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mord cjk_fallback">是因子节点，</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">是因子节点对应的函数，</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">是因子节点所有连接的变量节点</span></span><span class="mspace newline"></span></span></span></span><p>在机器学习中，通常将因子函数设为：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>其中</mtext><mi>k</mi><mtext>为特征编号，</mtext><msub><mi>f</mi><mrow><mi>a</mi><mi>k</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mi>a</mi></msub><mo separator="true">,</mo><msub><mi>y</mi><mi>a</mi></msub><mo stretchy="false">)</mo><mtext>为特征函数，</mtext><msub><mi>W</mi><mrow><mi>a</mi><mi>k</mi></mrow></msub><mtext>为特征的权重</mtext></mrow><annotation encoding="application/x-tex">其中k为特征编号，f_{ak}(x_a,y_a)为特征函数，W_{ak}为特征的权重</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">其中</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord cjk_fallback">为特征编号，</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">ak</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord cjk_fallback">为特征函数，</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">ak</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">为特征的权重</span></span></span></span></span><p>P(y_t|x_t)=\frac{1}{Z(x)}C_t(y_{t-1},y_t,x_t)\<br />
+=\frac{1}{Z(x)}exp{\sum_{k=1}^KW_{k}f_{k}(y_{t-1},y_t,x_t)}\其中：<br />
+Z(x)=\sum_{y}exp{\sum_{k=1}^KW_{k}f_{k}(y_{t-1},y_t,x_t)}<br />
+\K为特征数，f_{k}为特征函数，W_k为特征的权重</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>define：\\mathbb W ={W_1,W_2,&hellip;,W_k}^T\<br />
+\mathbb F(y_{t-1},y_t,x_t)={f_1(y_{t-1},y_t,x_t),&hellip;,f_k(y_{t-1},y_t,x_t)}\<br />
+so:\<br />
+P(y_t|x_t)=\frac {exp(\mathbb W\mathbb F(y_{t-1},y_t,x_t))}{Z(x)}</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 1: #̲## CRF的三个问题
+与H…" style="color:#cc0000">### CRF的三个问题
+与HMM一样，CRF也存在着三个待求解的问题。在HMM中，我们将观测序列按照时刻逐个的进行计算，但是在CRF中，我们无需拆开观测序列X，相比而言，CRF更加的容易。下面我们具体描述CRF的三个基本问题：
+* 评估问题： 概率计算的问题。给定P(Y|X), 输入序列X和输出序列Y时，求P(Y_i|X)和P(Y_i,Y_{i-1}|X)的条件概率。
+* 解码问题，给定CRF，条件概率分布P(Y|X)，观测序列X，求解条件概率最大的状态序列Y。
+#### 评估问题
+给定相关的约束条件，即给定相关的特征函数和对应的特征函数的权重值。处理这个问题的基本算法采用前向，后向算法，其中我们定义**给定的条件随机场**：γ
+定义：M_i(y_{i−1},y_i|x)=exp(∑_{k=1}^Kw_kf_k(y_{i−1},y_i,x))\\
+这样，我们很容易得到序列位置i+1的标记是y_{i+1}时，之前的部分标记序列的非规范化概率递推公式：\\
+\\
+    1,\quad y_0=start\\
+  \end{cases}\\
+我们定义β_i(y_i|x)表示序列位置i的标记是y_i时，之后的从i+1到n的部分标记序列的非规范化概率\\
+定义：β_{n+1}(y_{n+1}|x)=\begin{cases}
+    0, \quad else
+\\
+
+于是我们可以计算出计算序列位置i的标记是y_i时的条件概率P(Y_i=y_i|x):\\
+也能够计算序列位置i的标记是y_i，位置i−1的标记是y_{i−1}时的条件概率P(Y_{t-1}=y_{t-1},Y_t=y_i|x):\\</span><h4 id="heading-8">学习问题</h4>
+<p>我们给定训练数据集X和对应的标记序列Y，K个特征函数fk(x,y)，需要学习模型参数<strong>特征权重</strong>和<strong>条件概率Pw(y|x)</strong>，其中条件概率Pw(y|x)和模型权重wk满足以下关系</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p><strong>梯度下降法求解</strong></p>
+<p>在使用梯度下降法求解模型参数之前，我们需要定义我们的优化函数，这里采用<strong>极大似然函数</strong>作为目标函数：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mspace linebreak="newline"></mspace><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mo stretchy="false">(</mo><mi>w</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac><mo>=</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></munder><msup><mi>P</mi><mtext>¯</mtext></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><msub><mi>P</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi>x</mi><mo stretchy="false">)</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>−</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></munder><msup><mi>P</mi><mtext>¯</mtext></msup><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\\\frac{∂f(w)}{∂w}=∑_{x,y}P^¯(x)P_w(y|x)f(x,y)−∑_{x,y}P^¯(x,y)f(x,y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4361em;vertical-align:-1.3861em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.9em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3861em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.413em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">¯</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord">∣</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.4361em;vertical-align:-1.3861em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.9em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3861em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.413em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">¯</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span></span><p>首先计算第一个句子词性为1，2的非规范化概率：\<br />
+δ_1(1)=μ1s1=1\δ_1(2)=μ2s2=0.5</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>接下来进行递推，计算第二个句子：\<br />
+δ_2(1)=max{δ_1(1)+t_2λ_2+μ_3s_3,δ_1(2)+t_4λ_4+μ_3s_3}<br />
+\=max{1+0.6+0.8,0.5+1+0.8}=2.4\<br />
+δ_2(2)=max{δ_1(2)+μ_2s_2,δ_1(1)+t_1λ_1+μ_2s_2}<br />
+\=max{0.5+0.5,1+1+0.5}=2.5\</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>然后计算第三个句子：\<br />
+δ_3(1)=max{δ_2(1)+μ_3s_3,δ_2(2)+t_3λ_3+μ_3s_3}<br />
+\=max{2.4+0.8,2.5+1+0.8}=4.3\<br />
+δ_3(2)=max{δ_2(1)+t_1λ_1+μ_4s_4,δ_2(2)+t_5λ_5+μ_4s_4}<br />
+\=max{2.4+1+0.5,2.5+0.2+0.5}=3.9\</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>比较max(δ_3(1),δ_3(2)，得到y_3=1,再逆推回去\</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 36: …记为(名词，动词，名词)。
+#̲# 实现
+```python…" style="color:#cc0000"><span class="cjk_fallback">即最终的结果为(y1,y2,y1),即标记为(名词，动词，名词)。
+## 实现
+```python
+from pyhanlp.static import download, remove_file, HANLP_DATA_PATH
+import zipfile
+CRFLexicalAnalyzer = JClass(&#x27;com.hankcs.hanlp.model.crf.CRFLexicalAnalyzer&#x27;)
+CRF_MODEL_PATH=None
+root_path=None
+def test_data_path():
+    os.mkdir(data_path)
+    CRF_MODEL_TXT_PATH = data_path + &quot;/crf-cws-model.txt&quot;
+# 下载MSR语料库
+    root_path = test_data_path()
+    download(data_url, dest_path)
+        archive.extractall(root_path)
+    dest_path = dest_path[:-len(&#x27;.zip&#x27;)]
+sighan05 = ensure_data(&#x27;icwb2-data&#x27;, &#x27;http://sighan.cs.uchicago.edu/bakeoff2005/data/icwb2-data.zip&#x27;)
+msr_train = os.path.join(sighan05, &#x27;training&#x27;, &#x27;msr_training.utf8&#x27;)
+msr_test = os.path.join(sighan05, &#x27;testing&#x27;, &#x27;msr_test.utf8&#x27;)
+msr_gold = os.path.join(sighan05, &#x27;gold&#x27;, &#x27;msr_test_gold.utf8&#x27;)
+def train(corpus):
+    segmenter.train(corpus, CRF_MODEL_PATH)
+segment = train(msr_train)
+```
+由于运行过程太占时间和内存，直接使用书上的结果图
+
+
+
+![](https://voluntexi.github.io//post-images/1659585417527.png)</span></span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/ti-jie-n-huang-hou-wen-ti/">
+                    <h3 class="post-title">
+                        题解：N皇后问题
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

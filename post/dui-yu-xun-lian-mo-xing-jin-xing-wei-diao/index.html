@@ -1,0 +1,293 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>对预训练模型进行微调 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="对预训练模型进行微调 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="​ 近年来随着自然语言处理技术的不断发展，预训练模型已经成为了近年来最热门的研究方向之一。预训练模型有更好的性能表现。然而，对于刚接触的人来说，阵对预训练模型的训练可能会显得复杂和难以理解。">
+<link rel="canonical" href="https://voluntexi.github.io/post/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"对预训练模型进行微调","url":"https://voluntexi.github.io/post/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/","description":"​ 近年来随着自然语言处理技术的不断发展，预训练模型已经成为了近年来最热门的研究方向之一。预训练模型有更好的性能表现。然而，对于刚接触的人来说，阵对预训练模型的训练可能会显得复杂和难以理解。","image":"https://img1.baidu.com/it/u=1732097677,3720483819\u0026fm=253\u0026fmt=auto\u0026app=138\u0026f=PNG?w=500\u0026h=208","datePublished":"2023-03-01T20:18:30+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/","name":"对预训练模型进行微调","position":2}]}</script>
+<meta property="og:title" content="对预训练模型进行微调">
+<meta property="og:description" content="​ 近年来随着自然语言处理技术的不断发展，预训练模型已经成为了近年来最热门的研究方向之一。预训练模型有更好的性能表现。然而，对于刚接触的人来说，阵对预训练模型的训练可能会显得复杂和难以理解。">
+<meta property="og:url" content="https://voluntexi.github.io/post/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://img1.baidu.com/it/u=1732097677,3720483819&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=PNG?w=500&amp;h=208">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/">
+<meta name="twitter:title" content="对预训练模型进行微调">
+<meta name="twitter:description" content="​ 近年来随着自然语言处理技术的不断发展，预训练模型已经成为了近年来最热门的研究方向之一。预训练模型有更好的性能表现。然而，对于刚接触的人来说，阵对预训练模型的训练可能会显得复杂和难以理解。">
+<meta name="twitter:image" content="https://img1.baidu.com/it/u=1732097677,3720483819&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=PNG?w=500&amp;h=208">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        对预训练模型进行微调
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2023-03-01
+                        </span>
+                        <span>
+                            7 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://img1.baidu.com/it/u=1732097677,3720483819&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=PNG?w=500&amp;h=208" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>​	近年来随着自然语言处理技术的不断发展，预训练模型已经成为了近年来最热门的研究方向之一。预训练模型有更好的性能表现。然而，对于刚接触的人来说，阵对预训练模型的训练可能会显得复杂和难以理解。</p>
+<!-- more -->
+<p>​	因此，本文将以对<strong>BART微调用于文本摘要任务</strong>为例子提供如何对预训练模型+微调的教程，通过本文所提供的示例，相信能够更好地理解和应用预训练模型，从而在自己的研究和项目中取得更好的成果。</p>
+<h2 id="heading">什么是预训练+微调</h2>
+<p>​	预训练+微调是一种常用的NLP训练的范式。预训练+微调的过程通常可以分为两个阶段：</p>
+<p>​	首先，在一个大规模的数据集上训练一个通用的预训练模型，例如BERT、GPT-2等。这个预训练模型的目标是学习一些通用的语言模型或者视觉特征，以便能够应用到各种具体任务中。</p>
+<p>​	其次，针对具体的任务，在<strong>相对较小的数据集</strong>上对预训练模型进行微调。可以将预训练模型Fine-tune到文本分类、命名实体识别等子任务中。微调的过程通常是在原来预训练模型的基础上，针对具体任务的特定数据集进行少量的训练，以调整模型的参数，使得模型在具体任务上能够取得更好的表现。</p>
+<p>​	叫我们自己实现一个预训练模型是不现实的（没钱、没显卡），但是不用担心，Google、Facebook等大厂会帮我们训练好大模型，我们所需要做的，只需要调用他们在自己的数据集微调就好了。</p>
+<h2 id="heading-1">训练环境搭建</h2>
+<p>首先我们需要准备好微调环境，你可以在自己的电脑上安装所需要的库，如：Pytorch、Transformers、NLTK等等所必须要库。但是，我觉得可以，但是没有必要。因为随着互联网的发展，我们完全可以使用<strong>云平台</strong>来来协助我们训练模型，接下来的教程，将会依靠百度的云平台<a href="https://aistudio.baidu.com/aistudio/index">飞桨AI Studio - 人工智能学习实训社区</a>来完成</p>
+<h3 id="heading-2">云平台的优点</h3>
+<p>在自己的电脑上运行模型往往会安装大量的库，但是这些库的安装并不像</p>
+<pre><code>pip install xxx
+</code></pre>
+<p>这样一行命令就能够完成安装，往往需要踩过各种坑才能安装成功</p>
+<p>而如果使用云平台的话，事情就好办多了，<strong>自带各种深度学习框架，无需下载</strong></p>
+<h3 id="heading-3">如何使用</h3>
+<p>1.进入<strong>飞桨AI Studio</strong>，注册并登录</p>
+<p><img src="https://voluntexi.github.io//post-images/1677586801050.png" alt="" /></p>
+<p>2.右上角进入个人中心，在项目里新建一个项目，全部默认设置，最后设置项目名称、标签、描述，有需要可以添加自己的数据集</p>
+<p><img src="https://voluntexi.github.io//post-images/1677586809322.png" alt="" /></p>
+<p>3.创建好后，点击启动环境，注意基础版没有GPU，所以我们需要选择有GPU的环境</p>
+<p><img src="https://voluntexi.github.io//post-images/1677586817396.png" alt="" /></p>
+<p>等待环境部署&hellip;</p>
+<p>4.完善环境的搭建</p>
+<p>在文本摘要任务中我们还需要&quot;rouge_score&quot;库来进行ROUGE的计算，wandb库来进行微调的可视化，只需要点击“+”号，进入终端用pip命令安装即可。</p>
+<pre><code>pip install rouge_score
+pip install wandb
+</code></pre>
+<p>如此，我们的实验环境便搭建好了</p>
+<h2 id="heading-4">模型的获取</h2>
+<p>回到<strong>飞桨AI Studio</strong>，进入模型库，内置了包含许多任务的模型</p>
+<p><img src="https://voluntexi.github.io//post-images/1677586824511.png" alt="" /></p>
+<p>文本摘要是生成式模型，我们点击“自然语言处理-&gt;文本生成”查看是否有BART模型</p>
+<p><img src="https://voluntexi.github.io//post-images/1677586830778.png" alt="" /></p>
+<p>没有？其实我们在<a href="https://paddlenlp.readthedocs.io/zh/latest/model_zoo/transformers/BART/contents.html">BART模型汇总 — PaddleNLP 文档</a>，中可以看见，其实PaddleNlp已经内置了BART模型，不需要额外的进行下载。</p>
+<p>我们只需要在训练的时候这么写就能导入 <strong>BART</strong> 了</p>
+<pre><code class="language-python">from paddlenlp.transformers import BartForConditionalGeneration, BartTokenizer
+model = BartForConditionalGeneration.from_pretrained('bart-base')
+tokenizer = BartTokenizer.from_pretrained('bart-base')
+</code></pre>
+<hr>
+<p>其实相较于Huggingface，Paddle包含的模型简直少得可怜，但是PaddleNLP并不能直接使用Huggingface里的模型，那怎么办呢？其实我们可以通过转换，将Huggingface里的模型转为PaddleNLP所支持的就可以了</p>
+<h2 id="heading-5">数据集的获取</h2>
+<p>PaddleNLP内置了许多模型，当然也内置了许多的数据库，可以快速的使用API进行调用，具体的数据集可以在此查看：</p>
+<p><a href="https://paddlenlp.readthedocs.io/zh/latest/data_prepare/dataset_list.html">PaddleNLP Datasets API — PaddleNLP 文档</a></p>
+<p>我们在文本生成一类中发现了我们需要的<strong>摘要数据集</strong></p>
+<p><img src="https://voluntexi.github.io//post-images/1677586845466.png" alt="" /></p>
+<p>如此，便导入了本次训练的数据集LCSTS</p>
+<pre><code class="language-python">from paddlenlp.datasets import load_dataset
+train, val = load_dataset('lcsts_new', splits=[&quot;train&quot;, &quot;dev&quot;])
+</code></pre>
+<p>当然，如果有自己的数据集可以这样导入</p>
+<pre><code class="language-python">from paddlenlp.datasets import load_dataset
+train_ds, dev_ds = load_dataset(&quot;squad&quot;, data_files=(&quot;my_train_file.json&quot;, &quot;my_dev_file.json&quot;))
+test_ds = load_dataset(&quot;squad&quot;, data_files=&quot;my_test_file.json&quot;)
+</code></pre>
+<h2 id="heading-6">微调</h2>
+<p>以上，我们完成了环境的搭建、模型和数据集的导入，接下来就正式进入微调环节</p>
+<p>本次微调我们需要三个文件：</p>
+<blockquote>
+<p>train.py:训练接口文件,对参数的设置</p>
+<p>train_utils.py:模型的加载及其训练具体代码</p>
+<p>csl_title_public.py:数据集的加载与处理</p>
+</blockquote>
+<p>代码在此：<a href="https://github.com/voluntexi/Pre-trainedForSummarization">voluntexi/Pre-trainedForSummarization (github.com)</a></p>
+<h3 id="heading-7">运行</h3>
+<p>打开train.py，config中的参数</p>
+<pre><code class="language-python">config = {
+        'seed': 2022,
+        'pretrained_model': 'bart-base', 
+        'dataset_name': 'lcsts_new',  
+        'train_batch_size': 18,
+        'eval_batch_size': 16,
+        'save_steps':3000,
+        'logging_steps':200,
+        'max_source_length': 512,
+        'max_target_length': 128,
+        'min_target_length': 0,
+        'max_steps': -1,
+        'warmup_proportion': 0.1,
+        'warmup_steps': 0,
+        'num_train_epochs': 30,
+        'learning_rate': 1e-5,
+        'adam_epsilon': 1e-6,
+        'weight_decay': 0.01,
+        'use_amp': False,
+        'scale_loss': 2**15,
+        'output_dir': './output',
+        'device': 'GPU',
+        'ignore_pad_token_for_loss': True
+    }
+</code></pre>
+<p>执行代码</p>
+<pre><code>python train.py
+</code></pre>
+<p>就可以开始训练了，wandb能够将训练过程可视化</p>
+<p><img src="https://voluntexi.github.io//post-images/1677586864411.png" alt="" /></p>
+<p>可以看到训练完成后的效果并不好，主要有以下几个原因：</p>
+<ul>
+<li>训练Epoch太少，例子中我只设置的1代的Epoch，当然效果不是很好，在正式的任务中建议还是加大Epoch的数值</li>
+<li>本文采用的BART-BASE是在英文上进行预训练的，用于中文肯定效果不好，在正式的任务中对于中文数据集还是需要在Huggingface中寻找使用中文训练的模型</li>
+</ul>
+<h2 id="heading-8">总结</h2>
+<p>以上就是对预训练模型进行微调的形式，使用到的工具有：百度云平台、PaddlePaddle、PaddleNLP、wandb、NLTK等工具/库</p>
+<p>掌握后，后续就可以在此基础上加上其他模型,以更好的提升模型的性能，如BERT+LSTM+ATTEN等模型的拼接训练。</p>
+
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/moca/">
+                    <h3 class="post-title">
+                        MoCa
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

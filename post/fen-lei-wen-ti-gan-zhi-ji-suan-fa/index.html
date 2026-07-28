@@ -1,0 +1,267 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>感知机算法 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="感知机算法 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="机器学习" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="感知机是由美国学者Fran Rosenblatt 在1957 年提出来的一种算法,也是作为神经网络（深度学习）的起源的算法。">
+<link rel="canonical" href="https://voluntexi.github.io/post/fen-lei-wen-ti-gan-zhi-ji-suan-fa/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"感知机算法","url":"https://voluntexi.github.io/post/fen-lei-wen-ti-gan-zhi-ji-suan-fa/","description":"感知机是由美国学者Fran Rosenblatt 在1957 年提出来的一种算法,也是作为神经网络（深度学习）的起源的算法。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.uml.org.cn%2Fai%2Fimages%2F2020052011.jpg\u0026refer=http%3A%2F%2Fwww.uml.org.cn\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1661311955\u0026t=591c0a8c7b8be28e8d2fdaafe52f82f5","datePublished":"2022-07-25T11:31:10+08:00","dateModified":"2026-05-22T18:33:21+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/fen-lei-wen-ti-gan-zhi-ji-suan-fa/","name":"感知机算法","position":2}]}</script>
+<meta property="og:title" content="感知机算法">
+<meta property="og:description" content="感知机是由美国学者Fran Rosenblatt 在1957 年提出来的一种算法,也是作为神经网络（深度学习）的起源的算法。">
+<meta property="og:url" content="https://voluntexi.github.io/post/fen-lei-wen-ti-gan-zhi-ji-suan-fa/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.uml.org.cn%2Fai%2Fimages%2F2020052011.jpg&amp;refer=http%3A%2F%2Fwww.uml.org.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1661311955&amp;t=591c0a8c7b8be28e8d2fdaafe52f82f5">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/fen-lei-wen-ti-gan-zhi-ji-suan-fa/">
+<meta name="twitter:title" content="感知机算法">
+<meta name="twitter:description" content="感知机是由美国学者Fran Rosenblatt 在1957 年提出来的一种算法,也是作为神经网络（深度学习）的起源的算法。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.uml.org.cn%2Fai%2Fimages%2F2020052011.jpg&amp;refer=http%3A%2F%2Fwww.uml.org.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1661311955&amp;t=591c0a8c7b8be28e8d2fdaafe52f82f5">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        感知机算法
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-07-25
+                        </span>
+                        <span>
+                            9 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/ji-qi-xue-xi/" class="post-tag">
+                            # 机器学习
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.uml.org.cn%2Fai%2Fimages%2F2020052011.jpg&amp;refer=http%3A%2F%2Fwww.uml.org.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1661311955&amp;t=591c0a8c7b8be28e8d2fdaafe52f82f5" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>感知机是由美国学者Fran Rosenblatt 在1957 年提出来的一种算法,也是作为神经网络（深度学习）的起源的算法。</p>
+<!-- more -->
+<p>分类(classification)指的是预测样本所属类别的一类问题。形式化表述，分类问题的目标就是给定输人样本x，将其分配给K种类别中的一种，其中k=1,…,K。如果K=2，则称为二分类，否则称为多分类。</p>
+<h2 id="heading">线性分类模型与感知机算法</h2>
+<p>线性分类模型就是通过一条“线”将数据一分为二。线性模型由特征函数和对应的权重向量组成。</p>
+<p>而通过线性分类模型进行分类的话，必须先将样本转化为向量然后有一个感知机分类器才能进行。</p>
+<h3 id="heading-1">特征向量与样本空间</h3>
+<p><strong>特征向量：描述样本特征的向量。</strong></p>
+<p><strong>样本空间：样本分布的空间。</strong></p>
+<p>在收集了大量的样本后，可能会得到一个密集的样本空间。</p>
+<p><img src="https://voluntexi.github.io//post-images/1658720004770.png" alt="" /></p>
+<p>在样本转化为了特征向量后，分类问题实质上就是对样本空间的切割问题。</p>
+<h3 id="heading-2">决策边界与分离超平面</h3>
+<p><img src="https://voluntexi.github.io//post-images/1658720012004.png" alt="" /></p>
+<p>如上图所示，若两个样本可以通过一条直线分开。那么左右两边称为决策区域，而这条直线成为了决策边界。</p>
+<p>二维空间中，如果决策边界是直线，则称产生该决策边界的模型为线性分类模型。</p>
+<p>三维空间中的线性模型用平面做决策，任意维度空间中的线性决策边界统称为<strong>分离超平面</strong>。</p>
+<p><img src="https://img-blog.csdnimg.cn/201812290631543.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ppYW5fcWlhbw==,size_16,color_FFFFFF,t_70" alt="img" /></p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mspace linebreak="newline"></mspace><mtext>将其推广到</mtext><mi>N</mi><mtext>维空间</mtext><mo>:</mo><msub><mi>w</mi><mn>1</mn></msub><mi>x</mi><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><mi>y</mi><mo>+</mo><msub><mi>w</mi><mn>3</mn></msub><mi>z</mi><mo>+</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo>+</mo><mi>b</mi><mo>=</mo><mn>0</mn><mi>w</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>w</mi><mn>1</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>w</mi><mi>N</mi></msub><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">]</mo><mo separator="true">,</mo><mi>x</mi><mo>=</mo><mo stretchy="false">[</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>z</mi><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mtext>如上图：直线方程为</mtext><mn>3</mn><mi>x</mi><mo>−</mo><mi>y</mi><mo>−</mo><mn>1.5</mn><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mtext>那么权重向量为【</mtext><mn>3</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1.5</mn><mtext>】</mtext><mo separator="true">,</mo><mtext>那么“沈雁冰”的特征向量为【</mtext><mn>1</mn><mtext>，</mtext><mn>1</mn><mtext>，</mtext><mn>1</mn><mtext>】在有了决策边界的方程之后，线性模型使用方程左边的符号来作为最终的决策。</mtext><mo stretchy="false">!</mo><mo stretchy="false">[</mo><mo stretchy="false">]</mo><mo stretchy="false">(</mo><mi>h</mi><mi>t</mi><mi>t</mi><mi>p</mi><mi>s</mi><mo>:</mo><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>v</mi><mi>o</mi><mi>l</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>x</mi><mi>i</mi><mi mathvariant="normal">.</mi><mi>g</mi><mi>i</mi><mi>t</mi><mi>h</mi><mi>u</mi><mi>b</mi><mi mathvariant="normal">.</mi><mi>i</mi><mi>o</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mo>−</mo><mi>i</mi><mi>m</mi><mi>a</mi><mi>g</mi><mi>e</mi><mi>s</mi><mi mathvariant="normal">/</mi><mn>1658720021793.</mn><mi>p</mi><mi>n</mi><mi>g</mi><mo stretchy="false">)</mo><mtext>例如：沈冰雁【</mtext><mn>1</mn><mtext>，</mtext><mn>1</mn><mtext>，</mtext><mn>1</mn><mtext>】带入直线方程</mtext><mn>3</mn><mo>−</mo><mn>1</mn><mo>−</mo><mn>1.5</mn><mo>=</mo><mn>0.5</mn><mo>&gt;</mo><mn>0</mn><mtext>，决策符号为</mtext><mn>1</mn><mtext>。线性可分：如果数据集中所有样本都可以被分离超平面分割。若出现线性不可分的数据，我们可以采用如下方式来进行分类：</mtext><mo>∗</mo><mtext>定义更多的特征给定了训练集，可以通过感知机来进行训练线性模型。</mtext><mo>∗</mo><mtext>读入训练样本，进行预测</mtext><mo>∗</mo><mo>∗</mo><mi>s</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>n</mi><mo stretchy="false">(</mo><mi>w</mi><mtext>•</mtext><mi>X</mi><mo stretchy="false">)</mo><mo>∗</mo><mo>∗</mo></mrow><annotation encoding="application/x-tex">\\将其推广到N维空间:w_1x+w_2y+w_3z+.....+b=0
+w=[w_1,....,w_N,b],x=[x,y,z,....,1]
+如上图：直线方程为3x-y-1.5=0,那么权重向量为【3,-1,-1.5】,那么“沈雁冰”的特征向量为【1，1，1】
+在有了决策边界的方程之后，线性模型使用方程左边的符号来作为最终的决策。
+![](https://voluntexi.github.io//post-images/1658720021793.png)
+例如：
+沈冰雁【1，1，1】带入直线方程3-1-1.5=0.5&gt;0，决策符号为1。
+线性可分：如果数据集中所有样本都可以被分离超平面分割。
+若出现线性不可分的数据，我们可以采用如下方式来进行分类：
+* 定义更多的特征
+
+给定了训练集，可以通过感知机来进行训练线性模型。
+* 读入训练样本，进行预测**singn(w • X)**</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">将其推广到</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord cjk_fallback">维空间</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">.....</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">....</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">....</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">]</span><span class="mord cjk_fallback">如上图：直线方程为</span><span class="mord">3</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">那么权重向量为【</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">−</span><span class="mord">1.5</span><span class="mord cjk_fallback">】</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">那么</span><span class="mord">“</span><span class="mord cjk_fallback">沈雁冰</span><span class="mord">”</span><span class="mord cjk_fallback">的特征向量为【</span><span class="mord">1</span><span class="mord cjk_fallback">，</span><span class="mord">1</span><span class="mord cjk_fallback">，</span><span class="mord">1</span><span class="mord cjk_fallback">】在有了决策边界的方程之后，线性模型使用方程左边的符号来作为最终的决策。</span><span class="mclose">!</span><span class="mopen">[</span><span class="mclose">]</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mord mathnormal">ttp</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">//</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">i</span><span class="mord">.</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">i</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mord mathnormal">u</span><span class="mord mathnormal">b</span><span class="mord">.</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord">//</span><span class="mord mathnormal">p</span><span class="mord mathnormal">os</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ima</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">es</span><span class="mord">/1658720021793.</span><span class="mord mathnormal">p</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mclose">)</span><span class="mord cjk_fallback">例如：沈冰雁【</span><span class="mord">1</span><span class="mord cjk_fallback">，</span><span class="mord">1</span><span class="mord cjk_fallback">，</span><span class="mord">1</span><span class="mord cjk_fallback">】带入直线方程</span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6835em;vertical-align:-0.0391em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">0</span><span class="mord cjk_fallback">，决策符号为</span><span class="mord">1</span><span class="mord cjk_fallback">。线性可分：如果数据集中所有样本都可以被分离超平面分割。若出现线性不可分的数据，我们可以采用如下方式来进行分类：</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">定义更多的特征给定了训练集，可以通过感知机来进行训练线性模型。</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">读入训练样本，进行预测</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∗</span><span class="mord mathnormal">s</span><span class="mord mathnormal">in</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mord">•</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4653em;"></span><span class="mord">∗</span></span></span></span></span><p>在x=-0.3，y=0.96的时候 不符合，此时更新w和b，<br />
+\w_1=w_1+z<em>x</em>ŋ=1-0.3<em>0.5=0.85，\w_2=w_2+z</em>y<em>ŋ=1+0.96</em>0.5=1.48\<br />
+b=b+1*ŋ=-0.5</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 21: …t numpy as np
+#̲ 初始化 w 和 b
+# 向…" style="color:#cc0000">import numpy as np
+# 初始化 w 和 b
+# 向量的点积
+    return np.dot(w,x)+b 
+X = np.array([[5,2], [3,2], [2,7], [1,4], [6,1], [4,5]])
+run = True
+    run = False
+        if y*d(x)&lt;=0:
+            run = True
+print(w,b)
+negative = [x for x,y in zip(X,Y) if y==-1]
+plt.title(&#x27;w=&#x27;+str(w)+&#x27;, b=&#x27;+str(b))
+plt.scatter([x[0] for x in negative],[x[1] for x in negative],c=&#x27;red&#x27;,marker=&#x27;x&#x27;)
+plt.xlim(min([x[0] for x in X])-1,max([x[0] for x in X])+1)
+plt.show()</span><p>eg：假设损失函数J(w)=w^2,w=1时， △w=2w=2,方向为正无穷\<br />
+如果参数反方向移动，取学习率a=0.5，\<br />
+则w\leftarrow 1-0.5*2=0,则J(0)=0,马上就减少了</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>J(w)=\frac{1}{N}\sum^{N}_{i=1}max(0,-y<em>w</em>x)<br />
+\其中，y为误分类点，w为参数，x为训练样本自变量</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 1: #̲## 投票感知机和平均感知机…" style="color:#cc0000">### 投票感知机和平均感知机
+假设有10 000个实例，模型在前9999个实例的学习中都完美地得到正确答案，说明此时的模型接近完美了。可是最后一个实例是个噪声点,朴素感知机模型预测错误后直接修改了模型，导致前面9999个实例预测错误，模型训练前功尽弃。怎么办呢?
+可以采用简单的解决方法：投票感知机和平均感知机
+投票感知机：在每次迭代的时候，将参数、准确率都保留。在最后预测的时候每个模型都给出自己的结果，然后乘上对应的准确率加权平均值就得出最终结果。最后结果最高的确立为最终的参数。
+平均感知机：对每次迭代取模型参数加权相加平均，将平均值作为最终结果。
+![](https://voluntexi.github.io//post-images/1658720047833.png)
+## 实例
+通过使用hanlp来对&quot;赵建军&quot;, &quot;沈雁冰&quot;, &quot;陆雪琪&quot;, &quot;李冰冰&quot;进行性别的分类
+```python
+from tests.test_utility import ensure_data
+TRAINING_SET = os.path.join(&#x27;./train.csv&#x27;)
+def run_classifier():
+    print(&#x27;训练集准确率：&#x27;, classifier.train(TRAINING_SET, 10, False))
+    print(&#x27;特征数量：&#x27;, len(model.parameter))
+    for name in test:
+    print(&#x27;测试集准确率：&#x27;, classifier.evaluate(TESTING_SET))
+    run_classifier()
+
+训练集准确率： P=85.72 R=85.05 F1=85.39
+赵建军=男
+陆雪琪=女
+测试集准确率： P=83.35 R=82.82 F1=83.09
+
+
+感知机模型由于其简单，在应用时也有一定的局限，主要体现在以下几点。
+* 感知机只能处理线性可分的数据集，线性不可分的数据集会引起分离超平面的震荡而无法收敛。
+* 感知机的判别模型由符号函数给出，无法表示更复杂的非线性映射。</span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/yin-ma-er-ke-fu-mo-xing/">
+                    <h3 class="post-title">
+                        隐马尔可夫模型
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

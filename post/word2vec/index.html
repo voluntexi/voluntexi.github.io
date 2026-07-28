@@ -1,0 +1,314 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>Word2Vec | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Word2Vec | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="深度学习,NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="Word2Vec Word2Vec是常用的词嵌入模型之一。Word2Vec实际是一种浅层的神经网络模型，它有两种网络结构，分别是CBOW（Continues Bag of Words）连续词袋和Skip-gram。 我们可以选择其中一个方法来获得文本的词向量结果。">
+<link rel="canonical" href="https://voluntexi.github.io/post/word2vec/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Word2Vec","url":"https://voluntexi.github.io/post/word2vec/","description":"Word2Vec Word2Vec是常用的词嵌入模型之一。Word2Vec实际是一种浅层的神经网络模型，它有两种网络结构，分别是CBOW（Continues Bag of Words）连续词袋和Skip-gram。 我们可以选择其中一个方法来获得文本的词向量结果。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190521%2F72fd1c14c576478c89a0e1029cc5a9d4.jpeg\u0026refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1667817046\u0026t=cbb16e5fef506686286d802c25ff6813","datePublished":"2022-10-17T17:44:10+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/word2vec/","name":"Word2Vec","position":2}]}</script>
+<meta property="og:title" content="Word2Vec">
+<meta property="og:description" content="Word2Vec Word2Vec是常用的词嵌入模型之一。Word2Vec实际是一种浅层的神经网络模型，它有两种网络结构，分别是CBOW（Continues Bag of Words）连续词袋和Skip-gram。 我们可以选择其中一个方法来获得文本的词向量结果。">
+<meta property="og:url" content="https://voluntexi.github.io/post/word2vec/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190521%2F72fd1c14c576478c89a0e1029cc5a9d4.jpeg&amp;refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1667817046&amp;t=cbb16e5fef506686286d802c25ff6813">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/word2vec/">
+<meta name="twitter:title" content="Word2Vec">
+<meta name="twitter:description" content="Word2Vec Word2Vec是常用的词嵌入模型之一。Word2Vec实际是一种浅层的神经网络模型，它有两种网络结构，分别是CBOW（Continues Bag of Words）连续词袋和Skip-gram。 我们可以选择其中一个方法来获得文本的词向量结果。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190521%2F72fd1c14c576478c89a0e1029cc5a9d4.jpeg&amp;refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1667817046&amp;t=cbb16e5fef506686286d802c25ff6813">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        Word2Vec
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-10-17
+                        </span>
+                        <span>
+                            11 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/shen-du-xue-xi/" class="post-tag">
+                            # 深度学习
+                        </a>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190521%2F72fd1c14c576478c89a0e1029cc5a9d4.jpeg&amp;refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1667817046&amp;t=cbb16e5fef506686286d802c25ff6813" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <h1 id="word2vec">Word2Vec</h1>
+<p>Word2Vec是常用的词嵌入模型之一。Word2Vec实际是一种<strong>浅层的神经网络</strong>模型，它有两种网络结构，<strong>分别是CBOW（Continues Bag of Words）连续词袋和Skip-gram。</strong> 我们可以选择其中一个方法来获得文本的词向量结果。</p>
+<!-- more -->
+<p><strong>《word2vec Parameter Learning Explained》：https://arxiv.org/pdf/1411.2738.pdf</strong></p>
+<hr>
+<h2 id="skip-gram"><strong>Skip-gram</strong></h2>
+<p>Skip-gram是通过当前词来预测窗口中上下文词出现的概率模型。如果滑动窗口为n，那么就是将中心词的前n个词和后n个词作为样本带入进行训练，每次迭代训练2*n个样本。(通常是该词前k/2个词，该词后k/2个词，但从推导来看由于权重不同，对于窗口和词位置的关系并没有太大关系，前后词数不一定要对称）</p>
+<p>例如：</p>
+<blockquote>
+<p>句子：我 下午 准备 去 打 篮球</p>
+<p>设置滑动窗口为2，那么滑动窗口为：</p>
+<p>第一次输入：准备 -&gt;来预测&quot;我 下午 去 打&quot;,</p>
+<p>第二次输入:  去 -&gt;来预测&quot;下午 准备  打 篮球&quot;</p>
+<p>每次训练4个样本</p>
+</blockquote>
+<p><strong>原理如下</strong>：</p>
+<p><img src="https://voluntexi.github.io//post-images/1665906780418.png" alt="" /></p>
+<p>其中：V为词的数量；D为设定的词向量的维度；W为词的中心词矩阵；w*为词的周围词矩阵。</p>
+<h3 id="softmax">softmax</h3>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>o</mi><mi mathvariant="normal">∣</mi><mi>c</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(o|c)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">o</span><span class="mord">∣</span><span class="mord mathnormal">c</span><span class="mclose">)</span></span></span></span>为通过c预测词为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext> </mtext><mi>o</mi></mrow><annotation encoding="application/x-tex">\ o</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mspace"> </span><span class="mord mathnormal">o</span></span></span></span>的概率，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext> </mtext><msub><mi>v</mi><mi>c</mi></msub><mo separator="true">,</mo><msub><mi>u</mi><mn>0</mn></msub><mtext>，</mtext><msub><mi>u</mi><mi>w</mi></msub></mrow><annotation encoding="application/x-tex">\ v_c,u_0，u_w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">，</span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>分别为窗口内上下文词向量和中心词向量</p>
+<h3 id="heading"><strong>损失函数</strong></h3>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><hr>
+<p>总体流程如下：</p>
+<ul>
+<li>随机生成<strong>中心词矩阵w和周围词矩阵w</strong>*</li>
+<li>对词wi生成<strong>ont hot</strong>向量，将向量与<strong>中心词矩阵W</strong>相乘，获得<strong>中心词向量</strong></li>
+<li>将<strong>中心词向量</strong>与<strong>周围词矩阵w</strong><em>相乘，作为</em><em>周围词向量</em>*</li>
+<li>将<strong>周围词向量</strong>经过softmax作为输出向量也就是所预测的每个词的概率</li>
+<li>接下来就是反向传播来调整W和W’这两个矩阵数据进行优化，使得目标词的概率最大，损失函数最小</li>
+<li>最后将<strong>中心词矩阵W</strong>作为词的最终词向量</li>
+</ul>
+<p><img src="https://voluntexi.github.io//post-images/1757831509906.jpg" alt="" /></p>
+<hr>
+<h2 id="cbow">CBOW</h2>
+<p>CBOW原理与Skip-gram相反，是通过设置滑动窗口获得<strong>中间词</strong>两边的的上下文，然后用周围的词去预测中间的词。</p>
+<p><img src="https://voluntexi.github.io//post-images/1665906792706.png" alt="" /></p>
+<h3 id="softmax-1">softmax</h3>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>c</mi><mi mathvariant="normal">∣</mi><mi>o</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(c|o)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">c</span><span class="mord">∣</span><span class="mord mathnormal">o</span><span class="mclose">)</span></span></span></span>为通过中性词向量o预测词为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext> </mtext><mi>c</mi></mrow><annotation encoding="application/x-tex">\ c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mspace"> </span><span class="mord mathnormal">c</span></span></span></span>的概率，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext> </mtext><msub><mi>v</mi><mi>c</mi></msub><mo separator="true">,</mo><msub><mi>v</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\ v_c,v_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>为中心词向量，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext> </mtext><msub><mi>u</mi><mi>o</mi></msub></mrow><annotation encoding="application/x-tex">\ u_o</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mspace"> </span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>为窗口内上下文向量</p>
+<h3 id="heading-1"><strong>损失函数</strong></h3>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><hr>
+<ul>
+<li>随机生成<strong>中心词矩阵w*和窗口上下文词矩阵w</strong>中的参数</li>
+<li>当前词的上下文词语的one-hot编码输入到输入层。</li>
+<li>这些上下文词分别乘以同一个<strong>窗口上下文词矩阵W</strong>后分别得到各自的1*D向量。</li>
+<li>将这些1*D向量相加取平均作为<strong>窗口上下文向量</strong>。</li>
+<li>将这个1*D向量乘 <strong>中心词矩阵w</strong>*，作为<strong>中心词向量</strong>。</li>
+<li>将<strong>中心词向量</strong>softmax归一化后输出取每个词的概率向量1*V。</li>
+<li>接下来就是反向传播来调整<strong>中心矩阵W</strong>和<strong>上下文词矩阵w</strong>*这两个矩阵数据进行优化，使得目标词的概率最大，损失函数最小</li>
+<li>最后将<strong>中心词矩阵W</strong>作为词的最终词向量</li>
+</ul>
+<hr>
+<h2 id="word2vec-1">Word2Vec优化策略</h2>
+<p>论文提供了对<strong>Skip-gram模型</strong>两种优化的策略，分别是<strong>分层softmax和负样本</strong></p>
+<p>同时也可以运用在CBOW模型中</p>
+<p>也告诉了我们在训练词向量的时候的关键超参数：choice of the model architecture, the size of the vectors, the subsampling rate and the size of the training window.(模型的选择，向量的维度，子采样率和滑动窗口的大小)</p>
+<h3 id="softmax-2">层次Softmax</h3>
+<p><strong>层次softmax</strong>将softmax变为多个<strong>sigmod函数</strong>，进行多分类而减少softmax的计算，提升的效率。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p><img src="https://voluntexi.github.io//post-images/1665906805329.png" alt="" /></p>
+<p>层次softmax首先利用树结构的叶节点表示词库中的每一个词，从根节点到叶节点的路径，每一个中间路径都对应着一个概率，某个词出现的概率的计算方式改为<strong>路径上所有中间路径概率的乘积</strong>。</p>
+<p><img src="https://voluntexi.github.io//post-images/1665906840359.png" alt="" /></p>
+<p>每一个中间路节点（上图中实心球）对应一个D*1的向量，然后上面得到的1*D的向量与中间路径向量相乘，得到一个数值z，z输入到<strong>sigmod函数</strong>得到一个0-1的数值，就是该节点到下一节点向左的概率，另外一侧概率是1-sigmod(z)，这样就得到了中间路径的概率。最后某个词的概率就是从根节点到叶子节点中间路径概率的乘积。</p>
+<p>同时层次softmax的目标函数也做出了改变为了<strong>最大化目标词的路径概率</strong>，就是只关注目标词所在路径的概率，其他路径不再关注，也无需计算。</p>
+<h4 id="heading-2">具体</h4>
+<p>通过词出现在语料库中的频率进行排序，构建出哈夫曼树，频率越高则离根节点越近</p>
+<p><img src="https://voluntexi.github.io//post-images/1665906902025.png" alt="" /></p>
+<p>输入词c而输出为i的概率为：</p>
+<p><img src="https://voluntexi.github.io//post-images/1665906943789.png" alt="" /></p>
+<p><strong>层次Softmax构建公式</strong></p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo stretchy="false">(</mo><mi>w</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">n(w,j)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">)</span></span></span></span>表示词w在树的第j个节点,L(w)表示树的高度<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">(</mo><mi>w</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><msub><mi>v</mi><mrow><mi>w</mi><mi>I</mi></mrow></msub></mrow><annotation encoding="application/x-tex">ch(n(w,j))\\v_{wI}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">h</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">))</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span><span class="mord mathnormal mtight" style="margin-right:0.0785em;">I</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>表示中心词向量<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>v</mi><mrow><mi>n</mi><mo stretchy="false">(</mo><mi>w</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo></mrow><mrow><mo mathvariant="normal">′</mo><mi>T</mi></mrow></msubsup></mrow><annotation encoding="application/x-tex">v&#x27;^T_{n(w,j)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3383em;vertical-align:-0.497em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-2.378em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.497em;"><span></span></span></span></span></span></span></span></span></span>表示词w在树的第j个节点的向量</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;\end&#x27; at position 20: …uad x==True\\
+\̲e̲n̲d̲{cases}
+**损失函数…" style="color:#cc0000">1,\quad x==True\\
+\end{cases}
+**损失函数**
+J(\theta)=-logp(w|w_I)
+
+
+
+
+![](https://voluntexi.github.io//post-images/1665906954623.png)
+&gt; 训练样本 ( input word: &quot;fox&quot;，output word: &quot;quick&quot;) 
+训练我们的神经网络时，“ fox”和“quick”都是经过**one-hot编码**的。如果我们的**语料库有10000个词**，在输出层，我们期望对应“quick”单词的输出概率为1，其余9999个都应该输出0。在这里，这9999个我们**期望输出为0的神经元结点**所对应的单词我们称为 **&quot;negative&quot;word**  。
+再选择一小部分的negative words和目标词来更新对应的权重。
+&gt; 在论文中，作者指出:
+&gt; 对于小规模数据集，选择**5-20个**negative words会比较好，
+&gt; 对于大规模数据集可以仅选择**2-5个**negative words
+![](https://voluntexi.github.io//post-images/1665906962472.png)
+如果隐层-输出层拥有300 x 10000的权重矩阵。如果使用了负采样的方法我们仅仅去更新我们的positive word-“quick”的和我们选择的其他5个negative words的结点对应的权重，共计6个输出神经元，相当于每次只更新300×6=1800个权重。对于3百万的权重来说，相当于只计算了**0.06%** 的权重，这样计算效率就大幅度提高。
+#### 具体
+**负样本抽取公式为**：
+P(W)=\frac{U(w)^\frac{3}{4}}{Z}
+就是对词w的出现频率进行3/4次方再进行归一化操作
+**举个例子：**
+
+p(a)=\frac{0.01^{3/4}}{0.01^{3/4}+0.99^{3/4}}=0.03
+
+p(b)=\frac{0.99^{3/4}}{0.01^{3/4}+0.99^{3/4}}=0.97</span><p>J(\theta)=-log\sigma(u_0^Tv_c)-\sum_{k=1}^KE_{k-p(w)}[log\sigma(-u_k^Tv_C)]\</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 578: …ord2Vec
+
+    #̲首先打开需要进行训练的提前进行…" style="color:#cc0000">class gensim.models.word2vec.Word2Vec(sentences=None, corpus_file=None, vector_size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, ns_exponent=0.75, cbow_mean=1, hashfxn=&lt;built-in function hash&gt;, epochs=5, null_word=0, trim_rule=None, sorted_vocab=1, batch_words=10000, compute_loss=False, callbacks=(), max_final_vocab=None)
+
+
+
+* **sg：** 即我们的word2vec两个模型的选择了。如果是0， 则是CBOW模型；是1则是Skip-Gram模型；默认是CBOW模型。
+* **negative:** 即选取负采样词的个数，默认是5。
+
+
+from gensim.models import Word2Vec
+
+    #首先打开需要进行训练的提前进行分词后的语料库
+    #通过Word2vec进行训练
+    #保存训练好的模型
+
+
+    A()
+    print(model.wv[&#x27;张飞&#x27;])
+
+E:\python310\python.exe E:\word2vec\run.py 
+  0.36244896 -0.13611287 -0.04305122 -0.05948525  0.6624021   0.19892757
+ -0.29462233 -0.4473715   0.01844584  0.22937016  0.30038676  0.37411225
+ -0.19900236 -0.05217438  0.03655851 -0.7016526   0.11351124 -0.28412226
+ -0.46942952 -0.15252821  0.13466035 -0.32120392  0.06884138  0.47682145
+  0.30353147  0.14394882  0.07643879  0.3689174   0.4029759  -0.04832706]
+进程已结束,退出代码0</span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/shen-jing-wang-luo/">
+                    <h3 class="post-title">
+                        神经网络
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

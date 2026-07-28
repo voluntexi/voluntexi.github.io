@@ -1,0 +1,372 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>隐马尔可夫模型 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="隐马尔可夫模型 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="机器学习" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="隐马尔可夫模型（Hidden Markov Model，HMM）是描述两个时序序列联合分布p(x,y)的概率模型。">
+<link rel="canonical" href="https://voluntexi.github.io/post/yin-ma-er-ke-fu-mo-xing/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"隐马尔可夫模型","url":"https://voluntexi.github.io/post/yin-ma-er-ke-fu-mo-xing/","description":"隐马尔可夫模型（Hidden Markov Model，HMM）是描述两个时序序列联合分布p(x,y)的概率模型。","image":"https://www.edrawsoft.cn/wp/wp-content/uploads/2020/10/yingmaekefumxa.png","datePublished":"2022-07-21T13:17:14+08:00","dateModified":"2026-05-22T18:33:21+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/yin-ma-er-ke-fu-mo-xing/","name":"隐马尔可夫模型","position":2}]}</script>
+<meta property="og:title" content="隐马尔可夫模型">
+<meta property="og:description" content="隐马尔可夫模型（Hidden Markov Model，HMM）是描述两个时序序列联合分布p(x,y)的概率模型。">
+<meta property="og:url" content="https://voluntexi.github.io/post/yin-ma-er-ke-fu-mo-xing/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://www.edrawsoft.cn/wp/wp-content/uploads/2020/10/yingmaekefumxa.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/yin-ma-er-ke-fu-mo-xing/">
+<meta name="twitter:title" content="隐马尔可夫模型">
+<meta name="twitter:description" content="隐马尔可夫模型（Hidden Markov Model，HMM）是描述两个时序序列联合分布p(x,y)的概率模型。">
+<meta name="twitter:image" content="https://www.edrawsoft.cn/wp/wp-content/uploads/2020/10/yingmaekefumxa.png">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        隐马尔可夫模型
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-07-21
+                        </span>
+                        <span>
+                            13 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/ji-qi-xue-xi/" class="post-tag">
+                            # 机器学习
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://www.edrawsoft.cn/wp/wp-content/uploads/2020/10/yingmaekefumxa.png" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>隐马尔可夫模型（Hidden Markov Model，HMM）是描述两个时序序列联合分布p(x,y)的概率模型。</p>
+<!-- more -->
+<p>x序列外界可见（外界指的是观测者)，称为观测序列( observation sequence ) ; y序列外界不可见，称为状态序列( state sequence )。</p>
+<p>隐马尔可夫模型之所以称为“马尔可夫模型”，是因为它满足马尔可夫假设。</p>
+<p>马尔可夫假设：每个事件的发生概率只取决于前一个事件。</p>
+<hr/>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mspace linebreak="newline"></mspace><mtext>② 任意时刻观测</mtext><msub><mi>x</mi><mi>t</mi></msub><mtext>只依赖于该时刻的</mtext><msub><mi>y</mi><mi>t</mi></msub><mo separator="true">,</mo><mtext>于其他时刻的状态和观测无关</mtext><mo stretchy="false">!</mo><mo stretchy="false">[</mo><mo stretchy="false">]</mo><mo stretchy="false">(</mo><mi>h</mi><mi>t</mi><mi>t</mi><mi>p</mi><mi>s</mi><mo>:</mo><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>v</mi><mi>o</mi><mi>l</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>x</mi><mi>i</mi><mi mathvariant="normal">.</mi><mi>g</mi><mi>i</mi><mi>t</mi><mi>h</mi><mi>u</mi><mi>b</mi><mi mathvariant="normal">.</mi><mi>i</mi><mi>o</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">/</mi><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mo>−</mo><mi>i</mi><mi>m</mi><mi>a</mi><mi>g</mi><mi>e</mi><mi>s</mi><mi mathvariant="normal">/</mi><mn>1658380756706.</mn><mi>p</mi><mi>n</mi><mi>g</mi><mo stretchy="false">)</mo><mtext>为什么</mtext><mi>x</mi><mtext>可以决定</mtext><mi>y</mi><mtext>呢？因为在概率论中：联合概率分布</mtext><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mtext>中</mtext><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">\\ ②\ 任意时刻观测x_t只依赖于该时刻的y_t,于其他时刻的状态和观测无关
+![](https://voluntexi.github.io//post-images/1658380756706.png)
+ 为什么x可以决定y呢？因为在概率论中：联合概率分布p(x,y)中\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">②</span><span class="mspace"> </span><span class="mord cjk_fallback">任意时刻观测</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">只依赖于该时刻的</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">于其他时刻的状态和观测无关</span><span class="mclose">!</span><span class="mopen">[</span><span class="mclose">]</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mord mathnormal">ttp</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">//</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">i</span><span class="mord">.</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">i</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mord mathnormal">u</span><span class="mord mathnormal">b</span><span class="mord">.</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord">//</span><span class="mord mathnormal">p</span><span class="mord mathnormal">os</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ima</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">es</span><span class="mord">/1658380756706.</span><span class="mord mathnormal">p</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mclose">)</span><span class="mord cjk_fallback">为什么</span><span class="mord mathnormal">x</span><span class="mord cjk_fallback">可以决定</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord cjk_fallback">呢？因为在概率论中：联合概率分布</span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span><span class="mord cjk_fallback">中</span></span><span class="mspace newline"></span></span></span></span><p>隐马尔可夫模型利用了三个要素来模拟时序序列的发生，分别为<strong>初始状态概率向量、状态转移概率矩阵和发射概率矩阵（观测概率矩阵）</strong></p>
+<h3 id="heading">初始状态概率向量</h3>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>通过</mtext><mi>p</mi><mo stretchy="false">(</mo><msub><mi>y</mi><mn>1</mn></msub><mi mathvariant="normal">∣</mi><mi>π</mi><mo stretchy="false">)</mo><mtext>表示，其中</mtext><mo>:</mo><mspace linebreak="newline"></mspace><mi>π</mi><mtext>称之为初始状态概率向量</mtext></mrow><annotation encoding="application/x-tex">通过p(y_1|\pi)表示，其中:\\
+ \pi称之为初始状态概率向量</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">通过</span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mclose">)</span><span class="mord cjk_fallback">表示，其中</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord cjk_fallback">称之为初始状态概率向量</span></span></span></span></span><p>P(B) = 0.7\ P(M) = 0\ P(E) = 0\ P(S) = 0.3</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>p(y_1=B)=0.7\<br />
+p(y_1=M)=0\<br />
+p(y_1=E)=0\<br />
+p(y_1=S)=0.3\<br />
+此时的隐马尔可夫模型的初始状态概率向量为:[0.7,0,0,0.3]</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 1: #̲## 状态转移概率矩阵
+状态…" style="color:#cc0000">### 状态转移概率矩阵
+状态转移概率矩阵的确定过程：
+  在确定了y_t后根据马尔可夫假设，可以将y_t转移到y_{t+1}。因为y_t一共有N种假设状态，\\</span><p><img src="https://voluntexi.github.io//post-images/1658380795952.png" alt="" /></p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>S</mi><mi mathvariant="normal">∣</mi><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mtext>就可以模拟这种禁止转移的需求。</mtext><mspace linebreak="newline"></mspace><mtext>减少</mtext><mi>p</mi><mo stretchy="false">(</mo><msub><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>M</mi><mi mathvariant="normal">∣</mi><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>M</mi><mo stretchy="false">)</mo><mtext>来模拟该语言现象。</mtext><mspace linebreak="newline"></mspace><mtext>同样，词性标注中的“形容词</mtext><mo>→</mo><mtext>名词”“副词</mtext><mo>→</mo><mtext>动词”也可以通过状态转移概率来模拟。</mtext><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">p(y_{t+1}=S|y_t=B)=0就可以模拟这种禁止转移的需求。\\
+  减少p(y_{t+1}=M|y_t=M)来模拟该语言现象。\\同样，词性标注中的“形容词→名词”“副词→动词”也可以通过状态转移概率来模拟。\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">0</span><span class="mord cjk_fallback">就可以模拟这种禁止转移的需求。</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">减少</span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mclose">)</span><span class="mord cjk_fallback">来模拟该语言现象。</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord cjk_fallback">同样，词性标注中的</span><span class="mord">“</span><span class="mord cjk_fallback">形容词</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord cjk_fallback">名词</span><span class="mord">”“</span><span class="mord cjk_fallback">副词</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord cjk_fallback">动词</span><span class="mord">”</span><span class="mord cjk_fallback">也可以通过状态转移概率来模拟。</span></span><span class="mspace newline"></span></span></span></span><h3 id="heading-1">发射概率矩阵</h3>
+<p>有了状态y之后那么怎么确定对应的观测x的概率分布呢？</p>
+<p>这时根据隐马尔可夫假设②任意时刻观测x只依赖于该时刻的y,于其他时刻的状态和观测无关。若观测x一共有M种可能，那么x的概率分布参数向量的维度为M。由于y一共有N种，那么这些参数构成了N*M矩阵(size(状态) * size(x))，成为发射概率矩阵B。</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mtext>阿</mtext><mi mathvariant="normal">∣</mi><msub><mi>y</mi><mn>1</mn></msub><mo>=</mo><mi>B</mi><mo stretchy="false">)</mo><mtext>对应为矩阵中左上角的第一个元素。</mtext><mspace linebreak="newline"></mspace><mtext>若字符集的大小为</mtext><mn>1000</mn><mtext>，那么</mtext><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn><mo>∗</mo><mn>1000</mn><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">p(x_1=阿|y_1=B)对应为矩阵中左上角的第一个元素。\\若字符集的大小为1000，那么size(B)=4*1000\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">阿</span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mclose">)</span><span class="mord cjk_fallback">对应为矩阵中左上角的第一个元素。</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">若字符集的大小为</span><span class="mord">1000</span><span class="mord cjk_fallback">，那么</span><span class="mord mathnormal">s</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mord mathnormal">e</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1000</span></span><span class="mspace newline"></span></span></span></span><p><img src="https://voluntexi.github.io//post-images/1658380803841.png" alt="" /></p>
+<p><img src="https://voluntexi.github.io//post-images/1658380809450.png" alt="" /></p>
+<p>初始状态概率向量、状态转移概率矩阵与发射概率矩阵成为隐马尔可夫模型的三元组。三元组确定后，隐马尔可夫模型就确定了。</p>
+<h2 id="heading-2">隐马尔可夫模型的三个基本用法</h2>
+<ul>
+<li>样本生成问题：给定模型三元组，生成满足模型约束的样本。</li>
+<li>模型训练问题：给定训练集，估计模型三元组参数</li>
+<li>序列预测问题：已知模型三元组参数，给定观测序列x，求最可能的状态y</li>
+</ul>
+<h3 id="heading-3">样本生成问题实例</h3>
+<p>设想如下案例:</p>
+<p>某医院招标开发“智能”医疗诊断系统，用来辅助感冒诊断。</p>
+<ul>
+<li>①来诊者只有两种状态:要么健康，要么发烧。</li>
+<li>②来诊者不确定自己到底是哪种状态，只能回答感觉头晕、体寒或正常。</li>
+<li>③感冒这种病，只跟病人前一天的状态有关。</li>
+<li>④当天的病情决定当天的身体感觉。</li>
+</ul>
+<p>有位来诊者的病历卡上完整地记录了最近T天的身体感受(头晕、体寒或正常)，请预测这T天的身体状态（健康或发烧)。</p>
+<p>由于医疗数据属于机密隐私，医院无法提供训练数据，但根据医生经验，感冒发病的规律如图所示。</p>
+<p><img src="https://voluntexi.github.io//post-images/1658380817333.png" alt="" /></p>
+<p>也就是说，在初始状态下有0.4的概率第二天发烧，然后有0.1的概率正常。</p>
+<p>我们可以写出隐马尔可夫模型：</p>
+<p><strong>初始概率向量π</strong>：</p>
+<p>【0.6，0.4】</p>
+<p><strong>状态转移概率矩阵A</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>0.7</th>
+<th>0.3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0.4</strong></td>
+<td><strong>0.6</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>发射概率矩阵B</strong>：</p>
+<table>
+<thead>
+<tr>
+<th><strong>0.5</strong></th>
+<th><strong>0.4</strong></th>
+<th><strong>0.1</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0.1</strong></td>
+<td><strong>0.3</strong></td>
+<td><strong>0.6</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="heading-4"><strong>样本生成：</strong></h4>
+<p>生成过程就是沿着隐马尔可夫链走T步。</p>
+<ul>
+<li>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span></li>
+<li>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span></li>
+<li>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span></li>
+<li>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span></li>
+</ul>
+<h4 id="heading-5">代码：</h4>
+<pre><code class="language-python">import random
+pi=[0.6,0.4]
+y=['健康','发烧']
+x=['头晕','体寒','正常']
+A=[[0.7,0.3],
+   [0.4,0.6]]
+B=[[0.5,0.4,0.1],
+   [0.1,0.3,0.6]]
+size=4
+def generateHMM(status,size):
+    symList=[0 for i in range(size)]
+    symList[0]=x[status]
+    initSym=0 if random.random()&lt;=pi[0] else 1
+    for i in range(1,size):
+        symList[i],initSym=continueGen(initSym,i)
+    print(symList)
+def continueGen(now,i):
+    if i==size-1:
+        return y[now],0
+    else:
+        flag=random.random()
+        genx= 1 if flag&gt;=A[now][0] else 0#下一代的病情
+        flag=random.random()
+        if flag&lt;=B[now][0]:
+            return str(y[now]+&quot; &quot;+x[0]),genx
+        elif flag&lt;=(B[now][1]+B[now][0]):
+            return str(y[now]+&quot; &quot;+x[1]),genx
+        else:
+            return str(y[now]+&quot; &quot;+x[2]),genx
+generateHMM(0,4)
+generateHMM(1,4)
+generateHMM(2,4)
+</code></pre>
+<p>输出如下：</p>
+<pre><code class="language-python">['头晕', '发烧 正常', '健康 体寒', '健康']
+['体寒', '发烧 正常', '发烧 正常', '发烧']
+['正常', '健康 头晕', '发烧 正常', '发烧']
+</code></pre>
+<p>由于随机数的原因，每次运行的结果都是随机的。</p>
+<h3 id="heading-6">模型训练问题实例</h3>
+<p>通过上述样本来进行监督学习来估计模型参数。</p>
+<p>在监督学习中，通过利用极大似然法来估计隐马尔科夫模型的参数。</p>
+<h4 id="heading-7">初始状态概率向量的估计：</h4>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>统计</mtext><msub><mi>y</mi><mn>1</mn></msub><mtext>的所有取值的频次记作向量</mtext><mi>c</mi><mtext>，然后用类似的方法归一化</mtext><mo>:</mo><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">统计y_1的所有取值的频次记作向量c，然后用类似的方法归一化:\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord cjk_fallback">统计</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">的所有取值的频次记作向量</span><span class="mord mathnormal">c</span><span class="mord cjk_fallback">，然后用类似的方法归一化</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span><span class="mspace newline"></span></span></span></span><h4 id="heading-8">转移概率矩阵的估计：</h4>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>根据极大似然估计进行归一化：</mtext><mspace linebreak="newline"></mspace></mrow><annotation encoding="application/x-tex">根据极大似然估计进行归一化：\\</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">根据极大似然估计进行归一化：</span></span><span class="mspace newline"></span></span></span></span><h4 id="heading-9">发射概率矩阵的估计：</h4>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>b</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>B</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub><mrow><munderover><mo>∑</mo><mrow><mi>J</mi><mo>=</mo><mn>1</mn></mrow><mi>M</mi></munderover><msub><mi>B</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>J</mi></mrow></msub></mrow></mfrac><mtext> </mtext><mo separator="true">,</mo><mtext> </mtext><mi>i</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi>N</mi><mo separator="true">,</mo><mi>j</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2...</mn><mo separator="true">,</mo><mi>M</mi></mrow><annotation encoding="application/x-tex">\hat{b}_{ij}=\frac{B_{i,j}}{\sum_{J=1}^{M}B_{i,J}}\ ,\ i=1,2,...N,j=1,2...,M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.244em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">b</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5313em;vertical-align:-1.1709em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.1288em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9812em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0962em;">J</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">M</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.0962em;">J</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.1709em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace"> </span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">...</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2...</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span></span><p>p(y_1=S_i)=\pi_i\ &hellip;①</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>p(y_t=S_j|y_{t-1}=s_i)=A_{i,j}\ &hellip;②</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>p(y)=p(y_1,&hellip;,y_T)=p(y_1)\prod_{t=2}^{T}p(y_t|y_{t-1})</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>p(x_t=O_j|y_t=s_i)=B_{i,j}\ &hellip;③</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>p(x|y)=\prod_{t=1}^{T}p(x_t|y_{t})\ &hellip;④</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>p(x,y)=p(y_1)\prod_{t=2}^{T}p(y_t|y_{t-1})\prod_{t=1}^{T}p(x_t|y_{t})</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>首先求：\<br />
+P（晴天，干燥）=\pi（晴天）<em>B（晴天，干燥）=0.32<br />
+\p（阴天，干燥）=\pi（阴天）<em>B（阴天，干燥）=0.18\<br />
+p（雨天，干燥）=\pi(雨天)<em>B(雨天，干燥)=0.09\<br />
+接下来求：\P（潮湿，晴天|T_1=干燥）=（0.32</em>0.4+0.18</em>0.3</em>0.09<em>0.1）<em>0.2=0.382\<br />
+P（潮湿，阴天|T_1=干燥）=（0.32</em>0.5+0.18</em>0.4+0.09<em>0.5）<em>0.4=0.1108\<br />
+P(潮湿，雨天|T_1=干燥）=（0.32</em>0.1+0.18</em>0.3+0.09*0.4）*0.7=0.0854<br />
+\依此类推：\<br />
+P(干燥，晴天|T_1=干燥,T_2=潮湿)=0.0456\<br />
+&hellip;</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>P=0.0456+0.0637+0.0214=0.1307</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 1: #̲### 维特比算法
+在构成了…" style="color:#cc0000">#### 维特比算法
+在构成了图后，接下来使用维特比算法寻找最优的状态序列：
+![img](https://pic3.zhimg.com/80/v2-456e477e800815414ecf5092b563f7ae_720w.jpg)
+在上面的表格例子中：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20201224204246152.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzkxNDE0,size_16,color_FFFFFF,t_70)
+## HMM应用于中文分词
+大体步骤为：
+* 用{B,M,E,S}进行标注
+* 使用HMM训练
+在hanlp中已经实现了HMM分词器，因此可以直接使用API进行调用：
+```python
+FirstOrderHiddenMarkovModel = JClass(&#x27;com.hankcs.hanlp.model.hmm.FirstOrderHiddenMarkovModel&#x27;)
+def train(model):
+    segmenter.train(&#x27;./msr_training.utf8&#x27;)
+    return segmenter.toSegment()
+    segment = train(msr_train, FirstOrderHiddenMarkovModel())
+
+[商品, 和, 服务]#output
+
+
+
+
+
+2. 计算转移概率矩阵
+4. 使用 Viterbi 算法解码
+如果没有标注语料，则问题的解决过程：
+1. 获取词的个数
+3. 参数学习（利用 EM 迭代算法获取初始状态概率、状态转移概率和输出概率）</span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/zi-fu-chuan-pi-pei/">
+                    <h3 class="post-title">
+                        中文分词方法总结
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

@@ -1,0 +1,308 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>Transformer | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Transformer | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="NLP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN 的顺序结构，使得模型可以并行化训练，而且能够拥有全局信息。">
+<link rel="canonical" href="https://voluntexi.github.io/post/transformer/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Transformer","url":"https://voluntexi.github.io/post/transformer/","description":"Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN 的顺序结构，使得模型可以并行化训练，而且能够拥有全局信息。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg-blog.csdnimg.cn%2F20210307173356317.png%3Fx-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5NjEwOTE1%2Csize_16%2Ccolor_FFFFFF%2Ct_70\u0026refer=http%3A%2F%2Fimg-blog.csdnimg.cn\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1670754998\u0026t=7f66b9c8cf8c12113138065d2aa0ff0e","datePublished":"2022-12-01T17:45:03+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/transformer/","name":"Transformer","position":2}]}</script>
+<meta property="og:title" content="Transformer">
+<meta property="og:description" content="Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN 的顺序结构，使得模型可以并行化训练，而且能够拥有全局信息。">
+<meta property="og:url" content="https://voluntexi.github.io/post/transformer/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg-blog.csdnimg.cn%2F20210307173356317.png%3Fx-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5NjEwOTE1%2Csize_16%2Ccolor_FFFFFF%2Ct_70&amp;refer=http%3A%2F%2Fimg-blog.csdnimg.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1670754998&amp;t=7f66b9c8cf8c12113138065d2aa0ff0e">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/transformer/">
+<meta name="twitter:title" content="Transformer">
+<meta name="twitter:description" content="Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN 的顺序结构，使得模型可以并行化训练，而且能够拥有全局信息。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg-blog.csdnimg.cn%2F20210307173356317.png%3Fx-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5NjEwOTE1%2Csize_16%2Ccolor_FFFFFF%2Ct_70&amp;refer=http%3A%2F%2Fimg-blog.csdnimg.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1670754998&amp;t=7f66b9c8cf8c12113138065d2aa0ff0e">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        Transformer
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-12-01
+                        </span>
+                        <span>
+                            15 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/nlp/" class="post-tag">
+                            # NLP
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg-blog.csdnimg.cn%2F20210307173356317.png%3Fx-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5NjEwOTE1%2Csize_16%2Ccolor_FFFFFF%2Ct_70&amp;refer=http%3A%2F%2Fimg-blog.csdnimg.cn&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1670754998&amp;t=7f66b9c8cf8c12113138065d2aa0ff0e" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>Transformer 是 Google 的团队在 2017 年提出的一种 NLP 经典模型，现在比较火热的 Bert 也是基于 Transformer。Transformer 模型使用了 Self-Attention 机制，不采用 RNN 的顺序结构，使得模型可以并行化训练，而且能够拥有全局信息。</p>
+<!-- more -->
+<h2 id="transformer">Transformer整体结构</h2>
+<p><img src="https://pic4.zhimg.com/80/v2-4544255f3f24b7af1e520684ae38403f_720w.webp" alt="img" /></p>
+<p><strong>Transformer 由 Encoder 和 Decoder 两个部分组成</strong>，Encoder 和 Decoder 都包含 6 个 block。Transformer 的工作流程大体如下：</p>
+<p><strong>第一步：</strong> 获取输入句子的每一个单词的表示向量 <strong>X</strong>，<strong>X</strong>由单词的 Embedding 和单词位置的 Embedding 相加得到。</p>
+<p><img src="https://pic4.zhimg.com/80/v2-7dd39c44b0ae45d31a3ae7f39d3f883f_720w.webp" alt="img" /></p>
+<p><strong>第二步：</strong> 将得到的单词表示向量矩阵 (如上图所示矩阵）作为输入矩阵传入Encorder中，在经过了6个编码器后输出transformer对所有句子的编码信息矩阵C，其大小和输入矩阵相同。</p>
+<img src="https://pic3.zhimg.com/80/v2-45db05405cb96248aff98ee07a565baa_720w.webp" alt="img" style="zoom: 50%;" />
+<p><strong>第三步</strong>：将 Encoder 输出的编码信息矩阵 <strong>C</strong>传递到Decoder 中，Decoder 依次会根据当前翻译过的i个单词,翻译下一个单词 i+1，如下图所示。在使用的过程中，翻译单词的时候需要通过 <strong>Mask (掩盖)</strong> 操作遮盖住该单词之后的所有单词。</p>
+<p><img src="https://pic2.zhimg.com/80/v2-5367bd47a2319397317562c0da77e455_720w.webp" alt="img" /></p>
+<p>上图 Decoder 接收了 Encoder 的编码矩阵 <strong>C</strong>，然后首先输入一个翻译开始符 &ldquo;<Begin>&quot;，掩盖“<Begin>”后的所有单词，来预测单词 &ldquo;I&rdquo;；然后输入 &ldquo;<Begin>&rdquo; 和单词 &ldquo;I&rdquo;，预测单词 &ldquo;have&rdquo;，以此类推。</p>
+<h2 id="transformer-1">Transformer详解</h2>
+<h3 id="transformer-"><strong>Transformer 的输入</strong></h3>
+<p>Transformer 中单词的输入表示 <strong>x</strong>由<strong>单词 Embedding</strong> 和<strong>位置 Embedding</strong> （Positional Encoding）相加得到。</p>
+<p><strong>单词 Embedding</strong></p>
+<p>单词的 Embedding 就是将词语向量化，向量化的方式有很多种，可以采用 Word2Vec、Glove、FastText 等得到，也可以在 Transformer 中训练得到。</p>
+<p><strong>位置 Embedding</strong></p>
+<p>Transformer 中除了单词的 Embedding，还需要使用位置 Embedding 表示单词出现在句子中的位置。因为 Transformer 中需要使用位置 Embedding 保存单词在序列中的<strong>相对或绝对位置。</strong></p>
+<p>位置编码公式：</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;#&#x27; at position 329: …62930413.png)
+#̲## Encoder结构
+!…" style="color:#cc0000">PE(pos,2i+1)=cos(pos/10000^{2i/d_{model}})
+
+其中，pos 表示单词在句子中的位置，d 表示 PE的维度(就是词 Embedding的维度)，也就是偶数位置采用sin，奇数位置采用cos。
+![](https://voluntexi.github.io//post-images/1668162923351.png)
+将单词的词 Embedding 和位置 Embedding 相加，就可以得到单词的表示向量 **x**，**x** 就是 Transformer 的输入。
+![](https://voluntexi.github.io//post-images/1668162930413.png)
+### Encoder结构
+![](https://voluntexi.github.io//post-images/1668162940048.png)
+上图是 Transformer 的 Encoder 部分结构，可以看到是由 **Multi-Head Attention, Add &amp; Norm, Feed Forward, Add &amp; Norm** 组成的。
+#### Self-Attention（自注意力机制）
+&lt;img src=&quot;https://pic4.zhimg.com/80/v2-f6380627207ff4d1e72addfafeaff0bb_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom:67%;&quot; /&gt;
+上图是论文中 Transformer 的内部结构图，左侧为 Encoder，右侧为 Decoder。红色圈中的部分为 **Multi-Head Attention**，是由多个 **Self-Attention**组成的，可以看到 Encoder包含一个 Multi-Head Attention，Decoder包含两个 Multi-Head Attention (其中有一个用到 Masked)。
+ **Self-Attention**是 Transformer 的重点，首先详细了解一下 Self-Attention 的内部逻辑。
+**Self-Attention 结构**
+公式如下：
+Attention(Q,K,V)=softmax(\frac{QK^T}{\sqrt{d_k}})V
+其中$\ d_k$是设置的常数，其目的是为了使得结果在softmax中变化更明显；Q,K,V三个矩阵通过输入矩阵和随机初始化的权重矩阵WQ,WK，WV进行相乘得到。
+&lt;img src=&quot;https://pic3.zhimg.com/80/v2-4f4958704952dcf2c4b652a1cd38f32e_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom:50%;&quot; /&gt;
+经过softmax后最终得到Attention矩阵Z
+&lt;img src=&quot;https://pic4.zhimg.com/80/v2-7ac99bce83713d568d04e6ecfb31463b_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom:67%;&quot; /&gt;
+由于在经过 Softmax 后矩阵的第 1 行中各个数值表示单词 1 与其他所有单词的attention系数，其实矩阵 Z 第 j 行的输出 Z[j] 就是所有单词 i 的值 $\ V_i$ 根据 attention 系数的比例加在一起得到，如下图所示：
+&lt;img src=&quot;https://pic3.zhimg.com/80/v2-27822b2292cd6c38357803093bea5d0e_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom: 80%;&quot; /&gt;
+**Multi-Head Attention**
+Multi-Head Attention 是由多个 **Self-Attention** 组合形成的
+将输入**X**分别传递到 h 个不同的 Self-Attention 中，计算得到 h 个输出矩阵**Z**。下图是 h=8 时候的情况，此时会得到 8 个输出矩阵**Z**。
+&lt;img src=&quot;https://pic1.zhimg.com/80/v2-6bdaf739fd6b827b2087b4e151c560f4_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom:67%;&quot; /&gt;
+得到 8 个输出矩阵 **Z**1 到 **Z**8 之后，Multi-Head Attention 将它们拼接在一起 (**Concat**)，然后传入一个 **Linear**层，得到 Multi-Head Attention 最终的输出 **Z**。
+![img](https://pic4.zhimg.com/80/v2-35d78d9aa9150ae4babd0ea6aa68d113_720w.webp)
+使得最后输出的矩阵维度和输入矩阵维度相同
+#### **Add &amp; Norm**
+Add &amp; Norm 层由 Add 和 Norm 两部分组成，其计算公式如下：
+在**Multi-Head Attention**之后的**Add&amp;Norm**：
+LayerNorm(X+MultiHeadAttention(x))
+其中 **X**表示**输入矩阵** ，MultiHeadAttention(**X**) 表示在经过**Multi-Head Attention**之后的输出矩阵**Z**
+在**Feed Forward**之后的**Add&amp;Norm**：
+LayerNorm(X+FeedForward(x))
+其中 **X**表示经过**Multi-Head Attention**之后的输出Z，MultiHeadAttention(**X**) 表示在经过**Feed Forward**之后的输出
+**Add**指 X+F(x)结构,结构图示如下：
+![](https://voluntexi.github.io//post-images/1668162949453.png)
+**Norm**指 Layer Norm(x)，LayerNorm把一个样本的所有词义向量（如下图红色部分）视为一个分布（有几个句子就有几个分布），并将其标准化。这意味着:
+* 同一句子中词义向量（下图中的V1, V2, …, VL）的相对大小是保留的，或者也可以说LayerNorm不改变词义向量的方向，只改变它的模。
+  
+![](https://voluntexi.github.io//post-images/1758118324495.jpg)
+#### **Feed Forward**
+Feed Forward 层比较简单，是一个两层的全连接层，第一层的激活函数为 Relu，第二层不使用激活函数，对应的公式如下。
+encoder=max(0,XW_1+b_1)W_2+b_2
+encoder为经过一层Encoder后的输出
+### **组成 Encoder**
+通过上面描述的 Multi-Head Attention, Feed Forward, Add &amp; Norm 就可以构造出一层 Encoder ，接收输入矩阵 **X**(n×d)，并输出一个矩阵 **O**(n×d)。通过多层 Encoder  叠加就可以组成最终的**编码器**。
+第一层的 Encoder的输入为句子单词的表示向量矩阵，后续每层 Encoder  的输入是前一层输出，最后一层 Encoder  输出的矩阵就是 **编码信息矩阵 C**，这一矩阵后续会用到 Decoder 中。
+&lt;img src=&quot;https://pic3.zhimg.com/80/v2-45db05405cb96248aff98ee07a565baa_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom:50%;&quot; /&gt;
+### **Decoder 结构**
+&lt;img src=&quot;https://pic3.zhimg.com/80/v2-f5049e8711c3abe8f8938ced9e7fc3da_720w.webp&quot; alt=&quot;img&quot; style=&quot;zoom:50%;&quot; /&gt;
+上图红色部分为 Transformer 的一层 Decoder  结构，与 Encoder 相似，但是存在一些区别：
+- 包含两个 Multi-Head Attention 层。
+  - 第二个 Multi-Head Attention 层的**K, V**矩阵使用 Encoder 的**编码信息矩阵C**进行计算（就是将矩阵C与权重矩阵WK,WV相乘），而**Q**使用上一个 Decoder block 的输出计算。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&gt; 预测时：第i个decoder的输入 = encoder输出 + 第(i-1)个decoder输出
+&gt; 训练时因为知道ground truth embeding，相当于知道正确答案，网络可以一次训练完成。
+
+&gt;
+&gt;
+&gt;
+
+
+
+- Transformer 本身是不能利用单词的顺序信息的，因此需要在输入中添加位置 Embedding，否则 Transformer 就是一个词袋模型了。
+- Transformer 中 Multi-Head Attention 中有多个 Self-Attention，可以捕获单词之间多种维度上的相关系数 attention score。
+## 参考文献
+&gt; [《Transformer 模型详解》](https://baijiahao.baidu.com/s?id=1651219987457222196&amp;wfr=spider&amp;for=pc)</span>
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/cnn/">
+                    <h3 class="post-title">
+                        CNN
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

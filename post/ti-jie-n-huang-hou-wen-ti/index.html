@@ -1,0 +1,257 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>题解：N皇后问题 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="题解：N皇后问题 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="算法" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="题目要求，每个皇后不能与其他皇后在同一行，同一列，同一对角线上。因此，我们可以从第一行一直往下搜索，如果符合条件，则将皇后放置在上面。">
+<link rel="canonical" href="https://voluntexi.github.io/post/ti-jie-n-huang-hou-wen-ti/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"题解：N皇后问题","url":"https://voluntexi.github.io/post/ti-jie-n-huang-hou-wen-ti/","description":"题目要求，每个皇后不能与其他皇后在同一行，同一列，同一对角线上。因此，我们可以从第一行一直往下搜索，如果符合条件，则将皇后放置在上面。","image":"https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimage1.bubuko.com%2Finfo%2F202004%2F20200420175526543402.png\u0026refer=http%3A%2F%2Fimage1.bubuko.com\u0026app=2002\u0026size=f9999,10000\u0026q=a80\u0026n=0\u0026g=0n\u0026fmt=auto?sec=1661665110\u0026t=96eb2ac728fc9641bc39386dcd13c937","datePublished":"2022-07-29T13:01:28+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/ti-jie-n-huang-hou-wen-ti/","name":"题解：N皇后问题","position":2}]}</script>
+<meta property="og:title" content="题解：N皇后问题">
+<meta property="og:description" content="题目要求，每个皇后不能与其他皇后在同一行，同一列，同一对角线上。因此，我们可以从第一行一直往下搜索，如果符合条件，则将皇后放置在上面。">
+<meta property="og:url" content="https://voluntexi.github.io/post/ti-jie-n-huang-hou-wen-ti/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimage1.bubuko.com%2Finfo%2F202004%2F20200420175526543402.png&amp;refer=http%3A%2F%2Fimage1.bubuko.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1661665110&amp;t=96eb2ac728fc9641bc39386dcd13c937">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/ti-jie-n-huang-hou-wen-ti/">
+<meta name="twitter:title" content="题解：N皇后问题">
+<meta name="twitter:description" content="题目要求，每个皇后不能与其他皇后在同一行，同一列，同一对角线上。因此，我们可以从第一行一直往下搜索，如果符合条件，则将皇后放置在上面。">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimage1.bubuko.com%2Finfo%2F202004%2F20200420175526543402.png&amp;refer=http%3A%2F%2Fimage1.bubuko.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1661665110&amp;t=96eb2ac728fc9641bc39386dcd13c937">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        题解：N皇后问题
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2022-07-29
+                        </span>
+                        <span>
+                            3 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/suan-fa/" class="post-tag">
+                            # 算法
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimage1.bubuko.com%2Finfo%2F202004%2F20200420175526543402.png&amp;refer=http%3A%2F%2Fimage1.bubuko.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1661665110&amp;t=96eb2ac728fc9641bc39386dcd13c937" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p>题目要求，每个皇后不能与其他皇后在同一行，同一列，同一对角线上。因此，我们可以从第一行一直往下搜索，如果符合条件，则将皇后放置在上面。</p>
+<!-- more -->
+<p>题目如下：<br />
+<img src="https://voluntexi.github.io//post-images/1659071075177.jpg" alt="" /><br />
+<strong>那么，条件应该如何设置呢？</strong></p>
+<h2 id="heading">题目分析</h2>
+<p>首先我们观察棋谱：<br />
+<img src="https://voluntexi.github.io//post-images/1659071278713.jpg" alt="" /><br />
+可以将上述棋谱抽象成二维数组的形式，那么每个格子对应的坐标为：<br />
+<img src="https://voluntexi.github.io//post-images/1659071798181.jpg" alt="" /><br />
+我们画一条 135°斜对角线，观察：<br />
+<img src="https://voluntexi.github.io//post-images/1659071882556.jpg" alt="" /><br />
+<strong>在这条对角线上的位置的下标的行列值之差， 是一个定值，为1</strong><br />
+同时为了方便编写代码，使这样一个差值为非负数，我们加上棋盘的长度N；<br />
+那么这条对角线上是否有皇后就可以表示为：</p>
+<h4 id="heading-1"></h4>
+<pre><code class="language-python">if cdiag[n+x-y] ==True #True 表示为没有皇后
+</code></pre>
+<p>同理，画一条 45°斜对角线，观察<br />
+<img src="https://voluntexi.github.io//post-images/1659072240360.jpg" alt="" /><br />
+<strong>在这条对角线上的位置的下标的行列值之和， 是一个定值，为2</strong><br />
+那么这条对角线上是否有皇后就可以表示为：</p>
+<h4 id="heading-2"></h4>
+<pre><code class="language-python">if diag[x+y] ==True #True 表示为没有皇后
+</code></pre>
+<p>所以我们判断这个位置是否应该放置皇后的时候， 只需要设立三个数组col(列), diag(正对角线), cdiag(负对角线);<br />
+然后合并判断列， 45°对角线， 135°对角线上是否有皇后即可</p>
+<h4 id="heading-3"></h4>
+<pre><code class="language-python">if(col[i]==True and diag[r+i]==True and cdiag[n+r-i]==True)  #True 表示为没有皇后
+</code></pre>
+<h2 id="heading-4">题解</h2>
+<p>有了上述分析后，现在只需要初始化棋盘，使用DFS进行遍历是否符合上述条件就可以了<br />
+<strong>首先初始化棋盘以及判断条件：</strong></p>
+<h4 id="heading-5"></h4>
+<pre><code class="language-python">class Solution:
+    def solveNQueens(self, n: int) -&gt; List[List[str]]:
+        res=[]
+        init=[['.' for i in range(n)] for i in range(n)]
+        diag=[True for i in range(2*n)]
+        col=[True for i in range(n)]
+        cdiag=[True for i in range(2*n)]
+        dfs(0,n,init,diag,col,cdiag,res)
+        return res
+</code></pre>
+<p>接下来用DFS来进行遍历是否符合条件</p>
+<h4 id="heading-6"></h4>
+<pre><code class="language-python">def dfs(r,n,map,diag,col,cdiag,res):
+        if(r==n):
+            red=[]
+            for i in map:
+                red.append(&quot;&quot;.join(i))
+            res.append(red)
+        for i in range(0,n):
+            if(col[i]==True and diag[r+i]==True and cdiag[n+r-i]==True):
+                map[r][i]='Q'
+                col[i]=diag[r+i]=cdiag[n+r-i]=False
+                dfs(r+1,n,map,diag,col,cdiag,res)
+                map[r][i] = '.'   #如果路径不对，就退回
+                col[i] = cdiag[n+r-i] = diag[r+i] = True
+</code></pre>
+<p>大功告成！<br />
+<img src="https://voluntexi.github.io//post-images/1659072723255.jpg" alt="" /></p>
+<h2 id="heading-7">拓展</h2>
+<p>在此题的基础上，我们可以消灭第52题，N皇后Ⅱ<br />
+<img src="https://voluntexi.github.io//post-images/1659072891430.jpg" alt="" /><br />
+只改变一行代码，就能解决该题：</p>
+<h4 id="heading-8"></h4>
+<pre><code class="language-python">return len(res)
+</code></pre>
+<p>将返回值res改为返回res的长度即可</p>
+
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/fen-lei-wen-ti-gan-zhi-ji-suan-fa/">
+                    <h3 class="post-title">
+                        感知机算法
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>

@@ -1,0 +1,249 @@
+<html>
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content="Gridea Pro 1.2.2">
+<title>题解：区间的个数 | 威伦特</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1785221459">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="题解：区间的个数 | 威伦特 - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="算法" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+<meta name="description" content="这道题首先的一个难点就是读懂题意">
+<link rel="canonical" href="https://voluntexi.github.io/post/ti-jie-qu-jian-de-ge-shu/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"题解：区间的个数","url":"https://voluntexi.github.io/post/ti-jie-qu-jian-de-ge-shu/","description":"这道题首先的一个难点就是读懂题意","image":"/post-images/ti-jie-qu-jian-de-ge-shu.png","datePublished":"2020-11-07T12:47:37+08:00","dateModified":"2026-05-22T18:33:21+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/ti-jie-qu-jian-de-ge-shu/","name":"题解：区间的个数","position":2}]}</script>
+<meta property="og:title" content="题解：区间的个数">
+<meta property="og:description" content="这道题首先的一个难点就是读懂题意">
+<meta property="og:url" content="https://voluntexi.github.io/post/ti-jie-qu-jian-de-ge-shu/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="威伦特">
+<meta property="og:image" content="/post-images/ti-jie-qu-jian-de-ge-shu.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://voluntexi.github.io/post/ti-jie-qu-jian-de-ge-shu/">
+<meta name="twitter:title" content="题解：区间的个数">
+<meta name="twitter:description" content="这道题首先的一个难点就是读懂题意">
+<meta name="twitter:image" content="/post-images/ti-jie-qu-jian-de-ge-shu.png">
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            
+<div class="site-header">
+    <a href="/">
+        <img class="avatar" src="/images/avatar.png?v=1785221459" alt="">
+    </a>
+    <h1 class="site-title">
+        威伦特
+    </h1>
+    <p class="site-description">
+        亲近自然，解码生命
+    </p>
+    <div class="menu-container">
+        
+        
+        <a href="/" class="menu">
+            首页
+        </a>
+        
+        
+        
+        <a href="/archives" class="menu">
+            文章
+        </a>
+        
+        
+        
+        <a href="/tags" class="menu">
+            标签
+        </a>
+        
+        
+        
+        <a href="/post/about" class="menu">
+            关于
+        </a>
+        
+        
+    </div>
+    <div class="social-container">
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">
+                        题解：区间的个数
+                    </h2>
+                    <div class="post-info">
+                        <span>
+                            2020-11-07
+                        </span>
+                        <span>
+                            2 分钟阅读
+                        </span>
+                        
+                        <a href="/tag/suan-fa/" class="post-tag">
+                            # 算法
+                        </a>
+                        
+                    </div>
+                    
+                    <img class="post-feature-image" src="/post-images/ti-jie-qu-jian-de-ge-shu.png" alt="">
+                    
+                    <div class="post-content-wrapper">
+                        <div class="post-content" v-pre>
+                            <p><strong>这道题首先的一个难点就是读懂题意</strong></p>
+<!-- more -->
+<p>我首先读了几遍才明白了具体意思 意思如下：</p>
+<p><img src="https://voluntexi.github.io//post-images/1655959708595.png" alt="" /></p>
+<p>根据例题输入：</p>
+<p>也就是说在nums数组下标 0&lt;=i&lt;j&lt;nums.size()中 寻找和区间</p>
+<p>nums[j]+<del>nums[i]中 的值在lower和upper区间之间</del></p>
+<p>依此首先我们就会想到暴力法：</p>
+<pre><code class="language-c++">         int count=0;
+         for(int i=0;i&lt;nums.size();i++)
+         {
+             cout&lt;&lt;nums[i]&lt;&lt;&quot; &quot;;
+             long n=0;
+             for(int j=i;j&lt;nums.size();j++)
+             {
+                 n+=nums[j];
+             if(lower&lt;=n&amp;&amp;n&lt;=upper)  count++；
+             }
+          }
+          return count;
+</code></pre>
+<p>但是呢，好歹这是一个<font  color=red ><strong>困难题</strong></font> 哪有这么简单</p>
+<p>很明显暴力法会超时~</p>
+<p>于是我们可以转换思路</p>
+<ul>
+<li>
+<p>首先题目要求的是 <strong>lower&lt;=区间[i,j]的和&lt;=upper</strong></p>
+</li>
+<li>
+<p>可以转换成：<strong>lower&lt;=sum.at(j)-sum.at(i)的和&lt;=upper</strong></p>
+</li>
+<li>
+<p>通过变换:<strong>lower-sum.at(j)&lt;=-sum.at(i)&lt;=upper-sum.at(j)</strong></p>
+</li>
+<li>
+<p>去掉符号：**sum.at(j)-lower&gt;=sum.at(i)&gt;=sum.at(j)-upper **</p>
+</li>
+<li>
+<p>所以最后关键东东来了 就是 <strong>sum.at(j)-upper &lt;= sum.at(i) &lt;= sum.at(j)-lower</strong></p>
+</li>
+<li>
+<p>我们于是想到了用 <code>mutiset</code> 自动排序的特性</p>
+</li>
+<li>
+<p>并且mutiset 恰好有lower_bound,upper_bound这两个折半的查找函数~</p>
+</li>
+<li>
+<p>最后通过distance来结合就可以了~</p>
+</li>
+</ul>
+<pre><code class="language-c++">     multiset&lt;long&gt; helper;
+     int count=0;
+     helper.insert(0);
+     long long sum=0;
+     for (int i:nums)
+     {
+         sum+=i;
+         count+=distance(helper.lower_bound(sum-upper),helper.upper_bound(sum-lower));
+         helper.insert(sum);
+     }
+     return count;
+</code></pre>
+
+                        </div>
+                        <div class="toc-container">
+                            
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            
+            <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="/post/ti-jie-dong-tai-gui-hua-shi-pin-pin-jie/">
+                    <h3 class="post-title">
+                        题解：动态规划:视频拼接
+                    </h3>
+                </a>
+            </div>
+            
+
+            
+
+            
+<div class="site-footer">
+    Powered by Voluntexi
+    <a class="rss" href="/atom.xml" target="_blank">
+        <i class="ri-rss-line"></i> RSS
+    </a>
+</div>
+
+        </div>
+    </div>
+
+    <script>
+        hljs.initHighlightingOnLoad()
+
+        let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+        window.addEventListener("scroll", event => {
+            let fromTop = window.scrollY;
+
+            mainNavLinks.forEach((link, index) => {
+                let section = document.getElementById(decodeURI(link.hash).substring(1));
+                let nextSection = null
+                if (mainNavLinks[index + 1]) {
+                    nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+                }
+                if (section.offsetTop <= fromTop) {
+                    if (nextSection) {
+                        if (nextSection.offsetTop > fromTop) {
+                            link.classList.add("current");
+                        } else {
+                            link.classList.remove("current");
+                        }
+                    } else {
+                        link.classList.add("current");
+                    }
+                } else {
+                    link.classList.remove("current");
+                }
+            });
+        });
+
+    </script>
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: inotes v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>
