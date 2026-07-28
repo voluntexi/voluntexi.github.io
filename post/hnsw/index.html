@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content="Gridea Pro 1.2.2">
 <title>HNSW | 威伦特</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1785221531">
+<link rel="shortcut icon" href="/favicon.ico?v=1785228378">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="HNSW | 威伦特 - Atom Feed" href="/atom.xml">
@@ -20,7 +20,7 @@
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
 <meta name="description" content="在使用 RAG（Retrieval-Augmented Generation）时，我们通常需要在大量文本向量中，找到与查询最相似的若干条语句。最直观的方式是对所有向量逐一计算相似度（余弦相似度、欧氏距离等），然后进行比较。在数据规模较小时，这种方法尚可接受；但当数据量达到百万甚至更高量级时，逐一匹配将带来巨大的时间开销。">
 <link rel="canonical" href="https://voluntexi.github.io/post/hnsw/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"HNSW","url":"https://voluntexi.github.io/post/hnsw/","description":"在使用 RAG（Retrieval-Augmented Generation）时，我们通常需要在大量文本向量中，找到与查询最相似的若干条语句。最直观的方式是对所有向量逐一计算相似度（余弦相似度、欧氏距离等），然后进行比较。在数据规模较小时，这种方法尚可接受；但当数据量达到百万甚至更高量级时，逐一匹配将带来巨大的时间开销。","image":"/post-images/hnsw.webp","datePublished":"2026-01-21T20:50:32+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"HNSW","url":"https://voluntexi.github.io/post/hnsw/","description":"在使用 RAG（Retrieval-Augmented Generation）时，我们通常需要在大量文本向量中，找到与查询最相似的若干条语句。最直观的方式是对所有向量逐一计算相似度（余弦相似度、欧氏距离等），然后进行比较。在数据规模较小时，这种方法尚可接受；但当数据量达到百万甚至更高量级时，逐一匹配将带来巨大的时间开销。","image":"/post-images/hnsw.webp","datePublished":"2026-01-21T20:50:32+08:00","dateModified":"2026-07-28T16:46:11+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/hnsw/","name":"HNSW","position":2}]}</script>
 <meta property="og:title" content="HNSW">
 <meta property="og:description" content="在使用 RAG（Retrieval-Augmented Generation）时，我们通常需要在大量文本向量中，找到与查询最相似的若干条语句。最直观的方式是对所有向量逐一计算相似度（余弦相似度、欧氏距离等），然后进行比较。在数据规模较小时，这种方法尚可接受；但当数据量达到百万甚至更高量级时，逐一匹配将带来巨大的时间开销。">
@@ -41,7 +41,7 @@
             
 <div class="site-header">
     <a href="/">
-        <img class="avatar" src="/images/avatar.png?v=1785221531" alt="">
+        <img class="avatar" src="/images/avatar.png?v=1785228378" alt="">
     </a>
     <h1 class="site-title">
         威伦特

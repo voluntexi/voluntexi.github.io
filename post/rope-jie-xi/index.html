@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content="Gridea Pro 1.2.2">
 <title>RoPE 解析 | 威伦特</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1785221531">
+<link rel="shortcut icon" href="/favicon.ico?v=1785228378">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="RoPE 解析 | 威伦特 - Atom Feed" href="/atom.xml">
@@ -20,7 +20,7 @@
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
 <meta name="description" content="RoPE（旋转位置编码）是一种结合了绝对位置编码和相对位置编码的一种编码方法，出自苏剑林老师提出的RoFormer，现如今已经作为LLM结构的标配了，可见其效果强大。这篇文章就来具体解析一下，RoPE的原理和优势到底是什么。">
 <link rel="canonical" href="https://voluntexi.github.io/post/rope-jie-xi/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"RoPE 解析","url":"https://voluntexi.github.io/post/rope-jie-xi/","description":"RoPE（旋转位置编码）是一种结合了绝对位置编码和相对位置编码的一种编码方法，出自苏剑林老师提出的RoFormer，现如今已经作为LLM结构的标配了，可见其效果强大。这篇文章就来具体解析一下，RoPE的原理和优势到底是什么。","image":"/post-images/rope-jie-xi.png","datePublished":"2025-10-15T22:36:36+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"RoPE 解析","url":"https://voluntexi.github.io/post/rope-jie-xi/","description":"RoPE（旋转位置编码）是一种结合了绝对位置编码和相对位置编码的一种编码方法，出自苏剑林老师提出的RoFormer，现如今已经作为LLM结构的标配了，可见其效果强大。这篇文章就来具体解析一下，RoPE的原理和优势到底是什么。","image":"/post-images/rope-jie-xi.png","datePublished":"2025-10-15T22:36:36+08:00","dateModified":"2026-07-28T16:46:11+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/rope-jie-xi/","name":"RoPE 解析","position":2}]}</script>
 <meta property="og:title" content="RoPE 解析">
 <meta property="og:description" content="RoPE（旋转位置编码）是一种结合了绝对位置编码和相对位置编码的一种编码方法，出自苏剑林老师提出的RoFormer，现如今已经作为LLM结构的标配了，可见其效果强大。这篇文章就来具体解析一下，RoPE的原理和优势到底是什么。">
@@ -41,7 +41,7 @@
             
 <div class="site-header">
     <a href="/">
-        <img class="avatar" src="/images/avatar.png?v=1785221531" alt="">
+        <img class="avatar" src="/images/avatar.png?v=1785228378" alt="">
     </a>
     <h1 class="site-title">
         威伦特

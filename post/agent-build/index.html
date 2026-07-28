@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content="Gridea Pro 1.2.2">
 <title>Agent 三大构建范式解析 | 威伦特</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1785221531">
+<link rel="shortcut icon" href="/favicon.ico?v=1785228378">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Agent 三大构建范式解析 | 威伦特 - Atom Feed" href="/atom.xml">
@@ -15,12 +15,12 @@
 
 
     <meta name="description" content="" />
-    <meta name="keywords" content="Agent,大模型" />
+    <meta name="keywords" content="大模型" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
 <meta name="description" content="今年年初Manus引爆了Agent概念，随着越来越多的厂商开发发布自己的Agent，Agent逐渐的走进了大众的视野，今年可谓是Agent元年。而对于我们想要尝试构建自己的Agent，除开从Coze、Dify、星辰智能体平台等平台构建，还可以通过调用API通过提示词来进行进行构建。（微调不起了&amp;hellip;）为了让大家更好的做出自己的Agent，本文主要讲解构建Agent 的经典三大范式：ReAct、Plan-and-Solve和Relection。">
 <link rel="canonical" href="https://voluntexi.github.io/post/agent-build/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Agent 三大构建范式解析","url":"https://voluntexi.github.io/post/agent-build/","description":"今年年初Manus引爆了Agent概念，随着越来越多的厂商开发发布自己的Agent，Agent逐渐的走进了大众的视野，今年可谓是Agent元年。而对于我们想要尝试构建自己的Agent，除开从Coze、Dify、星辰智能体平台等平台构建，还可以通过调用API通过提示词来进行进行构建。（微调不起了\u0026hellip;）为了让大家更好的做出自己的Agent，本文主要讲解构建Agent 的经典三大范式：ReAct、Plan-and-Solve和Relection。","image":"/post-images/agent-build.png","datePublished":"2025-12-07T16:52:11+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Agent 三大构建范式解析","url":"https://voluntexi.github.io/post/agent-build/","description":"今年年初Manus引爆了Agent概念，随着越来越多的厂商开发发布自己的Agent，Agent逐渐的走进了大众的视野，今年可谓是Agent元年。而对于我们想要尝试构建自己的Agent，除开从Coze、Dify、星辰智能体平台等平台构建，还可以通过调用API通过提示词来进行进行构建。（微调不起了\u0026hellip;）为了让大家更好的做出自己的Agent，本文主要讲解构建Agent 的经典三大范式：ReAct、Plan-and-Solve和Relection。","image":"/post-images/agent-build.png","datePublished":"2025-12-07T16:52:11+08:00","dateModified":"2026-07-28T16:46:11+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/agent-build/","name":"Agent 三大构建范式解析","position":2}]}</script>
 <meta property="og:title" content="Agent 三大构建范式解析">
 <meta property="og:description" content="今年年初Manus引爆了Agent概念，随着越来越多的厂商开发发布自己的Agent，Agent逐渐的走进了大众的视野，今年可谓是Agent元年。而对于我们想要尝试构建自己的Agent，除开从Coze、Dify、星辰智能体平台等平台构建，还可以通过调用API通过提示词来进行进行构建。（微调不起了&amp;hellip;）为了让大家更好的做出自己的Agent，本文主要讲解构建Agent 的经典三大范式：ReAct、Plan-and-Solve和Relection。">
@@ -41,7 +41,7 @@
             
 <div class="site-header">
     <a href="/">
-        <img class="avatar" src="/images/avatar.png?v=1785221531" alt="">
+        <img class="avatar" src="/images/avatar.png?v=1785228378" alt="">
     </a>
     <h1 class="site-title">
         威伦特
@@ -97,10 +97,6 @@
                         <span>
                             32 分钟阅读
                         </span>
-                        
-                        <a href="/tag/agent/" class="post-tag">
-                            # Agent
-                        </a>
                         
                         <a href="/tag/da-mo-xing/" class="post-tag">
                             # 大模型

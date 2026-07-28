@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content="Gridea Pro 1.2.2">
 <title> BGE &amp;&amp; Qwen3： Reranker Model | 威伦特</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1785221531">
+<link rel="shortcut icon" href="/favicon.ico?v=1785228378">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title=" BGE &amp;&amp; Qwen3： Reranker Model | 威伦特 - Atom Feed" href="/atom.xml">
@@ -20,7 +20,7 @@
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
 <meta name="description" content="在 RAG 系统中，Reranker 往往是决定最终检索质量的关键一环，却也是最容易被忽视的模块。本文从 Reranker 的基本原理出发，介绍 Reranker Encoder 和 Decoder 两类架构的工作机制，随后解析目前中文场景下最主流的两大模型系列BGE-Reranker 与 Qwen3-Reranker的模型设计与训练策略，最后结合实测数据给出实际选&amp;hellip;">
 <link rel="canonical" href="https://voluntexi.github.io/post/reranker/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":" BGE \u0026\u0026 Qwen3： Reranker Model","url":"https://voluntexi.github.io/post/reranker/","description":"在 RAG 系统中，Reranker 往往是决定最终检索质量的关键一环，却也是最容易被忽视的模块。本文从 Reranker 的基本原理出发，介绍 Reranker Encoder 和 Decoder 两类架构的工作机制，随后解析目前中文场景下最主流的两大模型系列BGE-Reranker 与 Qwen3-Reranker的模型设计与训练策略，最后结合实测数据给出实际选\u0026hellip;","image":"/post-images/reranker.png","datePublished":"2026-05-21T22:01:57+08:00","dateModified":"2026-05-22T18:33:20+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":" BGE \u0026\u0026 Qwen3： Reranker Model","url":"https://voluntexi.github.io/post/reranker/","description":"在 RAG 系统中，Reranker 往往是决定最终检索质量的关键一环，却也是最容易被忽视的模块。本文从 Reranker 的基本原理出发，介绍 Reranker Encoder 和 Decoder 两类架构的工作机制，随后解析目前中文场景下最主流的两大模型系列BGE-Reranker 与 Qwen3-Reranker的模型设计与训练策略，最后结合实测数据给出实际选\u0026hellip;","image":"/post-images/reranker.png","datePublished":"2026-05-21T22:01:57+08:00","dateModified":"2026-07-28T16:46:11+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/reranker/","name":" BGE \u0026\u0026 Qwen3： Reranker Model","position":2}]}</script>
 <meta property="og:title" content=" BGE &amp;&amp; Qwen3： Reranker Model">
 <meta property="og:description" content="在 RAG 系统中，Reranker 往往是决定最终检索质量的关键一环，却也是最容易被忽视的模块。本文从 Reranker 的基本原理出发，介绍 Reranker Encoder 和 Decoder 两类架构的工作机制，随后解析目前中文场景下最主流的两大模型系列BGE-Reranker 与 Qwen3-Reranker的模型设计与训练策略，最后结合实测数据给出实际选&amp;hellip;">
@@ -41,7 +41,7 @@
             
 <div class="site-header">
     <a href="/">
-        <img class="avatar" src="/images/avatar.png?v=1785221531" alt="">
+        <img class="avatar" src="/images/avatar.png?v=1785228378" alt="">
     </a>
     <h1 class="site-title">
         威伦特

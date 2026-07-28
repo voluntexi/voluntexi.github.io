@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://voluntexi.github.io/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -17,7 +17,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/reranker/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/hyper-connections/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -44,7 +44,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/hnsw/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -53,7 +53,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/agent-build/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -62,7 +62,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/rag/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -71,7 +71,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/rope-jie-xi/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -80,7 +80,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/shou-xie-moe/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -98,7 +98,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/lmcache/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -107,7 +107,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/mcp-and-function-calling/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -116,7 +116,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/kv-cache/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -134,7 +134,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/prompt-learning/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -143,7 +143,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/less-is-more/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -152,7 +152,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/copy-is-all-you-need/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -161,7 +161,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/longnet/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -170,7 +170,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/scalingTo1m/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -179,7 +179,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/lora/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -188,7 +188,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/longformer/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -197,7 +197,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/SimCSE/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -206,7 +206,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/Survey2/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -215,7 +215,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/dui-yu-xun-lian-mo-xing-jin-xing-wei-diao/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -224,7 +224,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/moca/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -233,7 +233,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/brio/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -242,7 +242,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/bert/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -251,7 +251,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/transformer/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -269,7 +269,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/rnn/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -278,7 +278,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/glove/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -287,7 +287,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/fasttext/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -296,7 +296,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/word2vec/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -314,7 +314,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/yi-cun-yu-fa-fen-xi/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -323,7 +323,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/wen-ben-ju-lei-ji-qi-shi-xian/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -332,7 +332,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/xin-xi-chou-qu-ji-qi-shi-xian/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -341,7 +341,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/ming-ming-shi-ti-shi-bie-zai-hanlp-zhong-de-shi-xian/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -350,7 +350,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/ci-xing-biao-zhu-zai-hanlp-zhong-de-shi-xian/</loc>
-    <lastmod>2026-05-22T18:33:20+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -395,7 +395,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/zi-fu-chuan-pi-pei/</loc>
-    <lastmod>2026-05-22T18:33:21+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -404,7 +404,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/zhong-wen-fen-ci-fang-fa-zong-jie/</loc>
-    <lastmod>2026-05-22T18:33:21+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:11+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -422,7 +422,7 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/po-su-bei-xie-si-zai-sklearn-zhong-de-shi-xian/</loc>
-    <lastmod>2026-05-22T18:33:21+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:12+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -503,91 +503,85 @@
   </url>
   <url>
     <loc>https://voluntexi.github.io/post/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tags/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/archives/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tag/nlp/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tag/wen-ben-zhai-yao/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tag/da-mo-xing/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tag/jiao-cheng/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://voluntexi.github.io/tag/dai-ma/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://voluntexi.github.io/tag/shen-du-xue-xi/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://voluntexi.github.io/tag/ji-qi-xue-xi/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://voluntexi.github.io/tag/wang-luo-pa-chong/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://voluntexi.github.io/tag/agent/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tag/yu-yin-shi-bie/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://voluntexi.github.io/tag/dai-ma/</loc>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://voluntexi.github.io/tag/ji-qi-xue-xi/</loc>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/tag/suan-fa/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://voluntexi.github.io/tag/wang-luo-pa-chong/</loc>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://voluntexi.github.io/tag/shen-du-xue-xi/</loc>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://voluntexi.github.io/links/</loc>
-    <lastmod>2026-07-28T14:52:11+08:00</lastmod>
+    <lastmod>2026-07-28T16:46:18+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
