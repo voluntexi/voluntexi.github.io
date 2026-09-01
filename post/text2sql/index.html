@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content="Gridea Pro 1.2.2">
 <title>text2SQL | 威伦特</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1788238649">
+<link rel="shortcut icon" href="/favicon.ico?v=1788238770">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="text2SQL | 威伦特 - Atom Feed" href="/atom.xml">
@@ -20,7 +20,7 @@
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
 <meta name="description" content="在智能体业务场景中，&amp;ldquo;让 Agent 直接生成 SQL 去查库&amp;quot;几乎是每个人最先想到的做法——它简单、直接，不需要任何额外建设。但在实际项目中，并不建议这么做：模型生成的 SQL 常常&amp;quot;看着对、实际错&amp;rdquo;，幻觉会编造不存在的表和字段，超长上下文会稀释模型的注意力，业务口径不清则会产生语法完全正确、数字却错误的查询结果，而这类错误恰恰最难被察觉。那么，不直接生成 SQL，还有什么更可靠的做法？本文从这&amp;hellip;">
 <link rel="canonical" href="https://voluntexi.github.io/post/text2sql/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"text2SQL","url":"https://voluntexi.github.io/post/text2sql/","description":"在智能体业务场景中，\u0026ldquo;让 Agent 直接生成 SQL 去查库\u0026quot;几乎是每个人最先想到的做法——它简单、直接，不需要任何额外建设。但在实际项目中，并不建议这么做：模型生成的 SQL 常常\u0026quot;看着对、实际错\u0026rdquo;，幻觉会编造不存在的表和字段，超长上下文会稀释模型的注意力，业务口径不清则会产生语法完全正确、数字却错误的查询结果，而这类错误恰恰最难被察觉。那么，不直接生成 SQL，还有什么更可靠的做法？本文从这\u0026hellip;","image":"/post-images/text2sql.png","datePublished":"2026-09-01T20:53:22+08:00","dateModified":"2026-09-01T12:57:17+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"text2SQL","url":"https://voluntexi.github.io/post/text2sql/","description":"在智能体业务场景中，\u0026ldquo;让 Agent 直接生成 SQL 去查库\u0026quot;几乎是每个人最先想到的做法——它简单、直接，不需要任何额外建设。但在实际项目中，并不建议这么做：模型生成的 SQL 常常\u0026quot;看着对、实际错\u0026rdquo;，幻觉会编造不存在的表和字段，超长上下文会稀释模型的注意力，业务口径不清则会产生语法完全正确、数字却错误的查询结果，而这类错误恰恰最难被察觉。那么，不直接生成 SQL，还有什么更可靠的做法？本文从这\u0026hellip;","image":"/post-images/text2sql.png","datePublished":"2026-09-01T20:53:22+08:00","dateModified":"2026-09-01T12:59:27+08:00","author":{"@type":"Person","name":"威伦特"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"威伦特"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://voluntexi.github.io","name":"威伦特","position":1},{"@type":"ListItem","item":"https://voluntexi.github.io/post/text2sql/","name":"text2SQL","position":2}]}</script>
 <meta property="og:title" content="text2SQL">
 <meta property="og:description" content="在智能体业务场景中，&amp;ldquo;让 Agent 直接生成 SQL 去查库&amp;quot;几乎是每个人最先想到的做法——它简单、直接，不需要任何额外建设。但在实际项目中，并不建议这么做：模型生成的 SQL 常常&amp;quot;看着对、实际错&amp;rdquo;，幻觉会编造不存在的表和字段，超长上下文会稀释模型的注意力，业务口径不清则会产生语法完全正确、数字却错误的查询结果，而这类错误恰恰最难被察觉。那么，不直接生成 SQL，还有什么更可靠的做法？本文从这&amp;hellip;">
@@ -41,7 +41,7 @@
             
 <div class="site-header">
     <a href="/">
-        <img class="avatar" src="/images/avatar.png?v=1788238649" alt="">
+        <img class="avatar" src="/images/avatar.png?v=1788238770" alt="">
     </a>
     <h1 class="site-title">
         威伦特
@@ -95,7 +95,7 @@
                             2026-09-01
                         </span>
                         <span>
-                            27 分钟阅读
+                            26 分钟阅读
                         </span>
                         
                         <a href="/tag/nlp/" class="post-tag">
@@ -276,11 +276,8 @@ print(&quot;&lt;think&gt;\n&quot; + completion)
     &quot;oauthPublicClient&quot;: true
 }
 </code></pre>
-<p>接入前需在企业租户中预配 MCP Server 服务主体（App ID 为 <code>e8c77dc2-69b3-43f4-bc51-3213c9d915b4</code>）并注册 MCP 客户端应用，再按需给客户端分配 scopes：</p>
-<pre><code class="language-powershell">Grant-EntraBetaMCPServerPermission -ApplicationId &quot;&lt;MCP_Client_Application_Id&gt;&quot; -Scopes &quot;&lt;Scope1&gt;&quot;, &quot;&lt;Scope2&gt;&quot;
-Revoke-EntraBetaMCPServerPermission -ApplicationId &quot;&lt;MCP_Client_Application_Id&gt;&quot; -Scopes &quot;&lt;Scope1&gt;&quot;, &quot;&lt;Scope2&gt;&quot;
-</code></pre>
-<p>以&quot;我们的租户中有多少用户？&ldquo;为例，模型侧的实际调用过程如下：</p>
+<p>接入前需在企业租户中预配 MCP Server 服务主体（App ID 为 <code>e8c77dc2-69b3-43f4-bc51-3213c9d915b4</code>）并注册 MCP 客户端应用，再按需给客户端分配 scopes：<br />
+以&quot;我们的租户中有多少用户？&ldquo;为例，模型侧的实际调用过程如下：</p>
 <pre><code class="language-python"># 模型的 Agent 循环过程
 # 第 1 轮：LLM 识别到意图是&quot;统计用户数量&quot;，先检索候选查询
 microsoft_graph_suggest_queries(question=&quot;count the number of users in the tenant&quot;)

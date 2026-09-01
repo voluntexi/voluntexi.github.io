@@ -6,7 +6,7 @@
     <description>亲近自然，解码生命</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Tue, 01 Sep 2026 12:57:17 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 01 Sep 2026 12:59:27 +0800</lastBuildDate>
     <atom:link href="https://voluntexi.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <item>
       <title>text2SQL</title>
@@ -177,11 +177,8 @@ print(&quot;&lt;think&gt;\n&quot; + completion)
     &quot;oauthPublicClient&quot;: true
 }
 </code></pre>
-<p>接入前需在企业租户中预配 MCP Server 服务主体（App ID 为 <code>e8c77dc2-69b3-43f4-bc51-3213c9d915b4</code>）并注册 MCP 客户端应用，再按需给客户端分配 scopes：</p>
-<pre><code class="language-powershell">Grant-EntraBetaMCPServerPermission -ApplicationId &quot;&lt;MCP_Client_Application_Id&gt;&quot; -Scopes &quot;&lt;Scope1&gt;&quot;, &quot;&lt;Scope2&gt;&quot;
-Revoke-EntraBetaMCPServerPermission -ApplicationId &quot;&lt;MCP_Client_Application_Id&gt;&quot; -Scopes &quot;&lt;Scope1&gt;&quot;, &quot;&lt;Scope2&gt;&quot;
-</code></pre>
-<p>以&quot;我们的租户中有多少用户？&ldquo;为例，模型侧的实际调用过程如下：</p>
+<p>接入前需在企业租户中预配 MCP Server 服务主体（App ID 为 <code>e8c77dc2-69b3-43f4-bc51-3213c9d915b4</code>）并注册 MCP 客户端应用，再按需给客户端分配 scopes：<br />
+以&quot;我们的租户中有多少用户？&ldquo;为例，模型侧的实际调用过程如下：</p>
 <pre><code class="language-python"># 模型的 Agent 循环过程
 # 第 1 轮：LLM 识别到意图是&quot;统计用户数量&quot;，先检索候选查询
 microsoft_graph_suggest_queries(question=&quot;count the number of users in the tenant&quot;)
