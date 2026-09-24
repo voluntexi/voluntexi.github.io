@@ -6,8 +6,271 @@
     <description>亲近自然，解码生命</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Thu, 24 Sep 2026 08:47:04 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 24 Sep 2026 13:37:31 +0800</lastBuildDate>
     <atom:link href="https://voluntexi.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>Jev</title>
+      <link>https://voluntexi.github.io/post/jev/</link>
+      <guid isPermaLink="true">https://voluntexi.github.io/post/jev/</guid>
+      <pubDate>Thu, 24 Sep 2026 21:23:46 +0800</pubDate>
+      <description><![CDATA[<p>不知道最近大家有没有被 Jev 刷屏。</p>
+<p>Jev 的作者是 Diogo Almeida，他参与过 InstructGPT 与 ChatGPT 的早期开发，是 RLHF 的共同发明人，此前在 OpenAI 任研究员，后来在旧金山创办了 TypeSafe AI。公司刚完成由 DCVC 领投的 4000 万美元种子轮，并于 2026 年 9 月 15 日发布了 Jev。</p>
+<p>Jev 上线 Vercel AI Gateway 的 24 小时内，近 13% 的付费团队用过它，是该网关历史上新模型采用最快的一次，同期采用率达到 GPT-5.6 系列的两倍以上、Fable 5.1 的六倍以上。Jev 在开发者社区迅速出圈，现在已经对所有人开放：<strong>注册用户会获得 5 美元初始额度</strong>，由于其极低的定价策略，这笔额度相当于直接送出约 1.2 亿个 Token。</p>
+<h2 id="heading">概述</h2>
+<p>需要说明的是，Jev 并不是又一个生成式模型。它不会根据用户的问题来生成答案，只做一件事情——选择。</p>
+<p>在大多数模型都在比拼生成长度、对话能力和长文本推理的时候，Jev 走了一条完全相反的路。它不写文章，也不做开放式问答，只接收一段上下文与预设的几个选项，然后直接输出各个选项的概率。</p>
+<p>第一次进入 Jev 官网注册时，会弹出一道小测验，让我们判断 Jev 是否可以问答。</p>
+<p><img src="https://voluntexi.github.io/post-images/1790227523206209600_0.png" alt="" /></p>
+<p>本文的内容主要分为三部分：</p>
+<ol>
+<li><strong>Jev 的模型形态与三种题型</strong>：它为什么不做问答题，只做选择题；</li>
+<li><strong>官方 API 演示</strong>：请求长什么样，返回什么；</li>
+<li><strong>开源复刻模型</strong>：Laya、Kev、SemIf-OpenJev 三条路线，分别把「决策能力」放在了模型的哪个位置。</li>
+</ol>
+<p>下面逐一展开。</p>
+<h2 id="jev-">Jev 模型</h2>
+<p>从模型形态上看，Jev 不属于逐词预测的自回归生成模型，而是退回到了专门做分类与判断的判别式模型，可以简单理解为 BERT，但具体的模型架构并没有开源。</p>
+<p>开发者把待分析的文本作为输入，同时递给它几个固定选项。Jev 在运行后不吐出任何自然语言，而是像扫描一样，直接给每一个选项打出确切的概率。</p>
+<p>大家或许会有疑惑：我直接调用大模型就可以了，为什么要用 Jev？</p>
+<p>这是因为，调用常见的大语言模型时，哪怕你在提示词里写明了「请只回答是或否，不要输出任何多余内容」，模型的底层逻辑依然是在<strong>写作文</strong>。它必须走自回归流程，一个 Token 一个 Token 地往外吐字。有时候它老老实实输出「是」，有时候却会多吐出标点符号、解释前缀或者换行符，输出的稳定性无法保证。开发者为了在代码里使用这个结果，还得专门写正则表达式去清洗返回的文本；一旦大模型没按预期格式出牌，后续业务逻辑就会直接报错。</p>
+<p>让一个擅长写长文的生成模型来做这种是非判断，<strong>不仅慢、计费贵，而且输出格式随时可能失控</strong>。</p>
+<p>因此，Jev 从根本上不做问答题，只做选择题。</p>
+<p>这种选择题被抽象成了三种最基础的题型：</p>
+<ul>
+<li>Choice（单选题），用于多分类标签。模型直接返回各个分类的概率。</li>
+<li>Score（评分题），用于有序刻度打分。比如在 1 到 5 分之间评估内容的匹配度或风险等级，返回各档位的分布与加权分。</li>
+<li>Noul（判断题），用于纯粹的二元是非判断。直接评估某个命题是真是假。</li>
+</ul>
+<p>三种题型的返回字段并不相同。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Type</th>
+<th align="left">What it answers</th>
+<th align="left">Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><a href="https://docs.typesafe.ai/primitives/choice">Choice</a></td>
+<td align="left">Which of these options?</td>
+<td align="left"><code>choice</code>, <code>probabilities</code>, <code>confidence</code></td>
+</tr>
+<tr>
+<td align="left"><a href="https://docs.typesafe.ai/primitives/score">Score</a></td>
+<td align="left">Which level?</td>
+<td align="left"><code>score</code>, <code>legend</code>, <code>probabilities</code>, <code>confidence</code></td>
+</tr>
+<tr>
+<td align="left"><a href="https://docs.typesafe.ai/primitives/noul">Noul</a></td>
+<td align="left">Is this true?</td>
+<td align="left"><code>noul</code> (0 to 1)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Noul 是唯一不带 confidence 字段的题型。官方的解释是它的分布只有两个结果，一个数就能完整描述。</p>
+<p>Choice 和 Score 都把概率摊在多个选项或等级上，需要 confidence 概括摊开的程度。</p>
+<p>score 不是等级编号，是等级编号按概率加权后的位置。</p>
+<p>legend 的作用是把数字编号映射回你写的等级描述，避免回头查代码。</p>
+<p>usage 里有两个 token 计数。output_tokens 并不是 0，官方示例里它是 18 到 212 之间的正数，统计的是结构化答案占用的 token，不是模型生成的自然语言。</p>
+</blockquote>
+<p>开发者拿到的是带类型的值和概率分布，代码可以直接分支、排序和路由。</p>
+<p>三种题型可以混在同一次请求里。官方文档的说法是，每个问题会对同一份 state 并行、隔离地求值，增加问题几乎不改变响应时间，只多花少量 question token。</p>
+<h3 id="heading-1">演示</h3>
+<p>Jev 官方文档中给出了一个购物场景的请求示例：</p>
+<pre><code>{
+  &quot;state&quot;: &quot;My running shoes arrived in the wrong size. Can I swap them for a size 10?&quot;,
+  &quot;questions&quot;: {
+    &quot;department&quot;: {
+      &quot;type&quot;: &quot;choice&quot;,
+      &quot;instructions&quot;: &quot;Which team should handle this?&quot;,
+      &quot;criteria&quot;: {
+        &quot;returns&quot;: &quot;Exchanges, wrong or damaged items&quot;,
+        &quot;shipping&quot;: &quot;Delivery status, delays, lost packages&quot;,
+        &quot;billing&quot;: &quot;Charges, invoices, payment problems&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>把请求发送给模型，返回的 response 如下：</p>
+<pre><code>{
+  &quot;model&quot;: &quot;jev-1.13.0&quot;,
+  &quot;answers&quot;: {
+    &quot;department&quot;: {
+      &quot;type&quot;: &quot;choice&quot;,
+      &quot;choice&quot;: &quot;returns&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;probabilities&quot;: {
+        &quot;shipping&quot;: 0.0,
+        &quot;returns&quot;: 1.0,
+        &quot;billing&quot;: 0.0
+      }
+    }
+  },
+  &quot;usage&quot;: {
+    &quot;input_tokens&quot;: 328,
+    &quot;output_tokens&quot;: 34
+  }
+}
+</code></pre>
+<h2 id="heading-2">开源复刻模型</h2>
+<p>Jev 的架构未被公开发表。TypeSafe 仅表示，该模型通过一次查询生成所有输出，而非一次只输出一个 Token，返回带有校准概率的答案，并用 RLCD 在合成数据上训练。截至目前，参数数量、基础架构、权重和训练方法均未公开。也正因如此，开源社区在复刻 Jev 能力的过程中产生了大概三种架构。</p>
+<h3 id="laya">Laya</h3>
+<p>第一个流派走<strong>双向编码器路线</strong>，主打轻量、极速与多语言，代表作是开源项目 <strong>Laya</strong>。Laya 采用 ModernBERT 与多语言 mmBERT 构建，单张消费级显卡上的延迟仅 32.8 毫秒，甚至比 Jev 的远程接口快数倍。更关键的是，它内置了多字符集检测分流器，支持 100 多个语种，成为目前中文与多语言自建环境的首选。该项目截至 2026 年 9 月 24 日已积累 20.7k 颗 Star。</p>
+<p>Laya 的具体做法如下：</p>
+<p>例如，在一个智能体的工具选择场景中，输入状态为“当前XX地区的气象怎么查看？”，候选选项为“查询数据库”“查询天气”“查询 GIS”“发送短信”。模型可以将这些信息组织成类似下面的输入结构：</p>
+<pre><code class="language-text">[CLS]
+状态：当前XX地区的气象怎么查看？
+
+选项1：[MASK] 查询数据库
+选项2：[MASK] 查询天气
+选项3：[MASK] 查询 GIS
+选项4：[MASK] 发送短信
+[SEP]
+</code></pre>
+<p>其中，每个 <code>[MASK]</code> 对应一个候选选项。整个序列一次性输入 ModernBERT，经过双向 Transformer 编码后，模型分别取出 4 个 <code>[MASK]</code> 位置的隐藏状态，并由决策头将它们映射为对应的候选项得分。例如：</p>
+<pre><code class="language-text">[MASK]1 → 0.72   查询数据库
+[MASK]2 → 0.08   查询天气
+[MASK]3 → 0.16   查询 GIS
+[MASK]4 → 0.04   发送短信
+</code></pre>
+<p>随后在这些候选项之间进行 Softmax，得到最终的决策概率，并选择概率最高的“查询数据库”。因此，Laya 并不是把每个候选项单独编码后再计算余弦相似度，而是让状态、问题和所有候选项在同一个双向 Transformer 中共同建模，再利用各自的 <code>[MASK]</code> 表示完成候选项打分。<br />
+<img src="https://voluntexi.github.io/post-images/1790227487770891800_0.png" alt="" /></p>
+<h3 id="kev">Kev</h3>
+<p>第二个流派走<strong>因果解码器路线</strong>，主打大模型底座与超长上下文，代表作是近期在 Hugging Face 发布的 <strong>Kev</strong> 模型。Kev 基于 Qwen3.5 Base 构建，目前提供 0.8B、4B 和 9B 三种规模，并采用与 Jev 类似的「决策而非生成」思路：模型并不通过自回归方式逐个生成答案 Token，而是将待判断的状态、问题以及候选选项一次性输入模型，直接计算各候选项的决策概率。</p>
+<p>Kev 的输入由 <strong>State、Question 和 Options</strong> 三部分组成。</p>
+<p>例如在智能体工具选择场景中：</p>
+<ul>
+<li>State 可以是“当前XX地区的气象怎么查看？”</li>
+<li>Question 则是“应该调用哪个工具？”</li>
+<li>候选项包括“查询数据库”“查询天气”“查询 GIS”和“发送短信”。</li>
+</ul>
+<p>在 API 层面，Kev 并不要求用户按照固定的分类标签调用模型，而是可以在请求中动态提供候选项，因此模型面对的并不是一个固定的 <code>N</code> 分类问题，而是“给定当前状态和问题，在当前提供的候选项中进行选择”。官方接口的 Choice 类型最多可以提供 255 个候选项，同时还支持 Yes/No 和 Score 等其他决策形式。</p>
+<p>在模型内部，Kev 会把这些内容组织成特殊的文本结构，例如：</p>
+<pre><code>&lt;state&gt; 当前XX地区的气象怎么查看？
+
+&lt;q&gt; 应该调用哪个工具？
+&lt;opt&gt; 查询数据库 &lt;/opt&gt;
+&lt;opt&gt; 查询天气 &lt;/opt&gt;
+&lt;opt&gt; 查询 GIS &lt;/opt&gt;
+&lt;opt&gt; 发送短信 &lt;/opt&gt;
+&lt;decide&gt;
+</code></pre>
+<p>在 Qwen3.5 的基础上，Kev 并没有重新设计 Transformer，而是保留 Qwen3.5 作为语言理解的 Backbone，并额外加入 <strong>LoRA Adapter 和 Pointer Head</strong>。</p>
+<ul>
+<li><strong>LoRA</strong> 用于对 Qwen3.5 的内部表示进行轻量化微调；</li>
+<li><strong>Pointer Head</strong> 则负责将模型的 Hidden State 转换成候选项之间的决策分数。</li>
+</ul>
+<blockquote>
+<p>Pointer Head 是 Kev 区别于普通 Qwen3.5 的关键。</p>
+</blockquote>
+<p>Qwen3.5 在得到 Hidden State 后，会通过 LM Head 将其映射到整个词表空间，然后预测下一个 Token；</p>
+<p>Kev 则不再需要预测“查询”“天气”等自然语言 Token，而是直接利用候选项所在位置的 Hidden State 进行决策。</p>
+<p>具体而言，模型会分别取出每个候选项结束位置 <code>&lt;/opt&gt;</code> 的 Hidden State，同时取出问题末尾 <code>&lt;decide&gt;</code> 位置的 Hidden State。由于 <code>&lt;decide&gt;</code> 位于所有候选项之后，它能够结合完整的问题和候选项信息形成当前决策的上下文表示。随后 Pointer Head 将 <code>&lt;decide&gt;</code> 表示与每一个 <code>&lt;/opt&gt;</code> 表示进行匹配并计算分数，最后在所有候选项之间进行 Softmax，得到概率分布。</p>
+<p>例如，经过 Qwen3.5 编码后，Pointer Head 可能得到：</p>
+<pre><code>查询数据库 → 1.86
+查询天气   → 3.42
+查询 GIS   → 0.71
+发送短信   → -0.25
+</code></pre>
+<p>经过 Softmax 后得到：</p>
+<pre><code>查询数据库 → 0.16
+查询天气   → 0.72
+查询 GIS   → 0.08
+发送短信   → 0.04
+</code></pre>
+<p>因此模型最终直接选择“查询天气”，而不是生成“应该调用查询天气工具”这样的文本。</p>
+<p>为了让模型具备这种决策能力，Kev 还需要进行专门训练。训练数据的形式与实际推理基本一致，即给定一个 State、一个 Question 以及若干候选项，同时标注其中的正确答案。</p>
+<h3 id="semif-openjev">SemIf-OpenJev</h3>
+<p>第三个流派主打轻量包装与边缘交互。比如开源项目 SemIf-OpenJev，直接拿开源大模型的原生 logits 来做「语义 if 判断」，重点验证：能不能不生成文本，直接从模型的输出概率中得到决策结果。</p>
+<p>与 Kev 不同，SemIf 并没有在 Qwen3.5 上增加 LoRA 和 Pointer Head，而是直接利用基础语言模型原有的 LM Head 完成候选项判断。</p>
+<p>其核心思路是：既然因果语言模型本身就能够计算“下一个 Token 是什么”的概率，那么对于一个已经确定的候选集合，也可以直接读取这些候选答案 Token 在答案位置上的 logits，而不必真正执行自回归生成。SemIf 将这种方式称为直接读取 typed option probabilities，即候选项的概率由模型原生输出直接计算得到。</p>
+<p>例如，对于一个客服路由任务，可以将输入组织为类似下面的形式：</p>
+<pre><code>State：
+鞋子晚到了两周，而且尺码错误，同时信用卡被扣了两次。
+
+Question：
+哪个团队应该处理这个问题？
+
+Options：
+A：returns——退换货、退款、商品错误等
+B：shipping——配送状态、延迟、丢件等
+C：billing——扣款、发票、支付问题等
+
+Answer：
+</code></pre>
+<p>这里的 <code>A</code>、<code>B</code>、<code>C</code> 并不是模型需要生成的一段自然语言，而是三个候选答案的标识符。整个文本经过 Tokenizer 后输入 Qwen3.5，模型正常执行一次 Forward。</p>
+<p>而在 <code>Answer</code> 后对应的预测位置，可以得到整个词表中每个 Token 作为“下一个 Token”时的 logit。</p>
+<p>SemIf 并不要求模型生成完整答案，而是从这个位置的输出中，只取出候选答案 <code>A</code>、<code>B</code>、<code>C</code> 所对应 Token 的 logits。例如：</p>
+<pre><code>A → 2.31
+B → 0.87
+C → 3.15
+</code></pre>
+<p>随后仅在当前提供的候选项之间进行 Softmax：</p>
+<pre><code>A → 0.287
+B → 0.068
+C → 0.645
+</code></pre>
+<p>最终选择概率最高的 <code>C</code>，再根据候选项映射得到 <code>billing</code>。</p>
+<p>整个过程中模型没有生成“应该由 billing 团队处理”这样的自然语言，也没有进行 JSON 生成和解析，而是直接从一次模型前向计算的结果中得到决策。SemIf 官方实现明确采用这种「one forward pass + native option logits」的方式，并强调不会采样答案 Token。</p>
+<p>SemIf 并没有改变语言模型的基本结构，而是改变了模型输出的使用方式。普通 LLM 通常需要继续生成 Token，直到形成完整的答案；SemIf 则在模型刚刚计算出“下一个 Token”的概率后立即停止，只读取预先声明的候选答案对应的概率。</p>
+<p>这种设计还有一个重要特点：<strong>候选项可以在运行时动态提供，而不是要求模型在训练阶段固定一个分类标签集合</strong>。</p>
+<p>模型始终使用相同的语言模型，只需要根据当前请求提供的候选项计算对应 Token 的 logits。因此，它并不是传统意义上的固定 <code>N</code> 分类模型，而更接近一个运行时动态定义候选集合的语义决策器。SemIf 的输入接口也采用 <code>state</code>、<code>question</code> 和动态 <code>options</code> 三部分，其中候选项由请求方在运行时提供。</p>
+<p>不过，这种方法也存在一个明显限制：直接读取的是语言模型词表中的 Token，因此候选答案需要能够映射到模型可以直接读取的答案 Token。因此 SemIf 使用类型明确的选项标识，而不是直接将任意长度的自然语言选项作为一个分类类别。候选项的语义仍然由前面的描述提供，模型真正进行概率比较的是声明的答案 Token。</p>
+<p>SemIf 的另一个重要设计是对 <strong>State 复用</strong>。在智能体场景中，一个较长的 State 往往需要同时回答多个不同的问题。例如同一份防汛状态可能需要连续判断“是否需要预警”“是否需要通知乡镇”“是否需要发送短信”“是否需要升级响应”等。如果每个问题都重新处理完整 State，就会重复计算大量相同的上下文。SemIf 因此提供 Shared 模式，可以先对相同 State 进行 Prefill，再将其复用于多个不同 Question 的决策，从而减少重复计算。官方测试在 37 个 State、每个 State 对应 21 个判断的工作负载上，对直接计算、前缀复用和并行后缀计算进行了比较。</p>
+<h2 id="heading-3">总结</h2>
+<p>如果将三种开源实现放在一起，可以看到它们实际上代表了三种不同的思路：</p>
+<ul>
+<li>Laya 通过双向 Encoder 的 <code>[MASK]</code> 表示和决策头完成候选项打分；</li>
+<li>Kev 保留 Qwen3.5 的生成式 Backbone，通过 LoRA 和 Pointer Head 将 Hidden State 转换为动态候选项分数；</li>
+<li>SemIf 则进一步简化结构，完全不增加新的决策头，直接利用基础语言模型已有的 LM Head 读取候选答案 Token 的 logits。</li>
+</ul>
+<p>三者虽然都试图实现“给定 State、Question 和 Options，直接返回决策概率”的能力，但对“决策能力究竟应该放在模型的哪个位置”给出了不同答案。</p>
+<table>
+<thead>
+<tr>
+<th>路线</th>
+<th>代表项目</th>
+<th>决策能力放在哪里</th>
+<th>主打特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>双向编码器</td>
+<td>Laya</td>
+<td>选项位表示 + 决策头</td>
+<td>轻量极速、多语言</td>
+</tr>
+<tr>
+<td>因果解码器 + 微调</td>
+<td>Kev</td>
+<td>LoRA + Pointer Head</td>
+<td>大模型底座、超长上下文</td>
+</tr>
+<tr>
+<td>原生 logits 读取</td>
+<td>SemIf-OpenJev</td>
+<td>基础模型自带的 LM Head</td>
+<td>零结构改造、候选可动态定义</td>
+</tr>
+</tbody>
+</table>
+<p>其实，Jev 并不是什么全新的概念。回想起 NLP 还处在 BERT 时代的时候，当时的主流任务就是这样的各种分类。不同的是，现在它从单一分类演变成了辅助智能体决策的形式，其中涉及的各种技术也在不断创新。</p>
+<p>你说变了，也没变，思路和之前差不多；你说没变，其实也变了。</p>
+<p>未来的智能体架构里，生成式大模型负责写长文、做复杂的开放式推理，轻量判别模型站在最前面管流量分流和逻辑分支，各干各最擅长的事。</p>
+<h2 id="heading-4">参考文章</h2>
+<p><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Introducing System One Models &amp; Jev - TypeSafe AI Blog</a></p>
+<p><a href="https://systemonemodels.org/guides/jev-architecture/?utm_source=chatgpt.com">Jev architecture: parameters, encoder or decoder, and no paper yet</a></p>
+<p><a href="https://mp.weixin.qq.com/s/ynHlQijihuEZ3cqkQtXvrA">这是一篇把&quot;Jev模型&quot;讲明白的科普级解读！</a></p>
+<p><a href="https://github.com/NandhaKishorM/laya">NandhaKishorM/laya</a></p>
+<p><a href="https://github.com/jaredpalmer/kev">jaredpalmer/kev</a></p>
+]]></description>
+      <category>NLP</category>
+      <enclosure url="https://voluntexi.github.io/post-images/jev.png" length="0" type="image/png"></enclosure>
+    </item>
     <item>
       <title>text2SQL</title>
       <link>https://voluntexi.github.io/post/text2sql/</link>
@@ -2941,184 +3204,6 @@ sin\theta_0\\sin\theta_0\\sin\theta_1\\sin\theta_1\\...\\sin\theta_{d/2-1}\\sin\
       <category>大模型</category>
       <category>NLP</category>
       <enclosure url="https://voluntexi.github.io/post-images/rope-jie-xi.png" length="0" type="image/png"></enclosure>
-    </item>
-    <item>
-      <title>手写MOE</title>
-      <link>https://voluntexi.github.io/post/shou-xie-moe/</link>
-      <guid isPermaLink="true">https://voluntexi.github.io/post/shou-xie-moe/</guid>
-      <pubDate>Thu, 11 Sep 2025 18:28:25 +0800</pubDate>
-      <description><![CDATA[<p>MOE（Mixture of Experts）也就是混合专家系统，已经在LLM（Large Language Model）的结构中成为标配了。最近看到一篇手写MOE教程，所学下来，受益颇多。</p>
-<!-- more -->
-<h2 id="moe">MOE概述</h2>
-<p>MOE的核心思想就是通过多个神经网络构成多个“领域”的专家，对输入进行一个判断，让最“擅长”这个任务的专家处理这个任务。从而实现更高效、准确的处理任务。</p>
-<p>因此，MOE模型的必要组成部分包含：</p>
-<ul>
-<li>
-<p>专家（Experts）：模型中的每个专家都是一个<strong>独立的神经网络</strong>，专门处理输入数据的特定子集或特定任务。通常一个Experts是一个 前馈神经网络（FeadFoward Network，FFN）</p>
-</li>
-<li>
-<p>门控网络（Gate Network）：门控网络的作用是决定每个输入应该由哪个专家或哪些专家来处理。通常它根据输入样本的特征计算出每个专家的<strong>权重或重要性</strong>，然后根据这些权重将输入样本分配给相应的专家。门控网络通常是一个简单的神经网络，其输出经过softmax激活函数处理，以确保所有专家的权重之和为1。</p>
-</li>
-</ul>
-<p>而现在 LLM + MOE 如此火热的原因主要在于：</p>
-<ul>
-<li>
-<p>提高模型性能：通过将多个专家的预测结果进行整合，MoE模型可以在不同的数据子集或任务方面发挥每个专家的优势，从而提高整体模型的性能。在不同的任务中，激活擅长的专家，可以让模型可以更准确地对不同领域的任务进行处理。</p>
-</li>
-<li>
-<p>减少计算消耗：与传统的密集模型相比，MoE模型在处理每个输入样本时，只有相关的专家会被激活，而不是整个模型的所有参数都被使用。这意味着MoE模型可以在保持较高性能的同时，显著减少计算资源的消耗，特别是在LLM中，这种优势更为明显。</p>
-</li>
-<li>
-<p>增强模型的可扩展性：MoE模型的架构可以很容易地扩展到更多的专家和更大的模型规模。通过增加专家的数量，模型可以覆盖更广泛的数据特征和任务类型，从而在不增加计算复杂度的情况下，提升模型的表达能力和泛化能力。这种可扩展性为处理大规模、复杂的数据集提供了有效的解决方案，例如在处理多模态数据时，MoE模型可以通过设置不同的专家来专门处理不同模态的数据，实现更高效的多模态融合。</p>
-</li>
-</ul>
-<h2 id="expert">Expert</h2>
-<p>因为 MOE 网络对应着多个专家，而通常来说，专家的结构是一个前馈神经网络。</p>
-<p>因此我们首先需要实现一个普通前馈神经网络结构的专家。</p>
-<pre><code class="language-python">import torch
-import torch.nn as nn
-
-class MOE_basic(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super().__init__()
-        self.fc = nn.Linear(in_features=input_size, out_features=hidden_size)
-        self.fc2 = nn.Linear(in_features=hidden_size, out_features=output_size)
-        self.active = nn.ReLU()
-
-    def forward(self, x):
-        x = self.fc2(self.active(self.fc(x)))
-        return x
-</code></pre>
-<p>这个 FFN 专家先把输入向量从 <code>input_size</code> 维线性投影到更高的 <code>hidden_size</code> 维，经 ReLU激活函数， 进行非线性变换，再线性缩回 <code>input_size</code> 维，输出与输入同形状。</p>
-<p>通过这种“先扩后缩”的方式能够在更高维空间中学习复杂的特征交互。</p>
-<h2 id="moe-1">基础版本MOE</h2>
-<p>基础版本的MOE思想非常的简单，即首先将输入通过一个Gate NetWork，获得每一个专家的权重（weight），然后将输入依次通过每一个专家，最后将权重乘上专家的输出作为专家的”分析结果“，然后将每个专家的结果相加即可。</p>
-<pre><code class="language-python">class simple_MOE(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, num_experts):
-        super().__init__()
-        self.num_experts = num_experts
-        self.experts = nn.ModuleList(
-            [
-                MOE_basic(input_size=input_size, hidden_size=hidden_size, output_size=output_size)
-                for _ in range(num_experts)
-            ]
-        )
-        self.gate = nn.Linear(in_features=input_size, out_features=num_experts)
-
-    # x [batch, input_size]
-    def forward(self, x):
-        # shape: [batch, num_experts]
-        experts_weight = self.gate(x)
-        # shape: [[batch, 1, output_size] * num_experts]
-        experts_out_list = [expert(x).unsqueeze(1) for expert in self.experts]
-        # shape: [batch, num_experts, output_size]
-        experts_out_list = torch.cat(experts_out_list, dim=1)
-        # shape: [batch, 1, num_experts]
-        experts_weight = experts_weight.unsqueeze(1)
-        # shape: [batch, 1, output_size]
-        out = experts_weight @ experts_out_list
-        # shape: [batch, output_size]
-        return out.squeeze(1)
-</code></pre>
-<h2 id="sparse-moe">Sparse MoE</h2>
-<p>Sparse MoE 开始就是大模型训练时所采用的结构了。回看基础版本的MOE，让输入进过了每一个专家的计算，然后采取了不同权重，表示对不同专家的侧重程度。但是在大模型的训练架构中，由于模型的参数量过大，这种基础版本的MOE并没有减轻训练的负担。</p>
-<p>因此，Sparse Moe相较于基础版本的MOE的区别是，<strong>通过Router选择 topK 个专家</strong>，然后对这 topK 个专家的输出进行<strong>加权求和</strong>。</p>
-<p><em>如果 topK = 专家数量，那么其实也退化成了基础版本的MOE</em></p>
-<p>具体结构如下图所示：<br />
-<img src="https://voluntexi.github.io//post-images/1757586538586.jpg" alt="" /></p>
-<p><em>以 switch transformers 模型的 MOE 架构图作为演示</em></p>
-<p>首先是 Router，对每个 token 通过 top-k 选择专家</p>
-<pre><code class="language-python">class MOE_router(nn.Module):
-    def __init__(self, hidden_size, num_experts, top_k):
-        super().__init__()
-        self.num_experts = num_experts
-        self.gate = nn.Linear(in_features=hidden_size, out_features=num_experts)
-        self.top_k = top_k
-
-    # hidden_states :[batch* seq, hidden_size]
-    def forward(self, hidden_states):
-        routers_logits = self.gate(hidden_states)  # shape: [batch* seq, num_experts]
-        routers_probs = F.softmax(
-            routers_logits, dim=-1, dtype=torch.float
-        )  # shape:[batch* seq, num_experts]
-        router_weights, selected_experts = torch.topk(
-            routers_probs, self.top_k, dim=1
-        )  # shape:[batch* seq,top_k], topk 返回选择的top-k的值和对应的索引
-        router_weights = router_weights / router_weights.sum(
-            dim=-1, keepdim=True
-        )  # 归一化
-        router_weights = router_weights.to(hidden_states.dtype)  # 转换精度
-        # 生成专家掩码，提升计算效率
-        experts_mask = F.one_hot(
-            selected_experts, num_classes=self.num_experts
-        )  # 选的是1，没选的是0 shape:[batch* seq, top_k, num_experts]
-        experts_mask = experts_mask.permute(2, 1, 0)  # (num_experts, top_k, batch* seq)
-        return routers_logits, router_weights, selected_experts, experts_mask
-</code></pre>
-<p>然后是整个 Sparse MoE 的代码</p>
-<pre><code class="language-python">class spare_MOE(nn.Module):
-    def __init__(self, input_size, output_size, hidden_size, top_k, num_experts):
-        super().__init__()
-        self.input_size = input_size
-        self.output_size = output_size
-        self.hidden_size = hidden_size
-        self.num_experts = num_experts
-        self.top_k = top_k
-        self.router = MOE_router(self.hidden_size, num_experts, top_k)
-        self.MOE = nn.ModuleList([MOE_basic(input_size, hidden_size, output_size) for _ in range(num_experts)])
-
-    def forward(self, x):
-        # x shape [batch, seq,hidden_size]
-        print(x.shape)
-        batch_size, seq, hidden_size = x.size()
-        # 合并强两个维度，将所有token视为独立的输入，这样每个专家可以独立处理每个token，而不需要考虑它们属于哪个批次或序列
-        # [batch*seq, hidden_size]
-        hidden_state = x.view(-1, hidden_size)
-        routers_logits, router_weights, selected_experts, experts_mask = self.router(hidden_state)
-        print(routers_logits.shape, router_weights.shape, selected_experts.shape, experts_mask.shape)
-        final_hidden_states = torch.zeros_like(hidden_state)
-        for experts_idx in range(self.num_experts):
-            experts_layer = self.MOE[experts_idx]  # 当前专家网络
-            # idx [top_k]
-            # top_X [batch* seq]
-            idx, top_x = torch.where(experts_mask[experts_idx] == 1)
-            # 选出哪些token需要经过专家
-            current_state = hidden_state.unsqueeze(0)[:, top_x, :].reshape(-1, hidden_size)
-            # 专家处理*权重
-            current_hidden_state = experts_layer(current_state) * router_weights[top_x, idx].unsqueeze(-1)
-            final_hidden_states.index_add(0, top_x, current_hidden_state.to(hidden_state.dtype))
-        final_hidden_states = final_hidden_states.reshape(batch_size, seq, hidden_size)
-        return final_hidden_states, routers_logits
-</code></pre>
-<h2 id="shareexpert-sparse-moe">ShareExpert Sparse MoE</h2>
-<p>ShareExpert SparseMoE 则是 Deepseek 所采用的一种 MOE架构。</p>
-<p>和上面的 Sparse MoE 的区别是，ShareExpert Sparse MoE 增加了一组共享的专家模型。这些模型是所有输入的 token 共享的，也就是说，所有 token 都过这些共享专家模型，然后每个 token 再经过Sparse Moe，选出 top-k 个专家，然后这 top-K 个专家和共享的专家的输出一起再加权求和。</p>
-<p>具体结构如下图所示：</p>
-<p><img src="https://voluntexi.github.io//post-images/1757586550544.jpg" alt="" /></p>
-<p>下面的手写代码参考了 deepseek MoE 的思想，有一定的简化，但是可以方便理解训练过程。</p>
-<pre><code class="language-python">class shareExpert_MOE(nn.Module):
-    def __init__(self, input_size, output_size, hidden_size, top_k, num_experts):
-        super().__init__()
-        self.spare_MOE = spare_MOE(input_size, output_size, hidden_size, top_k, num_experts)
-        self.share_MOE = nn.ModuleList(
-            [MOE_basic(input_size=input_size, hidden_size=hidden_size, output_size=output_size) for _ in range(num_experts)]
-        )
-
-    def forward(self, x):
-        # spare_moe_out [batch, seq, hidden], routers_logits [batch* seq, num_experts]
-        spare_moe_out, routers_logits = self.spare_MOE(x)
-        share_moe_out = [
-            expert(x) for expert in self.share_MOE
-        ]  # [batch, seq, hidden]
-        share_moe_out = torch.stack(share_moe_out, dim=0).sum(dim=0)
-        return share_moe_out + spare_moe_out, routers_logits
-</code></pre>
-<h2 id="heading">参考文章</h2>
-<p><a href="https://yuanchaofa.com/llms-zero-to-hero/the-way-of-moe-model-evolution.html">LLM MOE的进化之路，从普通简化 MOE，到 sparse moe，再到 deepseek 使用的 share_expert sparse moe | chaofa用代码打点酱油</a></p>
-]]></description>
-      <category>大模型</category>
-      <category>NLP</category>
-      <enclosure url="https://voluntexi.github.io/post-images/shou-xie-moe.png" length="0" type="image/png"></enclosure>
     </item>
   </channel>
 </rss>
